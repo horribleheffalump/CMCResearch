@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCIntensityMatrix", "MCIntensityMatrix\MCIntensityMatrix.csproj", "{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransitionRateMatrix", "MCIntensityMatrix\TransitionRateMatrix.csproj", "{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMCToolsTest", "CMCToolsTest\CMCToolsTest.csproj", "{BCDEE0D5-F110-4A66-9902-7D980B689BB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCDEE0D5-F110-4A66-9902-7D980B689BB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDEE0D5-F110-4A66-9902-7D980B689BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCDEE0D5-F110-4A66-9902-7D980B689BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCDEE0D5-F110-4A66-9902-7D980B689BB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
