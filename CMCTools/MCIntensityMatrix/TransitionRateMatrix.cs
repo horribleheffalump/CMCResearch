@@ -41,29 +41,5 @@ namespace CMCTools
         }
 
     }
-
-    //public class TransitionRateMatrix : DenseMatrix
-    //{
-    //    public TransitionRateMatrix(int order) : base(order)
-    //    {
-    //    }
-
-    //    public TransitionRateMatrix(DenseColumnMajorMatrixStorage<double> storage) : base(storage)
-    //    {
-    //    }
-
-    //    public TransitionRateMatrix(int rows, int columns) : base(rows, columns)
-    //    {
-    //    }
-
-    //    public TransitionRateMatrix(int rows, int columns, double[] storage) : base(rows, columns, storage)
-    //    {
-    //    }
-
-    //    public TransitionRateMatrix(DenseMatrix m)
-    //    {
-
-    //    }
-
 }
 
