@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControllableCountingProcess.cs" />
+    <Compile Include="ControllableMarkovChain.cs" />
+    <Compile Include="DataTypes.cs" />
     <Compile Include="FiniteDiscreteDistribution.cs" />
     <Compile Include="TransitionRateMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
