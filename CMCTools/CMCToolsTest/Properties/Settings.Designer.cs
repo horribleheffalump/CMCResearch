@@ -25,13 +25,25 @@ namespace CMCToolsTest.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\trajectory.txt")]
-        public string FilePath {
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\MCTrajectory.txt")]
+        public string MCFilePath {
             get {
-                return ((string)(this["FilePath"]));
+                return ((string)(this["MCFilePath"]));
             }
             set {
-                this["FilePath"] = value;
+                this["MCFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\CPTrajectory.txt")]
+        public string CPFilePath {
+            get {
+                return ((string)(this["CPFilePath"]));
+            }
+            set {
+                this["CPFilePath"] = value;
             }
         }
     }

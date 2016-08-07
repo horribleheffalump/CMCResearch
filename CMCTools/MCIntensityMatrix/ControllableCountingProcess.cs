@@ -16,9 +16,7 @@ namespace CMCTools
         public int N;           // current state
         public double h = 1e-3; // discretization step
 
-        //public List<double> JumpTimes; // sequence of jump times
-        //public List<int> States;       // sequence of states
-        public List<Jump> Jumps;
+        public List<Jump> Jumps; // sequence of jumps
 
         public ControllableCountingProcess(double _t0, double _T, int _N0, double _h, Func<double, double, double> _Intensity)
         {
@@ -31,6 +29,20 @@ namespace CMCTools
             h = _h;
             Intensity = _Intensity;
             Jumps.Add(new Jump(t0, N0));
+        }
+
+        public int Step(double u)
+        {
+            double p = Intensity(t, u) * h;
+            t += h;
+            int nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
+            if (nojump == 0)
+            {
+                N++;
+                var J = new Jump(t, N);
+                Jumps.Add(J);
+            }
+            return N;
         }
 
         public Jump GetNextState(Func<double, double> u)

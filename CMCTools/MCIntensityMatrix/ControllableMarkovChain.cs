@@ -39,6 +39,35 @@ namespace CMCTools
             Jumps.Add(new Jump(t0, X0));
         }
 
+
+        //public int State(double t)
+        //{
+        //    int result = int.MinValue;
+        //    if (t > Jumps.Max(j => j.t) || t > Jumps.Min(j => j.t))
+        //    {
+        //        throw new ArgumentOutOfRangeException("time instant t", "Time instant is out of generated trajectory so far");
+        //    }
+        //    else
+        //    {
+        //        result = Jumps.Where(j => j.t < t).OrderByDescending(j => j.t).FirstOrDefault().X;
+        //    }
+        //    return result;
+        //}
+
+        public int Step(Vector<double> U)
+        {
+            Matrix<double> P = TransitionRateMatrix(t, U[X]) * h + Matrix<double>.Build.DenseIdentity(N);
+            t += h;
+            int x = FiniteDiscreteDistribution.Sample(P.Row(X));
+            if (x != X)
+            {
+                X = x;
+                var J = new Jump(t, X);
+                Jumps.Add(J);
+            }
+            return x;
+        }
+
         public Jump GetNextState(Func<double, Vector<double>> U)
         {
             while (t < T)
@@ -75,8 +104,10 @@ namespace CMCTools
             {
                 outputfile.WriteLine(j.ToString());
             }
+            outputfile.WriteLine(new Jump(T,X).ToString());
             outputfile.Close();
         }
+
 
     }
 }

@@ -2,8 +2,11 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CMCToolsTest.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="FilePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\Output\trajectory.txt</Value>
+    <Setting Name="MCFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\Output\MCTrajectory.txt</Value>
+    </Setting>
+    <Setting Name="CPFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\Output\CPTrajectory.txt</Value>
     </Setting>
   </Settings>
 </SettingsFile>

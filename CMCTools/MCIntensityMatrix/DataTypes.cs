@@ -9,9 +9,9 @@ namespace CMCTools
     public class Jump
     {
         public double t;
-        public double X;
+        public int X;
 
-        public Jump(double _t, double _X)
+        public Jump(double _t, int _X)
         {
             t = _t;
             X = _X;

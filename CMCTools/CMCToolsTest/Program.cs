@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CMCTools;
+using SystemCPObs;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Random;
@@ -59,16 +60,22 @@ namespace CMCToolsTest
                                          {  0.3,  0.7, -1.0 }}); // as TransitionRateMatrix;
 
             ControllableMarkovChain CMC = new ControllableMarkovChain(3, 0.0, 100.0, 0, 10E-3, (t, u) => m);
-            Vector<double> U = Vector<double>.Build.DenseOfArray(new[] { 0.0, 0.0, 0.0 });
+            Vector<double> U = Vector<double>.Build.DenseOfArray(new[] { 1.0, 1.0, 1.0 });
+            Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 1.0, 50.0, 150.0 });
             //CMC.GetNextState(t => U);
             //CMC.GetNextState(t => U);
             //CMC.GetNextState(t => U);
-            CMC.GenerateTrajectory(t => U);
+            //CMC.GenerateTrajectory(t => U);
             //CMC.SaveTrajectory(Properties.Settings.Default.FilePath);
 
-            ControllableCountingProcess CP = new ControllableCountingProcess(0.0, 100.0, 0, 10E-3, (t, u) => 1);
-            CP.GenerateTrajectory(t => 0);
-            CP.SaveTrajectory(Properties.Settings.Default.FilePath);
+            //ControllableCountingProcess CP = new ControllableCountingProcess(0.0, 100.0, 0, 10E-3, (t, u) => 1);
+            //CP.GenerateTrajectory(t => 0);
+            //CP.SaveTrajectory(Properties.Settings.Default.FilePath);
+
+            CountingProessObservationsSystem CPOS = new CountingProessObservationsSystem(3, 0.0, 10.0, 0, 10e-5, (t) => m, (t) => C);
+            CPOS.GenerateTrajectory((t) => U);
+            CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
+            CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
         }
     }
 }
