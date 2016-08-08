@@ -8,6 +8,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Random;
 using MathNet.Numerics.Distributions;
+using TransmitterModel;
 
 namespace CMCToolsTest
 {
@@ -72,10 +73,22 @@ namespace CMCToolsTest
             //CP.GenerateTrajectory(t => 0);
             //CP.SaveTrajectory(Properties.Settings.Default.FilePath);
 
-            CountingProessObservationsSystem CPOS = new CountingProessObservationsSystem(3, 0.0, 10.0, 0, 10e-5, (t) => m, (t) => C);
-            CPOS.GenerateTrajectory((t) => U);
-            CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
-            CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
+            //CountingProessObservationsSystem CPOS = new CountingProessObservationsSystem(3, 0.0, 10.0, 0, 10e-5, (t) => m, (t) => C);
+            //CPOS.GenerateTrajectory((t) => U);
+            //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
+            //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
+
+            Coords x = new Coords(1.0, 2.0);
+            Coords y = new Coords(3.0, 4.0);
+            Console.WriteLine(x.ToString());
+            Console.WriteLine(y.ToString());
+            Console.WriteLine((x+y).ToString());
+            Console.WriteLine((x-y).ToString());
+            Console.WriteLine(Coords.Distance(x, y));
+            Console.WriteLine(Coords.Distance(y, x));
+            Console.ReadKey();
+
+
         }
     }
 }
