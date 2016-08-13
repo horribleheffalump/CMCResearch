@@ -9,6 +9,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Random;
 using MathNet.Numerics.Distributions;
 using TransmitterModel;
+using System.IO;
 
 namespace CMCToolsTest
 {
@@ -78,16 +79,17 @@ namespace CMCToolsTest
             //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
             //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
-            Coords x = new Coords(1.0, 2.0);
-            Coords y = new Coords(3.0, 4.0);
-            Console.WriteLine(x.ToString());
-            Console.WriteLine(y.ToString());
-            Console.WriteLine((x+y).ToString());
-            Console.WriteLine((x-y).ToString());
-            Console.WriteLine(Coords.Distance(x, y));
-            Console.WriteLine(Coords.Distance(y, x));
-            Console.ReadKey();
-
+            Transmitter tr = new Transmitter(0.0, 10.0, new Coords(0, 0), 10e-4, (t) => new Coords(t, 10.0 * t - t * t));
+            tr.GenerateTrajectory();
+            tr.SaveTrajectory(Properties.Settings.Default.TransmitterFilePath);
+            foreach (Channel c in tr.Channels)
+            {
+                c.CPOS.GenerateTrajectory(t => U);
+                c.CPOS.State.SaveTrajectory(
+                    string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)));
+                c.CPOS.Observation.SaveTrajectory(
+                    string.Format(Properties.Settings.Default.CPFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)));
+            }
 
         }
     }

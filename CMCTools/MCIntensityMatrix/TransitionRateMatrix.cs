@@ -33,7 +33,7 @@ namespace CMCTools
                     if (Math.Abs(self[i, i] + _sumNonDiag) > _tolerance) return false;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

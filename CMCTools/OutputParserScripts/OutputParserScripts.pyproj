@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>212ac384-4c11-4f81-aebf-a26404881d3f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Trajectory.py</StartupFile>
+    <StartupFile>TransmitterPath.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Trajectory.py" />
+    <Compile Include="TransmitterPath.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
