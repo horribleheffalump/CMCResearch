@@ -11,5 +11,8 @@
     <Setting Name="TransmitterFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\..\Output\TrTrajectory.txt</Value>
     </Setting>
+    <Setting Name="BaseStationsFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\Output\BaseStations.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

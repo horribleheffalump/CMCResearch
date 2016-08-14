@@ -79,9 +79,10 @@ namespace CMCToolsTest
             //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
             //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
-            Transmitter tr = new Transmitter(0.0, 10.0, new Coords(0, 0), 10e-4, (t) => new Coords(t, 10.0 * t - t * t));
+            Transmitter tr = new Transmitter(0.0, 10.0*60.0, new Coords(0, 0), 10e-4, (t) => new Coords(t/600.0, 10.0 * t /600.0 - t * t / 36000.0));
             tr.GenerateTrajectory();
             tr.SaveTrajectory(Properties.Settings.Default.TransmitterFilePath);
+            tr.SaveBaseStations(Properties.Settings.Default.BaseStationsFilePath);
             foreach (Channel c in tr.Channels)
             {
                 c.CPOS.GenerateTrajectory(t => U);

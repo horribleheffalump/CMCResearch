@@ -71,6 +71,7 @@ namespace TransmitterModel
         public Func<double, Coords> PosDynamics; // function to calculate position in time
         public List<Coords> Trajectory;
         public List<Channel> Channels;
+        public double PathLength; // длина пути
 
         public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics)
         {
@@ -80,9 +81,9 @@ namespace TransmitterModel
             Pos0 = _Pos0;
             PosDynamics = _PosDynamics;
             Channels = new List<Channel>();
-            Channels.Add(new Channel(new Coords(1.0, 4.0), t0, T, h, (t) => _Pos0 + Pos(t)));
-            Channels.Add(new Channel(new Coords(4.0, 20.0), t0, T, h, (t) => Pos(t)));
-            Channels.Add(new Channel(new Coords(8.0, 10.0), t0, T, h, (t) => Pos(t)));
+            Channels.Add(new Channel(new Coords(0.1, 0.4), t0, T, h, (t) => _Pos0 + Pos(t)));
+            Channels.Add(new Channel(new Coords(0.4, 2.0), t0, T, h, (t) => Pos(t)));
+            Channels.Add(new Channel(new Coords(0.8, 1.0), t0, T, h, (t) => Pos(t)));
 
         }
 
@@ -95,19 +96,33 @@ namespace TransmitterModel
         {
             Trajectory = new List<Coords>();
             double t = t0;
+            Coords CurrentPos = Pos(t);
             while (t < T)
             {
-                Trajectory.Add(Pos(t));
+                Trajectory.Add(CurrentPos);
                 t += h;
+                Coords NextPos = Pos(t);
+                PathLength += Coords.Distance(CurrentPos, NextPos);
+                CurrentPos = NextPos;
             }
         }
 
         public void SaveTrajectory(string path)
         {
             System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path);
-            foreach (Coords c in Trajectory)
+            foreach (Coords c in Trajectory.Where((x, i) => i % 100 == 0))
             {
                 outputfile.WriteLine(c.ToString());
+            }
+            outputfile.Close();
+        }
+
+        public void SaveBaseStations(string path)
+        {
+            System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path);
+            foreach (Channel c in Channels)
+            {
+                outputfile.WriteLine(c.BaseStation.ToString());
             }
             outputfile.Close();
         }
