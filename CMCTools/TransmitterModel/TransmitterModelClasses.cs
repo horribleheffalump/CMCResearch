@@ -62,6 +62,12 @@ namespace TransmitterModel
         }
     }
 
+    public class Point
+    {
+        public double t;
+        public Coords coords;
+    }
+
     public class Transmitter
     {
         public double t0 = 0;   // observation start time
@@ -69,11 +75,11 @@ namespace TransmitterModel
         public double h = 1e-3; // discretization step
         public Coords Pos0;     // start position
         public Func<double, Coords> PosDynamics; // function to calculate position in time
-        public List<Coords> Trajectory;
+        public List<Point> Trajectory;
         public List<Channel> Channels;
         public double PathLength; // длина пути
 
-        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics)
+        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations)
         {
             t0 = _t0;
             T = _T;
@@ -81,10 +87,10 @@ namespace TransmitterModel
             Pos0 = _Pos0;
             PosDynamics = _PosDynamics;
             Channels = new List<Channel>();
-            Channels.Add(new Channel(new Coords(0.1, 0.4), t0, T, h, (t) => _Pos0 + Pos(t)));
-            Channels.Add(new Channel(new Coords(0.4, 2.0), t0, T, h, (t) => Pos(t)));
-            Channels.Add(new Channel(new Coords(0.8, 1.0), t0, T, h, (t) => Pos(t)));
-
+            for (int i = 0; i < _BaseStations.Length; i++)
+            {
+                Channels.Add(new Channel(_BaseStations[i], t0, T, h, (t) => Pos(t)));
+            }
         }
 
         public Coords Pos(double t)
@@ -94,12 +100,12 @@ namespace TransmitterModel
 
         public void GenerateTrajectory()
         {
-            Trajectory = new List<Coords>();
+            Trajectory = new List<Point>();
             double t = t0;
             Coords CurrentPos = Pos(t);
             while (t < T)
             {
-                Trajectory.Add(CurrentPos);
+                Trajectory.Add(new Point { t = t, coords = CurrentPos });
                 t += h;
                 Coords NextPos = Pos(t);
                 PathLength += Coords.Distance(CurrentPos, NextPos);
@@ -107,24 +113,35 @@ namespace TransmitterModel
             }
         }
 
-        public void SaveTrajectory(string path)
+        public void SaveTrajectory(string path, int every = 1)
         {
-            System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path);
-            foreach (Coords c in Trajectory.Where((x, i) => i % 100 == 0))
+            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                outputfile.WriteLine(c.ToString());
+                foreach (Point p in Trajectory.Where((x, i) => i % 100 == 0))
+                {
+                    NumberFormatInfo provider = new NumberFormatInfo();
+                    provider.NumberDecimalSeparator = ".";
+                    string line = string.Format(provider, "{0} {1}", p.t, p.coords.ToString());
+                    foreach (var ch in Channels)
+                    {
+                        line = string.Format(provider, "{0} {1}", line, Coords.Distance(ch.BaseStation, p.coords));
+                    }
+                    outputfile.WriteLine(line);
+                }
+                outputfile.Close();
             }
-            outputfile.Close();
         }
 
         public void SaveBaseStations(string path)
         {
-            System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path);
-            foreach (Channel c in Channels)
+            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                outputfile.WriteLine(c.BaseStation.ToString());
+                foreach (Channel c in Channels)
+                {
+                    outputfile.WriteLine(c.BaseStation.ToString());
+                }
+                outputfile.Close();
             }
-            outputfile.Close();
         }
 
     }

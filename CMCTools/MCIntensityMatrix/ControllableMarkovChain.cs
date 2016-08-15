@@ -20,6 +20,7 @@ namespace CMCTools
         //public List<double> JumpTimes; // sequence of jump times
         //public List<int> States;       // sequence of states
         public List<Jump> Jumps;
+        public List<Matrix<double>> TransitionMatrices;
 
         public ControllableMarkovChain(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _TransitionRateMatrix)
         {
@@ -37,6 +38,7 @@ namespace CMCTools
             h = _h;
             TransitionRateMatrix = _TransitionRateMatrix;
             Jumps.Add(new Jump(t0, X0));
+            TransitionMatrices = new List<Matrix<double>>();
         }
 
 
@@ -56,7 +58,9 @@ namespace CMCTools
 
         public int Step(Vector<double> U)
         {
-            Matrix<double> P = TransitionRateMatrix(t, U[X]) * h + Matrix<double>.Build.DenseIdentity(N);
+            var lambda = TransitionRateMatrix(t, U[X]);
+            TransitionMatrices.Add(lambda);
+            var P = lambda * h + Matrix<double>.Build.DenseIdentity(N);
             t += h;
             int x = FiniteDiscreteDistribution.Sample(P.Row(X));
             if (x != X)
@@ -72,7 +76,10 @@ namespace CMCTools
         {
             while (t < T)
             {
-                Matrix<double> P = TransitionRateMatrix(t, U(t)[X]) * h + Matrix<double>.Build.DenseIdentity(N);
+                var lambda = TransitionRateMatrix(t, U(t)[X]);
+                TransitionMatrices.Add(lambda);
+                var P =  lambda * h + Matrix<double>.Build.DenseIdentity(N);
+
                 t += h;
                 int x = FiniteDiscreteDistribution.Sample(P.Row(X));
                 if (x != X)
@@ -99,13 +106,27 @@ namespace CMCTools
 
         public void SaveTrajectory(string path)
         {
-            System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path);
-            foreach (Jump j in Jumps.OrderBy(s => s.t))
+            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                outputfile.WriteLine(j.ToString());
+                foreach (Jump j in Jumps.OrderBy(s => s.t))
+                {
+                    outputfile.WriteLine(j.ToString());
+                }
+                outputfile.WriteLine(new Jump(T, X).ToString());
+                outputfile.Close();
             }
-            outputfile.WriteLine(new Jump(T,X).ToString());
-            outputfile.Close();
+        }
+
+        public void SaveTransitionMatrices(string path)
+        {
+            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
+            {
+                foreach (var m in TransitionMatrices)
+                {
+                    outputfile.WriteLine(m.ToString());
+                }
+                outputfile.Close();
+            }
         }
 
 

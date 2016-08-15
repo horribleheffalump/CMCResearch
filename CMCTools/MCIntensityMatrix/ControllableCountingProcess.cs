@@ -74,12 +74,14 @@ namespace CMCTools
 
         public void SaveTrajectory(string path)
         {
-            System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path);
-            foreach (Jump j in Jumps.OrderBy(s => s.t))
+            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                outputfile.WriteLine(j.ToString());
+                foreach (Jump j in Jumps.OrderBy(s => s.t))
+                {
+                    outputfile.WriteLine(j.ToString());
+                }
+                outputfile.Close();
             }
-            outputfile.Close();
         }
 
     }

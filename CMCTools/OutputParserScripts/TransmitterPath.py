@@ -8,13 +8,19 @@ import pylab
 filename = u"../Output/TrTrajectory.txt"
 t, X = np.loadtxt(filename, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
+filename = u"../Output/temp.txt"
+tt, p1,p2,p3 = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3), unpack=True, dtype=float)
+
 from pylab import *
 
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
 
 
 plt.subplots_adjust(left=0.06, bottom=0.07, right=0.98, top=0.95, wspace=0.1)
-plt.plot(t, X, 'x', color = 'blue')
+#plt.plot(t, X, 'x', color = 'blue')
+plt.plot(tt, p1, '-', color = 'black')
+plt.plot(tt, p2, '-', color = 'blue')
+plt.plot(tt, p3, '-', color = 'red')
 
 #arr = np.linspace(0, np.sqrt(2))
 #print(arr)
@@ -46,10 +52,11 @@ def lims(x):
 #print (min(1,2))
 #print (max(1,2))
 
-x = np.linspace(0, np.sqrt(10**2 + 25**2), 1000)
-#plt.plot(x, exp(-x/2), color = 'black')
-#plt.plot(x, maxval(exp(-5+x/2)), color = 'blue')
-#plt.plot(x, minval(1.0 - exp(-x/2) - maxval(exp(-5+x/2))), color = 'red')
+#x = np.linspace(0, np.sqrt(10**2 + 25**2), 1000)
+x = np.linspace(0, 5.0, 1000)
+#plt.plot(x, exp(-10*x/2), color = 'black')
+#plt.plot(x, maxval(exp(-5+10*x/2)), color = 'blue')
+#plt.plot(x, minval(1.0 - exp(-10*x/2) - maxval(exp(-5+10*x/2))), color = 'red')
 #print (maxval(exp(-10+x)))
 
 def p(t):
