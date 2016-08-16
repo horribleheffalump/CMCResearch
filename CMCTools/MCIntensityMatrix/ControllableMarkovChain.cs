@@ -59,7 +59,7 @@ namespace CMCTools
         public int Step(Vector<double> U)
         {
             var lambda = TransitionRateMatrix(t, U[X]);
-            TransitionMatrices.Add(lambda);
+            //TransitionMatrices.Add(lambda);
             var P = lambda * h + Matrix<double>.Build.DenseIdentity(N);
             t += h;
             int x = FiniteDiscreteDistribution.Sample(P.Row(X));
@@ -77,7 +77,7 @@ namespace CMCTools
             while (t < T)
             {
                 var lambda = TransitionRateMatrix(t, U(t)[X]);
-                TransitionMatrices.Add(lambda);
+                //TransitionMatrices.Add(lambda);
                 var P =  lambda * h + Matrix<double>.Build.DenseIdentity(N);
 
                 t += h;

@@ -105,8 +105,8 @@ namespace CMCToolsTest
                 c.CPOS.GenerateTrajectory(t => U);
                 c.CPOS.State.SaveTrajectory(
                     string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)));
-                c.CPOS.State.SaveTransitionMatrices(
-                    string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation).ToString() + "_matrices"));
+                //c.CPOS.State.SaveTransitionMatrices(
+                //    string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation).ToString() + "_matrices"));
                 c.CPOS.Observation.SaveTrajectory(
                     string.Format(Properties.Settings.Default.CPFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)));
             }

@@ -74,5 +74,5 @@ print(la(8.0))
 print(la(10.0))
 
 show()
-#f.savefig("../Output/graph.pdf")
+f.savefig("../Output/graph.pdf")
 

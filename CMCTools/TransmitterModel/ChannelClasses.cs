@@ -20,7 +20,7 @@ namespace TransmitterModel
         const double minDist = 0;
         const double maxDist = 10;
         public CountingProessObservationsSystem CPOS;
-        
+
         //CPOS.GenerateTrajectory((t) => U);
         //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
         //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
@@ -57,18 +57,20 @@ namespace TransmitterModel
                 throw new ArgumentException("The result matrix is not transition rate matrix");
             }
             return l;
-//            plt.plot(x, exp(-10 * x / 2), color = 'black')
-//plt.plot(x, maxval(exp(-5 + 10 * x / 2)), color = 'blue')
-//plt.plot(x, minval(1.0 - exp(-10 * x / 2) - maxval(exp(-5 + 10 * x / 2))), color = 'red')
+            //            plt.plot(x, exp(-10 * x / 2), color = 'black')
+            //plt.plot(x, maxval(exp(-5 + 10 * x / 2)), color = 'blue')
+            //plt.plot(x, minval(1.0 - exp(-10 * x / 2) - maxval(exp(-5 + 10 * x / 2))), color = 'red')
         }
 
         public static Matrix<double> Probs(double dist)
         {
             dist = Math.Min(maxDist, dist);
             dist = Math.Max(minDist, dist);
-            dist = dist * 5.0;
-            double p0 = Math.Max(Math.Min(Math.Exp(-dist / 2.0), 0.95), 0.05);
-            double p2 = Math.Max(Math.Min(Math.Exp(-5 + dist / 2.0), 0.95), 0.05);
+            dist = dist * 2.0;
+            double p0 = Math.Max(Math.Min(1 / Math.Pow(dist + 1.0, 2), 0.95), 0.05);
+            double p2 = Math.Max(Math.Min(1 / Math.Pow(5.0-dist, 2), 0.95), 0.05);
+            //double p0 = Math.Max(Math.Min(Math.Exp(-dist / 2.0), 0.95), 0.05);
+            //double p2 = Math.Max(Math.Min(Math.Exp(-5 + dist / 2.0), 0.95), 0.05);
             double p1 = 1.0 - p0 - p2;
             return Matrix<double>.Build.DenseOfArray(new[,] { { p0, p1, p2 } });
         }
