@@ -20,13 +20,14 @@ namespace TransmitterModel
         const double minDist = 0;
         const double maxDist = 10;
         public CountingProessObservationsSystem CPOS;
+        public Func<double, Vector<double>> Costs;
 
         //CPOS.GenerateTrajectory((t) => U);
         //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
         //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
 
-        public Channel(Coords _BaseStation, double _t0, double _T, double _h, Func<double, Coords> _TransmitterPosition)
+        public Channel(Coords _BaseStation, double _t0, double _T, double _h, Func<double, Coords> _TransmitterPosition) //, Func<double, Vector<double>> _Costs)
         {
             BaseStation = _BaseStation;
             t0 = _t0;
@@ -35,7 +36,8 @@ namespace TransmitterModel
             TransmitterPosition = _TransmitterPosition;
             //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 1.0, 50.0, 150.0 });
             Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
-            CPOS = new CountingProessObservationsSystem(N, t0, T, 0, h, (t) => TransitionRate(Distance(t)), (t) => C, (t, X, U, N) => J(t, X, U, N));
+            CPOS = new CountingProessObservationsSystem(N, t0, T, 0, h, (t) => TransitionRate(Distance(t)), (t) => C);
+            Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 1.0, 2.0, 3.0 }); // costs for transmission in correponding states. Equal for all channels
 
         }
 
@@ -73,11 +75,6 @@ namespace TransmitterModel
             //double p2 = Math.Max(Math.Min(Math.Exp(-5 + dist / 2.0), 0.95), 0.05);
             double p1 = 1.0 - p0 - p2;
             return Matrix<double>.Build.DenseOfArray(new[,] { { p0, p1, p2 } });
-        }
-
-        public static double J(double t, int X, Vector<double> U, int N)
-        {
-            return -1.0 / (U.Sum()) - U.Sum();
         }
     }
 }

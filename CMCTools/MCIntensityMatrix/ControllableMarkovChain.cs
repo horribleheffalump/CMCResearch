@@ -18,11 +18,13 @@ namespace CMCTools
         public double h = 1e-3; // discretization step
 
         //public List<double> JumpTimes; // sequence of jump times
-        //public List<int> States;       // sequence of states
+        //public List<int> States;       // sequence of 
+
+        public bool SaveHistory;
         public List<Jump> Jumps;
         public List<Matrix<double>> TransitionMatrices;
 
-        public ControllableMarkovChain(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _TransitionRateMatrix)
+        public ControllableMarkovChain(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _TransitionRateMatrix, bool _SaveHistory = false)
         {
             N = _N;
             t0 = _t0;
@@ -37,7 +39,9 @@ namespace CMCTools
             //States.Add(X0);
             h = _h;
             TransitionRateMatrix = _TransitionRateMatrix;
-            Jumps.Add(new Jump(t0, X0));
+            SaveHistory = _SaveHistory;
+            if (SaveHistory)
+                Jumps.Add(new Jump(t0, X0));
             TransitionMatrices = new List<Matrix<double>>();
         }
 
@@ -56,9 +60,10 @@ namespace CMCTools
         //    return result;
         //}
 
-        public int Step(Vector<double> U)
+        //public int Step(Vector<double> U)
+        public int Step(double u)
         {
-            var lambda = TransitionRateMatrix(t, U[X]);
+            var lambda = TransitionRateMatrix(t, u);
             //TransitionMatrices.Add(lambda);
             var P = lambda * h + Matrix<double>.Build.DenseIdentity(N);
             t += h;
@@ -67,42 +72,43 @@ namespace CMCTools
             {
                 X = x;
                 var J = new Jump(t, X);
-                Jumps.Add(J);
+                if (SaveHistory)
+                    Jumps.Add(J);
             }
             return x;
         }
 
-        public Jump GetNextState(Func<double, Vector<double>> U)
-        {
-            while (t < T)
-            {
-                var lambda = TransitionRateMatrix(t, U(t)[X]);
-                //TransitionMatrices.Add(lambda);
-                var P =  lambda * h + Matrix<double>.Build.DenseIdentity(N);
+        //public Jump GetNextState(Func<double, Vector<double>> U) // here U is vector, because it is assumed to be predefined Markov control, i.e. vector of determined functions one for each state
+        //{
+        //    while (t < T)
+        //    {
+        //        var lambda = TransitionRateMatrix(t, U(t)[X]);
+        //        //TransitionMatrices.Add(lambda);
+        //        var P =  lambda * h + Matrix<double>.Build.DenseIdentity(N);
 
-                t += h;
-                int x = FiniteDiscreteDistribution.Sample(P.Row(X));
-                if (x != X)
-                {
-                    X = x;
-                    //JumpTimes.Add(t);
-                    //States.Add(X);
-                    var J = new Jump(t, X);
-                    Jumps.Add(J);
-                    return J;
-                }
-            }
-            return new Jump(T, X);
-        }
+        //        t += h;
+        //        int x = FiniteDiscreteDistribution.Sample(P.Row(X));
+        //        if (x != X)
+        //        {
+        //            X = x;
+        //            //JumpTimes.Add(t);
+        //            //States.Add(X);
+        //            var J = new Jump(t, X);
+        //            Jumps.Add(J);
+        //            return J;
+        //        }
+        //    }
+        //    return new Jump(T, X);
+        //}
 
-        public void GenerateTrajectory(Func<double, Vector<double>> U)
-        {
-            while (t < T)
-            {
-                GetNextState(U);
-            }
-            Jumps.Add(new Jump(T, X));
-        }
+        //public void GenerateTrajectory(Func<double, Vector<double>> U) // here U is vector, because it is assumed to be predefined Markov control, i.e. vector of determined functions one for each state
+        //{
+        //    while (t < T)
+        //    {
+        //        GetNextState(U);
+        //    }
+        //    Jumps.Add(new Jump(T, X));
+        //}
 
         public void SaveTrajectory(string path)
         {

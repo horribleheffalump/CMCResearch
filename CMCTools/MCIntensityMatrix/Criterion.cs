@@ -8,29 +8,28 @@ namespace CMCTools
 {
     public class Criterion
     {
-        public int N;           // state space
-        Func<double, int, Vector<double>, int, double> F;  // value function depends on t, X, U, N
-        public double t;        // current time
-        public double t0 = 0;   // observation start time
-        public double T;        // observation end time
+        Func<double, int[], double[], int[], double> F;  // value function depends on t, X (array of all MC states), U (array of controls for each MC), Obs (array of observations for all MCs)
+        //public int M;           // number of MC
+        //public double t;        // current time
+        //public double t0 = 0;   // observation start time
+        //public double T;        // observation end time
         public double h = 1e-3; // discretization step
-
         public double J = 0;
 
-        public Criterion(int _N, double _t0, double _T, double _h, Func<double, int, Vector<double>, int, double> _F)
+        public Criterion(double _h, Func<double, int[], double[], int[], double> _F)
         {
-            N = _N;
-            t0 = _t0;
-            t = t0;
-            T = _T;
+            //N = _N;
+            //t0 = _t0;
+            //t = t0;
+            //T = _T;
             h = _h;
 
             F = _F;
         }
 
-        public double Step(double t, int X, Vector<double> U, int Obs) //!!!! should take into account all states!!!!!
+        public double Step(double t, int[] X, double[] U, int[] Obs) //Vectors contain values for each channel
         {
-            var dJ = F(t, X, U, N);
+            var dJ = F(t, X, U, Obs);
             J += dJ * h;
             return J;
         }

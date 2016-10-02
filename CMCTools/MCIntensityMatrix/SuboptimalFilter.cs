@@ -21,9 +21,10 @@ namespace CMCTools
 
         public double Nu = 0;   // RHS martingale
 
+        public bool SaveHistory;
         public List<Estimate> estimates; // estimates list
 
-        public SuboptimalFilter(int _N, double _t0, double _T, double _h, Func<double, Matrix<double>> _A, Func<double, Vector<double>> _c)
+        public SuboptimalFilter(int _N, double _t0, double _T, double _h, Func<double, Matrix<double>> _A, Func<double, Vector<double>> _c, bool _SaveHistory = false)
         {
             N = _N;
             t0 = _t0;
@@ -38,7 +39,9 @@ namespace CMCTools
             pi = pi0;
 
             estimates = new List<Estimate>();
-            estimates.Add(new Estimate(t0, pi0));
+            SaveHistory = _SaveHistory;
+            if (SaveHistory)
+                estimates.Add(new Estimate(t0, pi0));
         }
 
         public Vector<double> Step(double u, int _Obs)
@@ -46,7 +49,7 @@ namespace CMCTools
             var a = A(t);
             t += h;
 
-            var dNu = _Obs - Obs - (c(t).ToRowMatrix()*pi)[0]*u*h;
+            var dNu = _Obs - Obs - (c(t).ToRowMatrix() * pi)[0] * u * h;
             Obs = _Obs;
 
             var Gamma = (1.0 / (c(t).ToRowMatrix() * pi)[0]) * c(t).PointwiseMultiply(pi) - pi;
@@ -55,7 +58,8 @@ namespace CMCTools
             pi = pi.Normalize(1.0);
 
             var estimate = new Estimate(t, pi);
-            estimates.Add(estimate);
+            if (SaveHistory)
+                estimates.Add(estimate);
 
             return pi;
         }
@@ -64,7 +68,7 @@ namespace CMCTools
         {
             using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                foreach (Estimate e in estimates.Where((x,i) => i % every == 0).OrderBy(s => s.t))
+                foreach (Estimate e in estimates.Where((x, i) => i % every == 0).OrderBy(s => s.t))
                 {
                     outputfile.WriteLine(e.ToString());
                 }

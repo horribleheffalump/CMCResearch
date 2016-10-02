@@ -82,5 +82,17 @@ namespace CMCToolsTest.Properties {
                 this["FilterFilePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\CriterionValues.txt")]
+        public string CriterionsFilePath {
+            get {
+                return ((string)(this["CriterionsFilePath"]));
+            }
+            set {
+                this["CriterionsFilePath"] = value;
+            }
+        }
     }
 }

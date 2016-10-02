@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CMCTools;
+using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -77,9 +79,11 @@ namespace TransmitterModel
         public Func<double, Coords> PosDynamics; // function to calculate position in time
         public List<Point> Trajectory;
         public List<Channel> Channels;
-        public double PathLength; // длина пути
+        public double PathLength; // length of transmitter path
+        public Func<double, double[]> Control; //control function (deterministic). Array contains values for all channels
+        public Criterion Crit; // control quality crtiterion 
 
-        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations)
+        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, double[]> _Control)
         {
             t0 = _t0;
             T = _T;
@@ -91,6 +95,8 @@ namespace TransmitterModel
             {
                 Channels.Add(new Channel(_BaseStations[i], t0, T, h, (t) => Pos(t)));
             }
+            Control = _Control;
+            Crit = new Criterion(h, ValueFunction);
         }
 
         public Coords Pos(double t)
@@ -98,7 +104,16 @@ namespace TransmitterModel
             return Pos0 + PosDynamics(t);
         }
 
-        public void GenerateTrajectory()
+        public double ValueFunction(double t, int[] X, double[] U, int[] Obs) // criterion Value function
+        {
+            double J = -1 / (U.Sum());
+            for (int i = 0; i < Channels.Count; i++)
+            {
+                J -= Channels[i].Costs(t)[X[i]] * U[i]; // == <Costs(t), X> * u_i 
+            }
+            return J;
+        }
+        public void GenerateTrajectory(bool justPath = false)
         {
             Trajectory = new List<Point>();
             double t = t0;
@@ -110,6 +125,18 @@ namespace TransmitterModel
                 Coords NextPos = Pos(t);
                 PathLength += Coords.Distance(CurrentPos, NextPos);
                 CurrentPos = NextPos;
+                if (!justPath)
+                {
+                    int[] X = Channels.Select(c => c.CPOS.State.X).ToArray();
+                    double[] U = Control(t);
+                    int[] Obs = Channels.Select(c => c.CPOS.Observation.N).ToArray();
+                    Crit.Step(t, X, U, Obs);
+                    foreach (Channel c in Channels)
+                    {
+                        int i = Channels.FindIndex(s => s.BaseStation == c.BaseStation);
+                        c.CPOS.Step(U[i]);
+                    }
+                }
             }
         }
 
@@ -143,6 +170,8 @@ namespace TransmitterModel
                 outputfile.Close();
             }
         }
+
+
 
     }
 }
