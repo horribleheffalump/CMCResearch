@@ -11,6 +11,7 @@ using MathNet.Numerics.Distributions;
 using TransmitterModel;
 using System.IO;
 using System.Globalization;
+using System.Threading;
 
 namespace CMCToolsTest
 {
@@ -93,6 +94,36 @@ namespace CMCToolsTest
             //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
             //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
+
+            int SamplesCount = 100;
+            int packCount = 10;
+
+            for (int pack = 0; pack < 10; pack++)
+            {
+                ManualResetEvent[] doneEvents = new ManualResetEvent[packCount];
+                CriterionsCalculator[] jArray = new CriterionsCalculator[packCount];
+
+                // Configure and start threads using ThreadPool.
+                Console.WriteLine("launching {0} tasks...", packCount);
+                for (int i = 0; i < packCount; i++)
+                {
+                    doneEvents[i] = new ManualResetEvent(false);
+                    CriterionsCalculator j = new CriterionsCalculator(pack * packCount + i, doneEvents[i]);
+                    jArray[i] = j;
+                    ThreadPool.QueueUserWorkItem(j.ThreadPoolCallback, i);
+                }
+
+                // Wait for all threads in pool to calculate.
+                WaitHandle.WaitAll(doneEvents);
+                Console.WriteLine("All calculations are complete.");
+
+                // Display the results.
+                for (int i = 0; i < packCount; i++)
+                {
+                    CriterionsCalculator j = jArray[i];
+                    Console.WriteLine("({0}) = {1}", j.N, j.JOfN);
+                }
+            }
             bool justPath = false;
 
             double[] U = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
@@ -101,73 +132,73 @@ namespace CMCToolsTest
             Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.5), new Coords(0.8, 1.0) };
 
             List<double> J0 = new List<double>();
-            int SamplesCount = 100;
+            //int SamplesCount = 100;
 
-            for (int i = 0; i < SamplesCount; i++)
-            {
-                Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
+            //for (int i = 0; i < SamplesCount; i++)
+            //{
+            //    Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
 
-                tr.GenerateTrajectory(justPath);
-                J0.Add(tr.Crit.J);
+            //    tr.GenerateTrajectory(justPath);
+            //    J0.Add(tr.Crit.J);
 
-                using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(Properties.Settings.Default.CriterionsFilePath + "_uniform", true))
-                {
-                    critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
-                    critoutputfile.Close();
-                }
-                Console.WriteLine(i);
-            }
+            //    using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_uniform"), true))
+            //    {
+            //        critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
+            //        critoutputfile.Close();
+            //    }
+            //    Console.WriteLine(i);
+            //}
 
-            U = new[] { 1.0, 0.0, 0.0 };
-            List<double> J1 = new List<double>();
-            for (int i = 0; i < SamplesCount; i++)
-            {
-                Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
+            ////U = new[] { 1.0, 0.0, 0.0 };
+            //List<double> J1 = new List<double>();
+            //for (int i = 0; i < SamplesCount; i++)
+            //{
+            //    Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
 
-                tr.GenerateTrajectory(justPath);
-                J1.Add(tr.Crit.J);
+            //    tr.GenerateTrajectory(justPath);
+            //    J1.Add(tr.Crit.J);
 
-                using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(Properties.Settings.Default.CriterionsFilePath + "_all_to_0", true))
-                {
-                    critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
-                    critoutputfile.Close();
-                }
-                Console.WriteLine(i);
-            }
+            //    using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_all_to_0"), true))
+            //    {
+            //        critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
+            //        critoutputfile.Close();
+            //    }
+            //    Console.WriteLine(i);
+            //}
 
-            U = new[] { 0.0, 1.0, 0.0 };
-            List<double> J2 = new List<double>();
-            for (int i = 0; i < SamplesCount; i++)
-            {
-                Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
+            //U = new[] { 0.0, 1.0, 0.0 };
+            //List<double> J2 = new List<double>();
+            //for (int i = 0; i < SamplesCount; i++)
+            //{
+            //    Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
 
-                tr.GenerateTrajectory(justPath);
-                J2.Add(tr.Crit.J);
+            //    tr.GenerateTrajectory(justPath);
+            //    J2.Add(tr.Crit.J);
 
-                using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(Properties.Settings.Default.CriterionsFilePath + "_all_to_1", true))
-                {
-                    critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
-                    critoutputfile.Close();
-                }
-                Console.WriteLine(i);
-            }
+            //    using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_all_to_1"), true))
+            //    {
+            //        critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
+            //        critoutputfile.Close();
+            //    }
+            //    Console.WriteLine(i);
+            //}
 
-            U = new[] { 0.0, 0.0, 1.0 };
-            List<double> J3 = new List<double>();
-            for (int i = 0; i < SamplesCount; i++)
-            {
-                Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
+            //U = new[] { 0.0, 0.0, 1.0 };
+            //List<double> J3 = new List<double>();
+            //for (int i = 0; i < SamplesCount; i++)
+            //{
+            //    Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
 
-                tr.GenerateTrajectory(justPath);
-                J3.Add(tr.Crit.J);
+            //    tr.GenerateTrajectory(justPath);
+            //    J3.Add(tr.Crit.J);
 
-                using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(Properties.Settings.Default.CriterionsFilePath + "_all_to_2", true))
-                {
-                    critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
-                    critoutputfile.Close();
-                }
-                Console.WriteLine(i);
-            }
+            //    using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_all_to_2"), true))
+            //    {
+            //        critoutputfile.WriteLine(string.Format(provider, "{0}", tr.Crit.J));
+            //        critoutputfile.Close();
+            //    }
+            //    Console.WriteLine(i);
+            //}
 
         }
 
@@ -186,4 +217,48 @@ namespace CMCToolsTest
     //                        100);
     //    }
 
+    public class CriterionsCalculator
+    {
+        private ManualResetEvent _doneEvent;
+        private int _n;
+        private double _JOfN;
+
+
+        public int N { get { return _n; } }
+        public double JOfN { get { return _JOfN; } }
+
+        // Constructor.
+        public CriterionsCalculator(int n, ManualResetEvent doneEvent)
+        {
+            _doneEvent = doneEvent;
+        }
+
+        // Wrapper method for use with thread pool.
+        public void ThreadPoolCallback(Object threadContext)
+        {
+            int threadIndex = (int)threadContext;
+            Console.WriteLine("thread {0} started...", threadIndex);
+            _JOfN = Calculate(_n);
+            Console.WriteLine("thread {0} result calculated...", threadIndex);
+            _doneEvent.Set();
+        }
+
+        // Recursive method that calculates the Nth Fibonacci number.
+        public double Calculate(int n)
+        {
+            bool justPath = false;
+
+            double[] U = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
+            double t0 = 0;
+            double T = 10.0 * 60.0;
+            Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.5), new Coords(0.8, 1.0) };
+
+
+            Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
+
+            tr.GenerateTrajectory(justPath);
+            //J0.Add(tr.Crit.J);
+            return tr.Crit.J;
+        }
+    }
 }

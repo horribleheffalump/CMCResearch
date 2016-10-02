@@ -18,7 +18,7 @@
       <Value Profile="(Default)">..\..\..\Output\Filter_{0}.txt</Value>
     </Setting>
     <Setting Name="CriterionsFilePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\Output\CriterionValues.txt</Value>
+      <Value Profile="(Default)">..\..\..\Output\CriterionValues_{0}.txt</Value>
     </Setting>
   </Settings>
 </SettingsFile>
