@@ -14,5 +14,8 @@
     <Setting Name="BaseStationsFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\..\Output\BaseStations.txt</Value>
     </Setting>
+    <Setting Name="FilterFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\Output\Filter_{0}.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

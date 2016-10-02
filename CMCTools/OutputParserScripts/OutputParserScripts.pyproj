@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>212ac384-4c11-4f81-aebf-a26404881d3f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>criterionGraph.py</StartupFile>
+    <StartupFile>Filter.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="criterionGraph.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Filter.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test.py">

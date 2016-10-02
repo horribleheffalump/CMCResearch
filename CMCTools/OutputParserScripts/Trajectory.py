@@ -52,5 +52,5 @@ ax1.plot(tplot, Xplot, color = 'black')
 
 ax2.plot(tN, N, color = 'black')
 
-#show()
-f.savefig("../Output/graph.pdf")
+show()
+#f.savefig("../Output/graph.pdf")

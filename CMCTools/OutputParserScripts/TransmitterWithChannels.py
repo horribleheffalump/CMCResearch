@@ -69,7 +69,7 @@ for n in range(0,3):
     for tl in ax_N[n].get_yticklabels():
         tl.set_color('b')
 
-#plt.show()
+plt.show()
 #f.savefig("../Output/graph.pdf")
-plt.savefig("../Output/observations.pdf")
+#plt.savefig("../Output/observations.pdf")
 

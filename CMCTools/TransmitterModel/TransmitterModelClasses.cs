@@ -117,7 +117,7 @@ namespace TransmitterModel
         {
             using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                foreach (Point p in Trajectory.Where((x, i) => i % 100 == 0))
+                foreach (Point p in Trajectory.Where((x, i) => i % every == 0))
                 {
                     NumberFormatInfo provider = new NumberFormatInfo();
                     provider.NumberDecimalSeparator = ".";

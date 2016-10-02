@@ -26,7 +26,7 @@ namespace CMCToolsTest
                 var probs = Channel.Probs(dist);
                 NumberFormatInfo provider = new NumberFormatInfo();
                 provider.NumberDecimalSeparator = ".";
-                outputfile.WriteLine(string.Format(provider, "{0} {1} {2} {3}", dist, probs[0,0], probs[0,1], probs[0,2]));
+                outputfile.WriteLine(string.Format(provider, "{0} {1} {2} {3}", dist, probs[0, 0], probs[0, 1], probs[0, 2]));
             }
             outputfile.Close();
 
@@ -109,6 +109,8 @@ namespace CMCToolsTest
                 //    string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation).ToString() + "_matrices"));
                 c.CPOS.Observation.SaveTrajectory(
                     string.Format(Properties.Settings.Default.CPFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)));
+                c.CPOS.Filter.SaveTrajectory(
+                     string.Format(Properties.Settings.Default.FilterFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)), 100);
             }
 
         }

@@ -70,5 +70,17 @@ namespace CMCToolsTest.Properties {
                 this["BaseStationsFilePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\Filter_{0}.txt")]
+        public string FilterFilePath {
+            get {
+                return ((string)(this["FilterFilePath"]));
+            }
+            set {
+                this["FilterFilePath"] = value;
+            }
+        }
     }
 }

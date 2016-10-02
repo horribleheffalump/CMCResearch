@@ -35,7 +35,7 @@ namespace TransmitterModel
             TransmitterPosition = _TransmitterPosition;
             //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 1.0, 50.0, 150.0 });
             Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
-            CPOS = new CountingProessObservationsSystem(N, t0, T, 0, h, (t) => TransitionRate(Distance(t)), (t) => C);
+            CPOS = new CountingProessObservationsSystem(N, t0, T, 0, h, (t) => TransitionRate(Distance(t)), (t) => C, (t, X, U, N) => J(t, X, U, N));
 
         }
 
@@ -68,11 +68,16 @@ namespace TransmitterModel
             dist = Math.Max(minDist, dist);
             dist = dist * 2.0;
             double p0 = Math.Max(Math.Min(1 / Math.Pow(dist + 1.0, 2), 0.95), 0.05);
-            double p2 = Math.Max(Math.Min(1 / Math.Pow(5.0-dist, 2), 0.95), 0.05);
+            double p2 = Math.Max(Math.Min(1 / Math.Pow(5.0 - dist, 2), 0.95), 0.05);
             //double p0 = Math.Max(Math.Min(Math.Exp(-dist / 2.0), 0.95), 0.05);
             //double p2 = Math.Max(Math.Min(Math.Exp(-5 + dist / 2.0), 0.95), 0.05);
             double p1 = 1.0 - p0 - p2;
             return Matrix<double>.Build.DenseOfArray(new[,] { { p0, p1, p2 } });
+        }
+
+        public static double J(double t, int X, Vector<double> U, int N)
+        {
+            return -1.0 / (U.Sum()) - U.Sum();
         }
     }
 }
