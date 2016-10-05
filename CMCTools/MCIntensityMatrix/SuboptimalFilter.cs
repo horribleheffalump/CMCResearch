@@ -15,7 +15,7 @@ namespace CMCTools
         public double t0 = 0;   // observation start time
         public double T;        // observation end time
         Vector<double> pi0;      // initial state
-        Vector<double> pi;      // current estimate
+        public Vector<double> pi;      // current estimate
         public double h = 1e-3; // discretization step
         public int Obs = 0;     // current observation
 
@@ -35,13 +35,16 @@ namespace CMCTools
             A = _A;
             c = _c;
 
-            pi0 = Vector<double>.Build.Dense(N, 1.0 / N); //!!!!!! TODO  !!!!!!!!!!!!!!!!
+            //pi0 = Vector<double>.Build.Dense(N, 1.0 / N); //!!!!!! TODO  !!!!!!!!!!!!!!!!
+            pi0 = Vector<double>.Build.Dense(N, 0.0); pi0[0] = 1.0; //!!!!!! TODO  !!!!!!!!!!!!!!!!
             pi = pi0;
 
             estimates = new List<Estimate>();
             SaveHistory = _SaveHistory;
             if (SaveHistory)
-                estimates.Add(new Estimate(t0, pi0));
+            {
+                estimates.Add(new Estimate(t0, pi0, 0));
+            }
         }
 
         public Vector<double> Step(double u, int _Obs)
@@ -57,7 +60,7 @@ namespace CMCTools
             pi = pi + a * pi * h + Gamma * dNu;
             pi = pi.Normalize(1.0);
 
-            var estimate = new Estimate(t, pi);
+            var estimate = new Estimate(t, pi, u);
             if (SaveHistory)
                 estimates.Add(estimate);
 

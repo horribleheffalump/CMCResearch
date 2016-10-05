@@ -34,7 +34,7 @@ for n in range(0,3):
     ax0.fill_between(tplot, levelzero, levelone, where=Xplot==ones*2, color='black', alpha = 0.8, linewidth=0.0);
 
     filename = u"../Output/Filter_" + str(n) + ".txt"
-    t, p0, p1, p2 = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3), unpack=True, dtype=float)
+    t, p0, p1, p2, u = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4), unpack=True, dtype=float)
     
     ax2.plot(t, p0, color = 'blue')
     ax1.plot(t, p1, color = 'blue')

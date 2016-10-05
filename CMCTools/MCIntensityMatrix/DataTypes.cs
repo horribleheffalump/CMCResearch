@@ -32,11 +32,14 @@ namespace CMCTools
     {
         public double t;
         public Vector<double> pi;
+        public double u;
 
-        public Estimate(double _t, Vector<double> _pi)
+        public Estimate(double _t, Vector<double> _pi, double _u)
         {
             t = _t;
             pi = _pi;
+            u = _u;
+
         }
 
         public override string ToString()
@@ -44,7 +47,7 @@ namespace CMCTools
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
             string piString = pi.ToRowMatrix().ToMatrixString(null, provider).Trim().Replace("  "," ");
-            string result = string.Format(provider, "{0} {1} {2}", t, piString, pi.Sum());
+            string result = string.Format(provider, "{0} {1} {2}", t, piString, u);
             return result;
         }
 

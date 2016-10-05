@@ -99,20 +99,50 @@ namespace CMCToolsTest
             double T = 10.0 * 60.0;
             Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.5), new Coords(0.8, 1.0) };
             Coords Pos0 = new Coords(0, 0);
-            double h = 10e-2;
+            double h = 10e-3;
             Func<double, Coords> PosDynamics = (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0);
 
-            TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t) => U);
+            TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t, pi) => U);
             test.UString = "[1/3, 1/3, 1/3]";
             test.Name = "uniform";
 
-            test.GenerateAndSaveTrajectory();
+            //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(100, 3);
 
-            U = new[] { 1.0 , 0.0, 0.0 };
-            test.U = (t) => U;
+            U = new[] { 0.8, 0.1, 0.1 };
+            test.U = (t, pi) => U;
             test.UString = "[1, 0, 0]";
             test.Name = "all_to_0";
+            //test.GenerateAndSaveTrajectory();
+            test.GenerateSeriesAndSaveCrits(100, 3);
+
+            U = new[] { 0.1, 0.8, 0.1 };
+            test.U = (t, pi) => U;
+            test.UString = "[0, 1, 0]";
+            test.Name = "all_to_1";
+            test.GenerateSeriesAndSaveCrits(100, 3);
+
+            U = new[] { 0.1, 0.1, 0.8 };
+            test.U = (t, pi) => U;
+            test.UString = "[0, 0, 1]";
+            test.Name = "all_to_2";
+            test.GenerateSeriesAndSaveCrits(100, 3);
+
+            test.U = (t, pi) =>
+            {
+                double[] U0 = new[] { 0.8, 0.1, 0.1 };
+                double[] U1 = new[] { 0.1, 0.8, 0.1 };
+                double[] U2 = new[] { 0.1, 0.1, 0.8 };
+                double kappa0 = (pi[0].ToRowMatrix() * C)[0];
+                double kappa1 = (pi[1].ToRowMatrix() * C)[0];
+                double kappa2 = (pi[2].ToRowMatrix() * C)[0];
+                if (kappa0 < Math.Min(kappa1, kappa2)) return U0;
+                else if (kappa1 < Math.Min(kappa0, kappa2)) return U1;
+                else return U2;
+            };
+            test.UString = "[suboptimal]";
+            test.Name = "suboptimal";
+            //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(100, 3);
 
 
@@ -224,12 +254,12 @@ namespace CMCToolsTest
         public Coords[] BaseStations;
         public Coords Pos0;
         public Func<double, Coords> PosDynamics;
-        public Func<double, double[]> U;
+        public Func<double, Vector<double>[], double[]> U;
         public double h;
         public string Name;
         public string UString;
 
-        public TestEnvoronment(double _t0, double _T, double _h, Coords[] _BaseStations, Coords _Pos0, Func<double, Coords> _PosDynamics, Func<double, double[]> _U)
+        public TestEnvoronment(double _t0, double _T, double _h, Coords[] _BaseStations, Coords _Pos0, Func<double, Coords> _PosDynamics, Func<double, Vector<double>[], double[]> _U)
         {
             t0 = _t0;
             T = _T;
@@ -269,7 +299,7 @@ namespace CMCToolsTest
             provider.NumberDecimalSeparator = ".";
             AsyncCalculatorPlanner acp = new AsyncCalculatorPlanner(samplesCount, packCount, this.Calculate);
             List<double> J = acp.DoCalculate();
-            using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_" + Name + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.ToShortTimeString()), true))
+            using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_" + Name + "_" + NowToString(), true)))
             {
                 foreach (double j in J)
                 {
@@ -285,6 +315,13 @@ namespace CMCToolsTest
                 critoutlogfile.Close();
             }
 
+        }
+
+        public static string NowToString()
+        {
+            string result = string.Format("{0}{1}{2}-{3}{4}{5}", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+
+            return result;
         }
     }
 }

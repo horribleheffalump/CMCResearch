@@ -80,11 +80,11 @@ namespace TransmitterModel
         public List<Point> Trajectory;
         public List<Channel> Channels;
         public double PathLength; // length of transmitter path
-        public Func<double, double[]> Control; //control function (deterministic). Array contains values for all channels
+        public Func<double, Vector<double>[], double[]> Control; //control function (deterministic). Array contains values for all channels
         public Criterion Crit; // control quality crtiterion 
         public bool SaveHistory;
 
-        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, double[]> _Control, bool _saveHistory = false)
+        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, Vector<double>[], double[]> _Control, bool _saveHistory = false)
         {
             t0 = _t0;
             T = _T;
@@ -108,7 +108,7 @@ namespace TransmitterModel
 
         public double ValueFunction(double t, int[] X, double[] U, int[] Obs) // criterion Value function
         {
-            double J = -1 / (U.Sum());
+            double J = -1 / (160.0 * U.Sum());
             for (int i = 0; i < Channels.Count; i++)
             {
                 J -= Channels[i].Costs(t)[X[i]] * U[i]; // == <Costs(t), X> * u_i 
@@ -130,7 +130,7 @@ namespace TransmitterModel
                 //if (SaveHistory)
                 //{
                     int[] X = Channels.Select(c => c.CPOS.State.X).ToArray();
-                    double[] U = Control(t);
+                    double[] U = Control(t, Channels.Select(c => c.CPOS.Filter.pi).ToArray());
                     int[] Obs = Channels.Select(c => c.CPOS.Observation.N).ToArray();
                     Crit.Step(t, X, U, Obs);
                     foreach (Channel c in Channels)
