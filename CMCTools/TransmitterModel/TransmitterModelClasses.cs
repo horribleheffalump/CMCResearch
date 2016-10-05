@@ -82,8 +82,9 @@ namespace TransmitterModel
         public double PathLength; // length of transmitter path
         public Func<double, double[]> Control; //control function (deterministic). Array contains values for all channels
         public Criterion Crit; // control quality crtiterion 
+        public bool SaveHistory;
 
-        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, double[]> _Control)
+        public Transmitter(double _t0, double _T, Coords _Pos0, double _h,  Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, double[]> _Control, bool _saveHistory = false)
         {
             t0 = _t0;
             T = _T;
@@ -91,9 +92,10 @@ namespace TransmitterModel
             Pos0 = _Pos0;
             PosDynamics = _PosDynamics;
             Channels = new List<Channel>();
+            SaveHistory = _saveHistory;
             for (int i = 0; i < _BaseStations.Length; i++)
             {
-                Channels.Add(new Channel(_BaseStations[i], t0, T, h, (t) => Pos(t)));
+                Channels.Add(new Channel(_BaseStations[i], t0, T, h, (t) => Pos(t), _saveHistory));
             }
             Control = _Control;
             Crit = new Criterion(h, ValueFunction);
@@ -113,7 +115,7 @@ namespace TransmitterModel
             }
             return J;
         }
-        public void GenerateTrajectory(bool justPath = false)
+        public void GenerateTrajectory()
         {
             Trajectory = new List<Point>();
             double t = t0;
@@ -125,8 +127,8 @@ namespace TransmitterModel
                 Coords NextPos = Pos(t);
                 PathLength += Coords.Distance(CurrentPos, NextPos);
                 CurrentPos = NextPos;
-                if (!justPath)
-                {
+                //if (SaveHistory)
+                //{
                     int[] X = Channels.Select(c => c.CPOS.State.X).ToArray();
                     double[] U = Control(t);
                     int[] Obs = Channels.Select(c => c.CPOS.Observation.N).ToArray();
@@ -136,7 +138,7 @@ namespace TransmitterModel
                         int i = Channels.FindIndex(s => s.BaseStation == c.BaseStation);
                         c.CPOS.Step(U[i]);
                     }
-                }
+                //}
             }
         }
 

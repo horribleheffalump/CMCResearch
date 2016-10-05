@@ -94,44 +94,44 @@ namespace CMCToolsTest
             //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
             //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
-
-            int SamplesCount = 100;
-            int packCount = 10;
-
-            for (int pack = 0; pack < 10; pack++)
-            {
-                ManualResetEvent[] doneEvents = new ManualResetEvent[packCount];
-                CriterionsCalculator[] jArray = new CriterionsCalculator[packCount];
-
-                // Configure and start threads using ThreadPool.
-                Console.WriteLine("launching {0} tasks...", packCount);
-                for (int i = 0; i < packCount; i++)
-                {
-                    doneEvents[i] = new ManualResetEvent(false);
-                    CriterionsCalculator j = new CriterionsCalculator(pack * packCount + i, doneEvents[i]);
-                    jArray[i] = j;
-                    ThreadPool.QueueUserWorkItem(j.ThreadPoolCallback, i);
-                }
-
-                // Wait for all threads in pool to calculate.
-                WaitHandle.WaitAll(doneEvents);
-                Console.WriteLine("All calculations are complete.");
-
-                // Display the results.
-                for (int i = 0; i < packCount; i++)
-                {
-                    CriterionsCalculator j = jArray[i];
-                    Console.WriteLine("({0}) = {1}", j.N, j.JOfN);
-                }
-            }
-            bool justPath = false;
-
             double[] U = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
             double t0 = 0;
             double T = 10.0 * 60.0;
             Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.5), new Coords(0.8, 1.0) };
+            Coords Pos0 = new Coords(0, 0);
+            double h = 10e-2;
+            Func<double, Coords> PosDynamics = (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0);
 
-            List<double> J0 = new List<double>();
+            TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t) => U);
+            test.UString = "[1/3, 1/3, 1/3]";
+            test.Name = "uniform";
+
+            test.GenerateAndSaveTrajectory();
+            test.GenerateSeriesAndSaveCrits(100, 3);
+
+            U = new[] { 1.0 , 0.0, 0.0 };
+            test.U = (t) => U;
+            test.UString = "[1, 0, 0]";
+            test.Name = "all_to_0";
+            test.GenerateSeriesAndSaveCrits(100, 3);
+
+
+
+            //int samplesCount = 100;
+            //int packCount = 3;
+
+            //AsyncCalculatorPlanner acp = new AsyncCalculatorPlanner(samplesCount, packCount, CriterionsCalculator.Calculate);
+            //List<double> J0 = acp.DoCalculate();
+            //using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_uniform"), true))
+            //{
+            //    foreach (double j in J0)
+            //    {
+            //        critoutputfile.WriteLine(string.Format(provider, "{0}", j));
+            //    }
+            //    critoutputfile.Close();
+            //}
+
+
             //int SamplesCount = 100;
 
             //for (int i = 0; i < SamplesCount; i++)
@@ -217,48 +217,74 @@ namespace CMCToolsTest
     //                        100);
     //    }
 
-    public class CriterionsCalculator
+    public class TestEnvoronment
     {
-        private ManualResetEvent _doneEvent;
-        private int _n;
-        private double _JOfN;
+        public double t0;
+        public double T;
+        public Coords[] BaseStations;
+        public Coords Pos0;
+        public Func<double, Coords> PosDynamics;
+        public Func<double, double[]> U;
+        public double h;
+        public string Name;
+        public string UString;
 
-
-        public int N { get { return _n; } }
-        public double JOfN { get { return _JOfN; } }
-
-        // Constructor.
-        public CriterionsCalculator(int n, ManualResetEvent doneEvent)
+        public TestEnvoronment(double _t0, double _T, double _h, Coords[] _BaseStations, Coords _Pos0, Func<double, Coords> _PosDynamics, Func<double, double[]> _U)
         {
-            _doneEvent = doneEvent;
+            t0 = _t0;
+            T = _T;
+            h = _h;
+            BaseStations = _BaseStations;
+            Pos0 = _Pos0;
+            PosDynamics = _PosDynamics;
+            U = _U;
         }
-
-        // Wrapper method for use with thread pool.
-        public void ThreadPoolCallback(Object threadContext)
+        public double Calculate()
         {
-            int threadIndex = (int)threadContext;
-            Console.WriteLine("thread {0} started...", threadIndex);
-            _JOfN = Calculate(_n);
-            Console.WriteLine("thread {0} result calculated...", threadIndex);
-            _doneEvent.Set();
-        }
-
-        // Recursive method that calculates the Nth Fibonacci number.
-        public double Calculate(int n)
-        {
-            bool justPath = false;
-
-            double[] U = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
-            double t0 = 0;
-            double T = 10.0 * 60.0;
-            Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.5), new Coords(0.8, 1.0) };
-
-
-            Transmitter tr = new Transmitter(t0, T, new Coords(0, 0), 10e-4, (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0), BaseStations, (t) => U);
-
-            tr.GenerateTrajectory(justPath);
-            //J0.Add(tr.Crit.J);
+            Transmitter tr = new Transmitter(t0, T, Pos0, h, PosDynamics, BaseStations, U, false);
+            tr.GenerateTrajectory();
             return tr.Crit.J;
+        }
+
+        public void GenerateAndSaveTrajectory(int every = 1)
+        {
+            Transmitter tr = new Transmitter(t0, T, Pos0, h, PosDynamics, BaseStations, U, true);
+            tr.GenerateTrajectory();
+            tr.SaveTrajectory(Properties.Settings.Default.TransmitterFilePath, every);
+            tr.SaveBaseStations(Properties.Settings.Default.BaseStationsFilePath);
+
+            foreach (Channel c in tr.Channels)
+            {
+                c.CPOS.SaveAll(
+                                string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)),
+                                string.Format(Properties.Settings.Default.CPFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)),
+                                string.Format(Properties.Settings.Default.FilterFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)), every);
+            }
+
+        }
+
+        public void GenerateSeriesAndSaveCrits(int samplesCount, int packCount)
+        {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+            AsyncCalculatorPlanner acp = new AsyncCalculatorPlanner(samplesCount, packCount, this.Calculate);
+            List<double> J = acp.DoCalculate();
+            using (System.IO.StreamWriter critoutputfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsFilePath, "_" + Name + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.ToShortTimeString()), true))
+            {
+                foreach (double j in J)
+                {
+                    critoutputfile.WriteLine(string.Format(provider, "{0}", j));
+                }
+                critoutputfile.Close();
+            }
+            double EJ = J.Average();
+            double sJ = Math.Sqrt(J.Sum(j => Math.Pow(j - EJ, 2.0)) / (J.Count - 1));
+            using (System.IO.StreamWriter critoutlogfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsCountLog), true))
+            {
+                critoutlogfile.WriteLine(string.Format(provider, "{0} {1} {2} {3} {4} {5}", DateTime.Now, Name, UString, EJ, sJ, samplesCount));
+                critoutlogfile.Close();
+            }
+
         }
     }
 }

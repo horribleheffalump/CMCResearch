@@ -94,5 +94,17 @@ namespace CMCToolsTest.Properties {
                 this["CriterionsFilePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\CriterionCalculationLog.txt")]
+        public string CriterionsCountLog {
+            get {
+                return ((string)(this["CriterionsCountLog"]));
+            }
+            set {
+                this["CriterionsCountLog"] = value;
+            }
+        }
     }
 }

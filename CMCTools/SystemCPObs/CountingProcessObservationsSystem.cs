@@ -14,11 +14,11 @@ namespace SystemCPObs
         public ControllableCountingProcess Observation;
         public SuboptimalFilter Filter;
 
-        public CountingProessObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, Matrix<double>> _A, Func<double, Vector<double>> _c)
+        public CountingProessObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, Matrix<double>> _A, Func<double, Vector<double>> _c, bool _saveHistory = false)
         {
-            State = new ControllableMarkovChain(_N, _t0, _T, _X0, _h, (t, u) => _A(t));
-            Observation = new ControllableCountingProcess(_t0, _T, 0, _h, (t, u) => _c(t)[State.X] * u);
-            Filter = new SuboptimalFilter(_N, _t0, _T, _h, (t) => _A(t), (t) => _c(t));
+            State = new ControllableMarkovChain(_N, _t0, _T, _X0, _h, (t, u) => _A(t), _saveHistory);
+            Observation = new ControllableCountingProcess(_t0, _T, 0, _h, (t, u) => _c(t)[State.X] * u, _saveHistory);
+            Filter = new SuboptimalFilter(_N, _t0, _T, _h, (t) => _A(t), (t) => _c(t), _saveHistory);
         }
 
         public double Step(double u)
