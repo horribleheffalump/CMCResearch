@@ -99,7 +99,7 @@ namespace CMCToolsTest
             double T = 10.0 * 60.0;
             Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.5), new Coords(0.8, 1.0) };
             Coords Pos0 = new Coords(0, 0);
-            double h = 10e-3;
+            double h = 10e-2;
             Func<double, Coords> PosDynamics = (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0);
 
             TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t, pi) => U);
@@ -109,20 +109,20 @@ namespace CMCToolsTest
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(100, 3);
 
-            U = new[] { 0.8, 0.1, 0.1 };
+            U = new[] { 1.0, 0.0, 0.0 };
             test.U = (t, pi) => U;
             test.UString = "[1, 0, 0]";
             test.Name = "all_to_0";
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(100, 3);
 
-            U = new[] { 0.1, 0.8, 0.1 };
+            U = new[] { 0.0, 1.0, 0.0 };
             test.U = (t, pi) => U;
             test.UString = "[0, 1, 0]";
             test.Name = "all_to_1";
             test.GenerateSeriesAndSaveCrits(100, 3);
 
-            U = new[] { 0.1, 0.1, 0.8 };
+            U = new[] { 0.0, 0.0, 1.0 };
             test.U = (t, pi) => U;
             test.UString = "[0, 0, 1]";
             test.Name = "all_to_2";
