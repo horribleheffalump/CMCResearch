@@ -51,7 +51,7 @@ namespace CMCToolsTest
         public List<double> DoCalculate()
         {
             List<double> result = new List<double>();
-            for (int pack = 0; pack <= samplesCount / packCount ; pack++)
+            for (int pack = 0; pack <= samplesCount / packCount; pack++)
             {
                 ManualResetEvent[] doneEvents = new ManualResetEvent[Math.Min(packCount, samplesCount - pack * packCount)];
                 AsyncCalculator[] calcArray = new AsyncCalculator[Math.Min(packCount, samplesCount - pack * packCount)];
@@ -67,7 +67,8 @@ namespace CMCToolsTest
                 }
 
                 // Wait for all threads in pool to calculate.
-                WaitHandle.WaitAll(doneEvents);
+                if (doneEvents.Length > 0)
+                    WaitHandle.WaitAll(doneEvents);
                 //Console.WriteLine("All calculations are complete.");
 
                 // Display the results.
