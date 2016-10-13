@@ -9,14 +9,14 @@ namespace CMCToolsTest
     class AsyncCalculator
     {
         private ManualResetEvent doneEvent;
-        private double result;
-        private Func<double> calculate;
+        private double[] result;
+        private Func<double[]> calculate;
 
 
-        public double Result { get { return result; } }
+        public double[] Result { get { return result; } }
 
         // Constructor.
-        public AsyncCalculator(int n, ManualResetEvent _doneEvent, Func<double> _calculate)
+        public AsyncCalculator(int n, ManualResetEvent _doneEvent, Func<double[]> _calculate)
         {
             doneEvent = _doneEvent;
             calculate = _calculate;
@@ -39,18 +39,18 @@ namespace CMCToolsTest
     {
         private int samplesCount;
         private int packCount;
-        private Func<double> calculate;
+        private Func<double[]> calculate;
 
-        public AsyncCalculatorPlanner(int _samplesCount, int _packCount, Func<double> _calculate)
+        public AsyncCalculatorPlanner(int _samplesCount, int _packCount, Func<double[]> _calculate)
         {
             samplesCount = _samplesCount;
             packCount = _packCount;
             calculate = _calculate;
         }
 
-        public List<double> DoCalculate()
+        public List<double[]> DoCalculate()
         {
-            List<double> result = new List<double>();
+            List<double[]> result = new List<double[]>();
             for (int pack = 0; pack <= samplesCount / packCount; pack++)
             {
                 ManualResetEvent[] doneEvents = new ManualResetEvent[Math.Min(packCount, samplesCount - pack * packCount)];

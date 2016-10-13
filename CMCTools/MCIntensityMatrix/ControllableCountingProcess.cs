@@ -14,6 +14,8 @@ namespace CMCTools
         public double T;        // observation end time
         public int N0 = 0;      // initial state
         public int N;           // current state
+        public int dN = 0;      // N - N(t-deltaT)
+        public double deltaT = 5;   //  
         public double h = 1e-3; // discretization step
         public bool SaveHistory;
 
@@ -30,7 +32,7 @@ namespace CMCTools
             h = _h;
             Intensity = _Intensity;
             SaveHistory = _SaveHistory;
-            if (SaveHistory)
+            //if (SaveHistory)
                 Jumps.Add(new Jump(t0, N0));
         }
 
@@ -43,9 +45,10 @@ namespace CMCTools
             {
                 N++;
                 var J = new Jump(t, N);
-                if (SaveHistory)
+                //if (SaveHistory)
                     Jumps.Add(J);
             }
+            dN = N - Jumps.FindLast(j => j.t <= Math.Max(0,t - deltaT)).X;
             return N;
         }
 

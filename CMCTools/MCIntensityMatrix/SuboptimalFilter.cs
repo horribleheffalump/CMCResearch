@@ -58,6 +58,8 @@ namespace CMCTools
             var Gamma = (1.0 / (c(t).ToRowMatrix() * pi)[0]) * c(t).PointwiseMultiply(pi) - pi;
 
             pi = pi + a * pi * h + Gamma * dNu;
+            for (int i = 0; i < pi.Count; i++)
+                if (pi[i] < 0) pi[i] = 0;
             pi = pi.Normalize(1.0);
 
             var estimate = new Estimate(t, pi, u);

@@ -35,7 +35,8 @@ namespace TransmitterModel
             h = _h;
             TransmitterPosition = _TransmitterPosition;
             //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 1.0, 50.0, 150.0 });
-            Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
+            //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
+            Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
             CPOS = new CountingProessObservationsSystem(N, t0, T, 0, h, (t) => TransitionRate(Distance(t)), (t) => C, _saveHistory);
             //Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 1.0, 2.0, 3.0 }); // costs for transmission in correponding states. Equal for all channels
             Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // costs for transmission in correponding states. Equal for all channels
