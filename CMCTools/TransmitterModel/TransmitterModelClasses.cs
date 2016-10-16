@@ -81,10 +81,10 @@ namespace TransmitterModel
         public List<Channel> Channels;
         public double PathLength; // length of transmitter path
         public Func<double, Vector<double>[], double[], int[], double[]> Control; //control function (deterministic). Array contains values for all channels
-        public Criterion Crit; // control quality crtiterion 
+        public List<Criterion> Crits; // control quality crtiterion 
         public bool SaveHistory;
 
-        public Transmitter(double _t0, double _T, Coords _Pos0, double _h, Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, Vector<double>[], double[], int[], double[]> _Control, bool _saveHistory = false)
+        public Transmitter(double _t0, double _T, Coords _Pos0, double _h, Func<double, Coords> _PosDynamics, Coords[] _BaseStations, Func<double, Vector<double>[], double[], int[], double[]> _Control, List<Func<double, Vector<double>[], double[], int[], double>> _ValueFunctions, bool _saveHistory = false)
         {
             t0 = _t0;
             T = _T;
@@ -98,7 +98,11 @@ namespace TransmitterModel
                 Channels.Add(new Channel(_BaseStations[i], t0, T, h, (t) => Pos(t), _saveHistory));
             }
             Control = _Control;
-            Crit = new Criterion(h, ValueFunction);
+            Crits = new List<Criterion>();
+            foreach (var vf in _ValueFunctions)
+            {
+                Crits.Add(new Criterion(h, vf));
+            }
         }
 
         public Coords Pos(double t)
@@ -106,17 +110,17 @@ namespace TransmitterModel
             return Pos0 + PosDynamics(t);
         }
 
-        public double ValueFunction(double t, int[] X, double[] U, int[] Obs) // criterion Value function
-        {
-            double J = -1 / (160.0 * U.Sum());
-            //double J = 0;
-            for (int i = 0; i < Channels.Count; i++)
-            {
-                J -= Channels[i].Costs(t)[X[i]] * U[i]; // == <Costs(t), X> * u_i 
-                //J += U[i]; // == u_i 
-            }
-            return J;
-        }
+        //public double ValueFunction(double t, int[] X, double[] U, int[] Obs) // criterion Value function
+        //{
+        //    double J = -1 / (160.0 * U.Sum());
+        //    //double J = 0;
+        //    for (int i = 0; i < Channels.Count; i++)
+        //    {
+        //        J -= Channels[i].Costs(t)[X[i]] * U[i]; // == <Costs(t), X> * u_i 
+        //        //J += U[i]; // == u_i 
+        //    }
+        //    return J;
+        //}
         public void GenerateTrajectory()
         {
             Trajectory = new List<Point>();
@@ -131,10 +135,14 @@ namespace TransmitterModel
                 CurrentPos = NextPos;
                 //if (SaveHistory)
                 //{
-                int[] X = Channels.Select(c => c.CPOS.State.X).ToArray();
+                //int[] X = Channels.Select(c => c.CPOS.State.X).ToArray();
+                Vector<double>[] X = Channels.Select(c => c.CPOS.State.Xvec).ToArray();
                 double[] U = Control(t, Channels.Select(c => c.CPOS.Filter.pi).ToArray(), Channels.Select(c => Coords.Distance(c.BaseStation, CurrentPos)).ToArray(), Channels.Select(c => c.CPOS.Observation.dN).ToArray());
                 int[] Obs = Channels.Select(c => c.CPOS.Observation.N).ToArray();
-                Crit.Step(t, X, U, Obs);
+                foreach (var crit in Crits)
+                {
+                    crit.Step(t, X, U, Obs);
+                }
                 foreach (Channel c in Channels)
                 {
                     int i = Channels.FindIndex(s => s.BaseStation == c.BaseStation);

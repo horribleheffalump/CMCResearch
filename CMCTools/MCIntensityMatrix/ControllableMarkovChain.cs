@@ -61,6 +61,17 @@ namespace CMCTools
         //}
 
         //public int Step(Vector<double> U)
+
+        public Vector<double> Xvec
+        {
+            get
+            {
+                Vector<double> _Xvec = Vector<double>.Build.Dense(N, 0.0);
+                _Xvec[X] = 1.0;
+                return _Xvec;
+            }
+        }    // current state vector
+
         public int Step(double u)
         {
             var lambda = TransitionRateMatrix(t, u);

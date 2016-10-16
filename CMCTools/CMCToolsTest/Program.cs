@@ -12,6 +12,7 @@ using TransmitterModel;
 using System.IO;
 using System.Globalization;
 using System.Threading;
+using Cureos.Numerics.Optimizers;
 
 namespace CMCToolsTest
 {
@@ -79,12 +80,12 @@ namespace CMCToolsTest
             //ControllableMarkovChain CMC = new ControllableMarkovChain(3, 0.0, 100.0, 0, 10E-3, (t, u) => m);
             //Vector<double> U = Vector<double>.Build.DenseOfArray(new[] { 1.0, 1.0, 1.0 });
             //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
-           // Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
-                                                                                                                     //CMC.GetNextState(t => U);
-                                                                                                                     //CMC.GetNextState(t => U);
-                                                                                                                     //CMC.GetNextState(t => U);
-                                                                                                                     //CMC.GenerateTrajectory(t => U);
-                                                                                                                     //CMC.SaveTrajectory(Properties.Settings.Default.FilePath);
+            // Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
+            //CMC.GetNextState(t => U);
+            //CMC.GetNextState(t => U);
+            //CMC.GetNextState(t => U);
+            //CMC.GenerateTrajectory(t => U);
+            //CMC.SaveTrajectory(Properties.Settings.Default.FilePath);
 
             //ControllableCountingProcess CP = new ControllableCountingProcess(0.0, 100.0, 0, 10E-3, (t, u) => 1);
             //CP.GenerateTrajectory(t => 0);
@@ -95,33 +96,97 @@ namespace CMCToolsTest
             //CPOS.State.SaveTrajectory(Properties.Settings.Default.MCFilePath);
             //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
+
+            //<CSNumerics test>
+
+            //LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, x, flag) => -(-1 / (x[0] + x[1] + x[2]) - 0.1 * x[0] - 0.01*x[1] - 0.001*x[2]));
+            //double[,] a = new double[,] { { 1.0, 1.0, 1.0 }, { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } };
+            //double[] b = new double[] { 1.0, 0.0, 0.0, 0.0 };
+
+            //Lincoa optimizer = new Lincoa(F, a, b);
+            //var result = optimizer.FindMinimum(new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
+            //if (result.Status == OptimizationStatus.Normal)
+            //{
+            //    var res = result.X;
+            //}
+
+            // </CSNumerics test>
+
+
+            // <criterion series calcultion>
+
             double t0 = 0;
             double T = 10.0 * 60.0;
             Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.4, 1.2), new Coords(0.8, 1.0) };
             Coords Pos0 = new Coords(0, 0);
             double h = 10e-2;
             Func<double, Coords> PosDynamics = (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0);
+            //Func<double, Vector<double>> Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // costs for transmission in correponding states. Equal for all channels
+            //Func<double, Vector<double>> Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 1 + 0.01, 1 + 0.04, 1 + 0.1 }); // costs for transmission in correponding states. Equal for all channels
+            Func<double, Vector<double>> Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 0.01, 0.04, 0.1 }); // costs for transmission in correponding states. Equal for all channels
 
-            TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t, pi, dists, dN) => new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
-            test.UString = "[1/3, 1/3, 1/3]";
+            Func<double, Vector<double>[], double[], int[], double> ValueFunction = (t, X, U, Obs) =>
+            {
+                //double pow = 0.9;
+                //double J = Math.Pow(U.Sum(), pow) / (1-pow);
+                //for (int i = 0; i < X.Length; i++)
+                //{
+                //    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i] / 1.01 * pow / (1-pow);
+                //}
+
+                //f =@(v)v.^ a / (1 - a); % функция полезности
+                //h =@(v, g) f(v) - (a / (1 - a)) * (g / g_min) * v; % целевая функция
+                //v_opt =@(g)(g_min./ g).^ (1 / (1 - a)); % оптимальная скорость
+                // h_opt =@(g)(g_min./ g).^ (a / (1 - a)); % максимум целевой функции
+
+
+                //double J = -1 / U.Sum();
+                //for (int i = 0; i < X.Length; i++)
+                //{
+                //    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i];
+                //}
+                //return J;
+
+                double J = -1 / (U[0] + U[1] + U[2]);
+                for (int i = 0; i < X.Length; i++)
+                {
+                    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i];
+                }
+                return J;
+
+            };
+
+
+            List<Func<double, Vector<double>[], double[], int[], double>> ValueFunctions = new List<Func<double, Vector<double>[], double[], int[], double>>();
+            ValueFunctions.Add(ValueFunction);
+            ValueFunctions.Add(
+                 (t, X, U, Obs) =>
+                 {
+                     return 160.0* U.Sum();
+                 }
+            );
+
+            TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t, pi, dists, dN) => new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 }, ValueFunctions);
+
+            test.UString = "[1/3; 1/3; 1/3]";
             test.Name = "uniform";
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(10, 5);
 
             test.U = (t, pi, dists, dN) => new[] { 1.0, 0.0, 0.0 };
-            test.UString = "[1, 0, 0]";
+            test.UString = "[1; 0; 0]";
             test.Name = "all_to_0";
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(10, 5);
 
             test.U = (t, pi, dists, dN) => new[] { 0.0, 1.0, 0.0 };
-            test.UString = "[0, 1, 0]";
+            test.UString = "[0; 1; 0]";
             test.Name = "all_to_1";
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(10, 5);
 
             test.U = (t, pi, dists, dN) => new[] { 0.0, 0.0, 1.0 };
-            test.UString = "[0, 0, 1]";
+            test.UString = "[0; 0; 1]";
             test.Name = "all_to_2";
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(10, 5);
@@ -130,7 +195,7 @@ namespace CMCToolsTest
             test.U = (t, pi, dists, dN) =>
             {
                 double[] U = new[] { 0.0, 0.0, 0.0 };
-                double sum = dists.Sum(x => 1 / Math.Pow(x + 1.0, 2));               
+                double sum = dists.Sum(x => 1 / Math.Pow(x + 1.0, 2));
                 for (int i = 0; i < dists.Count(); i++)
                 {
                     U[i] = 1 / Math.Pow(dists[i] + 1.0, 2) / sum;
@@ -189,24 +254,59 @@ namespace CMCToolsTest
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(10, 5);
 
-            Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
+            ////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
+            double[,] a = new double[,] { { 1.0, 1.0, 1.0 }, { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } };
+            //double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
+            double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
             test.U = (t, pi, dists, dN) =>
             {
-                double[] U0 = new[] { 0.9, 0.05, 0.05 };
-                double[] U1 = new[] { 0.05, 0.9, 0.05 };
-                double[] U2 = new[] { 0.05, 0.05, 0.9 };
-                double kappa0 = (pi[0].ToRowMatrix() * C)[0];
-                double kappa1 = (pi[1].ToRowMatrix() * C)[0];
-                double kappa2 = (pi[2].ToRowMatrix() * C)[0];
-                if (kappa0 < Math.Min(kappa1, kappa2)) return U0;
-                else if (kappa1 < Math.Min(kappa0, kappa2)) return U1;
-                else return U2;
+                LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunction(t, pi, (u as double[]), null));
+                Lincoa optimizer = new Lincoa(F, a, b);
+                var result = optimizer.FindMinimum(new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
+                double[] res = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
+                if (result.Status == OptimizationStatus.Normal)
+                {
+                    res = result.X;
+                }
+                else
+                {
+                    throw new Exception();
+                }
+                //double[] res2;
+                //double[] res3;
+
+                //double[] U0 = new[] { 0.9, 0.05, 0.05 };
+                //double[] U1 = new[] { 0.05, 0.9, 0.05 };
+                //double[] U2 = new[] { 0.05, 0.05, 0.9 };
+                //double[] U01 = new[] { 1.0, 0.0, 0.0 };
+                //double[] U11 = new[] { 0.0, 1.0, 0.0 };
+                //double[] U21 = new[] { 0.0, 0.0, 1.0 };
+                //double kappa0 = Costs(t).ConjugateDotProduct(pi[0]);// pi[0].ConjugateDotProduct(Costs(t));
+                //double kappa1 = Costs(t).ConjugateDotProduct(pi[1]);// pi[1].ConjugateDotProduct(Costs(t));
+                //double kappa2 = Costs(t).ConjugateDotProduct(pi[2]);// pi[2].ConjugateDotProduct(Costs(t));
+                //if (kappa0 < Math.Min(kappa1, kappa2)) { res2 = U0; res3 = U01; }
+                //else if (kappa1 < Math.Min(kappa0, kappa2)) { res2 = U1; res3 = U11; }
+                //else { res2 = U2; res3 = U21; }
+
+                //if (res != res2)
+                //{
+                //    double v1 = ValueFuncion(t, pi, res, null);
+                //    double v2 = ValueFuncion(t, pi, res2, null);
+                //    double v3 = ValueFuncion(t, pi, res3, null);
+
+                //    return res;
+                //}
+                return res;
             };
             test.UString = "[suboptimal]";
             test.Name = "suboptimal";
             //test.GenerateAndSaveTrajectory();
             test.GenerateSeriesAndSaveCrits(10, 5);
 
+
+
+
+            // </criterion series calculation>
 
 
             //int samplesCount = 100;
@@ -317,11 +417,12 @@ namespace CMCToolsTest
         public Coords Pos0;
         public Func<double, Coords> PosDynamics;
         public Func<double, Vector<double>[], double[], int[], double[]> U;
+        public List<Func<double, Vector<double>[], double[], int[], double>> ValueFunctions;
         public double h;
         public string Name;
         public string UString;
 
-        public TestEnvoronment(double _t0, double _T, double _h, Coords[] _BaseStations, Coords _Pos0, Func<double, Coords> _PosDynamics, Func<double, Vector<double>[], double[], int[], double[]> _U)
+        public TestEnvoronment(double _t0, double _T, double _h, Coords[] _BaseStations, Coords _Pos0, Func<double, Coords> _PosDynamics, Func<double, Vector<double>[], double[], int[], double[]> _U, List<Func<double, Vector<double>[], double[], int[], double>> _ValueFunctions)
         {
             t0 = _t0;
             T = _T;
@@ -330,17 +431,20 @@ namespace CMCToolsTest
             Pos0 = _Pos0;
             PosDynamics = _PosDynamics;
             U = _U;
+            ValueFunctions = _ValueFunctions;
         }
         public double[] Calculate()
         {
-            Transmitter tr = new Transmitter(t0, T, Pos0, h, PosDynamics, BaseStations, U, false);
+            Transmitter tr = new Transmitter(t0, T, Pos0, h, PosDynamics, BaseStations, U, ValueFunctions, false);
             tr.GenerateTrajectory();
-            return new[] { tr.Crit.J, (T-t0)*160.0 - tr.Channels.Sum(c => c.CPOS.Observation.N), tr.Channels.Sum(c => c.CPOS.Observation.N) };
+            List<double> result = tr.Crits.Select(c => c.J).ToList();
+            result.Add(tr.Channels.Sum(c => c.CPOS.Observation.N));
+            return result.ToArray();
         }
 
         public void GenerateAndSaveTrajectory(int every = 1)
         {
-            Transmitter tr = new Transmitter(t0, T, Pos0, h, PosDynamics, BaseStations, U, true);
+            Transmitter tr = new Transmitter(t0, T, Pos0, h, PosDynamics, BaseStations, U, ValueFunctions, true);
             tr.GenerateTrajectory();
             tr.SaveTrajectory(Properties.Settings.Default.TransmitterFilePath, every);
             tr.SaveBaseStations(Properties.Settings.Default.BaseStationsFilePath);
@@ -369,7 +473,7 @@ namespace CMCToolsTest
                 }
                 critoutputfile.Close();
             }
-            double[] EJ = new double[J[0].Length];         
+            double[] EJ = new double[J[0].Length];
             double[] sJ = new double[J[0].Length];
             for (int i = 0; i < J[0].Length; i++)
             {
@@ -378,7 +482,7 @@ namespace CMCToolsTest
             }
             using (System.IO.StreamWriter critoutlogfile = new System.IO.StreamWriter(string.Format(Properties.Settings.Default.CriterionsCountLog), true))
             {
-                critoutlogfile.WriteLine(string.Format(provider, "{0} {1} {2} {3} {4} {5}", DateTime.Now, Name, UString, 
+                critoutlogfile.WriteLine(string.Format(provider, "{0}, {1}, {2}, {3}, {4}, {5}", DateTime.Now, Name, UString,
                                                             string.Join(", ", EJ.Select(e => string.Format(provider, "{0}", e))),
                                                             string.Join(", ", sJ.Select(e => string.Format(provider, "{0}", e))), samplesCount));
                 critoutlogfile.Close();
