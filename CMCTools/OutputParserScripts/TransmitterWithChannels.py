@@ -15,9 +15,11 @@ from pylab import *
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
 plt.subplots_adjust(left=0.06, bottom=0.07, right=0.98, top=0.95, wspace=0.1)
 #ax1 = plt.subplot(411)
-plt.axis('equal')
-plt.plot(x, y, '-', color = 'black')
-plt.plot(bx, by, 'x', color = 'blue')
+#plt.axis('equal')
+ax1 = plt.subplot(111)
+ax1.plot(x, y, '-', color = 'black')
+ax1.plot(bx, by, 'x', color = 'blue')
+ax1.set_xlim(0,1)
 
 plt.savefig("../Output/trajectory.pdf")
 #plt.show()
@@ -38,6 +40,11 @@ ax_N = [ax2_N,ax3_N,ax4_N]
 ax2.plot(t, d1, '-', color = 'red')
 ax3.plot(t, d2, '-', color = 'red')
 ax4.plot(t, d3, '-', color = 'red')
+
+ax2.set_xlim(0,600)
+ax3.set_xlim(0,600)
+ax4.set_xlim(0,600)
+
 for n in range(0,3):
     filename = u"../Output/MCTrajectory_" + str(n) + ".txt"
     t, X = np.loadtxt(filename, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)

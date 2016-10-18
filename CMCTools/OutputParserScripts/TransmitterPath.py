@@ -66,6 +66,10 @@ def P(t):
 def la(t):
     return P(t) - np.identity(3);
 
+            #double p0 = Math.Max(Math.Min(1 / Math.Pow(dist + 1.0, 2), 0.95), 0.05);
+            #double p2 = Math.Max(Math.Min(1 / Math.Pow(5.0 - dist, 2), 0.95), 0.05);
+
+
 print(la(0.0))
 print(la(2.0))
 print(la(4.0))

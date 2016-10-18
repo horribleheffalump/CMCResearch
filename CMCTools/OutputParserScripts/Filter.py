@@ -37,7 +37,7 @@ for n in range(0,3):
     Utplot[len(t)*2-2] = t[len(t)-1]
     Uplot[len(t)*2-2] = u[len(t)-1]
     Uo = np.zeros(len(Utplot))
-    Uones = np.ones(len(Utplot))*0.5
+    Uones = np.ones(len(Utplot))*0.8
     Ulevelzero = np.ones(len(Utplot))*0.0
     Ulevelone = np.ones(len(Utplot))*1.0
 
