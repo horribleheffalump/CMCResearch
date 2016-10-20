@@ -23,5 +23,8 @@
     <Setting Name="CriterionsCountLog" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\..\Output\CriterionCalculationLog.txt</Value>
     </Setting>
+    <Setting Name="ValueFunctionTrajectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\Output\VFTrajectory_{0}.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

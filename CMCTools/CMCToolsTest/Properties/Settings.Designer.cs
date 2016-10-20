@@ -106,5 +106,17 @@ namespace CMCToolsTest.Properties {
                 this["CriterionsCountLog"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\VFTrajectory_{0}.txt")]
+        public string ValueFunctionTrajectory {
+            get {
+                return ((string)(this["ValueFunctionTrajectory"]));
+            }
+            set {
+                this["ValueFunctionTrajectory"] = value;
+            }
+        }
     }
 }

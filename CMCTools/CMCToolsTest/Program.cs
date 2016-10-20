@@ -117,9 +117,10 @@ namespace CMCToolsTest
 
             double t0 = 0;
             double T = 10.0 * 60.0;
-            Coords[] BaseStations = new[] { new Coords(0.1, 0.5), new Coords(0.35, 1.7), new Coords(0.8, 1.3) };
+            //Coords[] BaseStations = new[] { new Coords(0.1, 0.5), new Coords(0.35, 1.7), new Coords(0.8, 1.3) };
+            Coords[] BaseStations = new[] { new Coords(0.3, 0.5), new Coords(0.35, 1.7), new Coords(0.6, 1.3) };
             Coords Pos0 = new Coords(0, 0);
-            double h = 10e-4;
+            double h = 10e-2;
             Func<double, Coords> PosDynamics = (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0);
             //Func<double, Vector<double>> Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // costs for transmission in correponding states. Equal for all channels
             //Func<double, Vector<double>> Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 1 + 0.01, 1 + 0.04, 1 + 0.1 }); // costs for transmission in correponding states. Equal for all channels
@@ -127,12 +128,12 @@ namespace CMCToolsTest
 
             Func<double, Vector<double>[], double[], int[], double> ValueFunction = (t, X, U, Obs) =>
             {
-                //double pow = 0.9;
-                //double J = Math.Pow(U.Sum(), pow) / (1-pow);
-                //for (int i = 0; i < X.Length; i++)
-                //{
-                //    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i] / 1.01 * pow / (1-pow);
-                //}
+                double pow = 0.9;
+                double J = Math.Pow(U.Sum(), pow) / (1 - pow);
+                for (int i = 0; i < X.Length; i++)
+                {
+                    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i] / 1.01 * pow / (1 - pow);
+                }
 
                 //f =@(v)v.^ a / (1 - a); % функция полезности
                 //h =@(v, g) f(v) - (a / (1 - a)) * (g / g_min) * v; % целевая функция
@@ -147,11 +148,12 @@ namespace CMCToolsTest
                 //}
                 //return J;
 
-                double J = -1 / (U[0] + U[1] + U[2]);
-                for (int i = 0; i < X.Length; i++)
-                {
-                    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i];
-                }
+                //double J = -1 / (U[0] + U[1] + U[2]);
+                //for (int i = 0; i < X.Length; i++)
+                //{
+                //    J -= Costs(t).ConjugateDotProduct(X[i]) * U[i];
+                //}
+
                 return J;
 
             };
@@ -162,96 +164,96 @@ namespace CMCToolsTest
             ValueFunctions.Add(
                  (t, X, U, Obs) =>
                  {
-                     return 160.0* U.Sum();
+                     return 160.0 * U.Sum();
                  }
             );
 
             TestEnvoronment test = new TestEnvoronment(t0, T, h, BaseStations, Pos0, PosDynamics, (t, pi, dists, dN) => new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 }, ValueFunctions);
 
-            //test.UString = "[1/3; 1/3; 1/3]";
-            //test.Name = "uniform";
-            ////test.GenerateAndSaveTrajectory();
+            test.UString = "[1/3; 1/3; 1/3]";
+            test.Name = "uniform";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
-            //test.U = (t, pi, dists, dN) => new[] { 1.0, 0.0, 0.0 };
-            //test.UString = "[1; 0; 0]";
-            //test.Name = "all_to_0";
-            ////test.GenerateAndSaveTrajectory();
+            test.U = (t, pi, dists, dN) => new[] { 1.0, 0.0, 0.0 };
+            test.UString = "[1; 0; 0]";
+            test.Name = "all_to_0";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
-            //test.U = (t, pi, dists, dN) => new[] { 0.0, 1.0, 0.0 };
-            //test.UString = "[0; 1; 0]";
-            //test.Name = "all_to_1";
-            ////test.GenerateAndSaveTrajectory();
+            test.U = (t, pi, dists, dN) => new[] { 0.0, 1.0, 0.0 };
+            test.UString = "[0; 1; 0]";
+            test.Name = "all_to_1";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
-            //test.U = (t, pi, dists, dN) => new[] { 0.0, 0.0, 1.0 };
-            //test.UString = "[0; 0; 1]";
-            //test.Name = "all_to_2";
-            ////test.GenerateAndSaveTrajectory();
+            test.U = (t, pi, dists, dN) => new[] { 0.0, 0.0, 1.0 };
+            test.UString = "[0; 0; 1]";
+            test.Name = "all_to_2";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
-            ////
-            //test.U = (t, pi, dists, dN) =>
-            //{
-            //    double[] U = new[] { 0.0, 0.0, 0.0 };
-            //    double sum = dists.Sum(x => 1 / Math.Pow(x + 1.0, 2));
-            //    for (int i = 0; i < dists.Count(); i++)
-            //    {
-            //        U[i] = 1 / Math.Pow(dists[i] + 1.0, 2) / sum;
-            //    }
-            //    return U;
-            //};
-            //test.UString = "[apr prop]";
-            //test.Name = "a_priori_proportional";
-            ////test.GenerateAndSaveTrajectory();
+            //
+            test.U = (t, pi, dists, dN) =>
+            {
+                double[] U = new[] { 0.0, 0.0, 0.0 };
+                double sum = dists.Sum(x => 1 / Math.Pow(x + 1.0, 2));
+                for (int i = 0; i < dists.Count(); i++)
+                {
+                    U[i] = 1 / Math.Pow(dists[i] + 1.0, 2) / sum;
+                }
+                return U;
+            };
+            test.UString = "[apr prop]";
+            test.Name = "a_priori_proportional";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
 
 
-            //test.U = (t, pi, dists, dN) =>
-            //{
-            //    double[] U0 = new[] { 1.0, 0.0, 0.0 };
-            //    double[] U1 = new[] { 0.0, 1.0, 0.0 };
-            //    double[] U2 = new[] { 0.0, 0.0, 1.0 };
-            //    if (dists[0] < Math.Min(dists[1], dists[2])) return U0;
-            //    else if (dists[1] < Math.Min(dists[0], dists[2])) return U1;
-            //    else return U2;
-            //};
-            //test.UString = "[apr conc]";
-            //test.Name = "a_priori_concentrated";
-            ////test.GenerateAndSaveTrajectory();
+            test.U = (t, pi, dists, dN) =>
+            {
+                double[] U0 = new[] { 1.0, 0.0, 0.0 };
+                double[] U1 = new[] { 0.0, 1.0, 0.0 };
+                double[] U2 = new[] { 0.0, 0.0, 1.0 };
+                if (dists[0] < Math.Min(dists[1], dists[2])) return U0;
+                else if (dists[1] < Math.Min(dists[0], dists[2])) return U1;
+                else return U2;
+            };
+            test.UString = "[apr conc]";
+            test.Name = "a_priori_concentrated";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
-            //test.U = (t, pi, dists, dN) =>
-            //{
-            //    double[] U = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
-            //    if (dN.Sum() > 0)
-            //    {
-            //        for (int i = 0; i < dN.Count(); i++)
-            //        {
-            //            U[i] = (double)dN[i] / (double)dN.Sum();
-            //        }
-            //    }
-            //    return U;
-            //};
-            //test.UString = "[fb prop]";
-            //test.Name = "feedback_proportional";
-            ////test.GenerateAndSaveTrajectory();
+            test.U = (t, pi, dists, dN) =>
+            {
+                double[] U = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
+                if (dN.Sum() > 0)
+                {
+                    for (int i = 0; i < dN.Count(); i++)
+                    {
+                        U[i] = (double)dN[i] / (double)dN.Sum();
+                    }
+                }
+                return U;
+            };
+            test.UString = "[fb prop]";
+            test.Name = "feedback_proportional";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
-            //test.U = (t, pi, dists, dN) =>
-            //{
-            //    double[] U0 = new[] { 1.0, 0.0, 0.0 };
-            //    double[] U1 = new[] { 0.0, 1.0, 0.0 };
-            //    double[] U2 = new[] { 0.0, 0.0, 1.0 };
-            //    if (dN[0] < Math.Min(dN[1], dN[2])) return U0;
-            //    else if (dN[1] < Math.Min(dN[0], dN[2])) return U1;
-            //    else return U2;
-            //};
-            //test.UString = "[fb conc]";
-            //test.Name = "feedback_concentrated";
-            ////test.GenerateAndSaveTrajectory();
+            test.U = (t, pi, dists, dN) =>
+            {
+                double[] U0 = new[] { 1.0, 0.0, 0.0 };
+                double[] U1 = new[] { 0.0, 1.0, 0.0 };
+                double[] U2 = new[] { 0.0, 0.0, 1.0 };
+                if (dN[0] < Math.Min(dN[1], dN[2])) return U0;
+                else if (dN[1] < Math.Min(dN[0], dN[2])) return U1;
+                else return U2;
+            };
+            test.UString = "[fb conc]";
+            test.Name = "feedback_concentrated";
+            //test.GenerateAndSaveTrajectory();
             //test.GenerateSeriesAndSaveCrits(10, 5);
 
             ////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
@@ -301,7 +303,7 @@ namespace CMCToolsTest
             test.UString = "[suboptimal]";
             test.Name = "suboptimal";
             test.GenerateAndSaveTrajectory();
-            //test.GenerateSeriesAndSaveCrits(10, 5);
+            test.GenerateSeriesAndSaveCrits(10, 5);
 
 
 
@@ -454,9 +456,15 @@ namespace CMCToolsTest
                 c.CPOS.SaveAll(
                                 string.Format(Properties.Settings.Default.MCFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)),
                                 string.Format(Properties.Settings.Default.CPFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)),
-                                string.Format(Properties.Settings.Default.FilterFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)), every);
+                                string.Format(Properties.Settings.Default.FilterFilePath, tr.Channels.FindIndex(s => s.BaseStation == c.BaseStation)), every
+                                );
             }
-
+            foreach (Criterion c in tr.Crits)
+            {
+                c.SaveTrajectory(
+                                                    string.Format(Properties.Settings.Default.ValueFunctionTrajectory, tr.Crits.FindIndex(s => s == c)), every
+                    );
+            }
         }
 
         public void GenerateSeriesAndSaveCrits(int samplesCount, int packCount)
