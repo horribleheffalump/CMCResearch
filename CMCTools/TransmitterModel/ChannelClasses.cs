@@ -27,17 +27,19 @@ namespace TransmitterModel
         //CPOS.Observation.SaveTrajectory(Properties.Settings.Default.CPFilePath);
 
 
-        public Channel(Coords _BaseStation, double _t0, double _T, double _h, Func<double, Coords> _TransmitterPosition, bool _saveHistory = false) //, Func<double, Vector<double>> _Costs)
+        public Channel(Coords _BaseStation, double _t0, double _T, double _h, Func<double, Coords> _TransmitterPosition, Func<double, Vector<double>> _C, bool _saveHistory = false)
         {
             BaseStation = _BaseStation;
             t0 = _t0;
             T = _T;
             h = _h;
             TransmitterPosition = _TransmitterPosition;
+
+
             //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 1.0, 50.0, 150.0 });
-            Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
+            //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
             //Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
-            CPOS = new CountingProessObservationsSystem(N, t0, T, 0, h, (t) => TransitionRate(Distance(t)), (t) => C, _saveHistory);
+            CPOS = new CountingProessObservationsSystem(N, t0, T, N-1, h, (t) => TransitionRate(Distance(t)), (t) => _C(t), _saveHistory);
             //Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 1.0, 2.0, 3.0 }); // costs for transmission in correponding states. Equal for all channels
             //Costs = (t) => Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.01, 160.0 * 0.04, 160.0 * 0.1 }); // costs for transmission in correponding states. Equal for all channels
         }

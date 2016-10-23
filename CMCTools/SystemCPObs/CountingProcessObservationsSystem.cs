@@ -21,11 +21,11 @@ namespace SystemCPObs
             Filter = new SuboptimalFilter(_N, _t0, _T, _h, (t) => _A(t), (t) => _c(t), _saveHistory);
         }
 
-        public double Step(double u)
+        public double Step(double u, bool _doCalculateFilter)
         {
             State.Step(u);
             Observation.Step(u);
-            Filter.Step(u, Observation.N);
+            Filter.Step(u, Observation.N, _doCalculateFilter);
             return State.t;
         }
 

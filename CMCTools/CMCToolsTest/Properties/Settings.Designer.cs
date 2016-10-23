@@ -118,5 +118,17 @@ namespace CMCToolsTest.Properties {
                 this["ValueFunctionTrajectory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\Output\\VFForm.txt")]
+        public string ValueFunctionForm {
+            get {
+                return ((string)(this["ValueFunctionForm"]));
+            }
+            set {
+                this["ValueFunctionForm"] = value;
+            }
+        }
     }
 }

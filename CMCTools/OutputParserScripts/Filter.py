@@ -58,7 +58,7 @@ for n in range(0,3):
     ax1.plot(t, p1, color = 'blue')
     ax0.plot(t, p2, color = 'blue')
     ax3.fill_between(Utplot, Ulevelzero, Ulevelone, where=Uplot>Uones, color='red', alpha = 0.5, linewidth=0.0);
-    #ax3.plot(t, u, color = 'red')
+    ax3.plot(t, u, color = 'red')
 
 
     ax0.set_xlim(0,600)
