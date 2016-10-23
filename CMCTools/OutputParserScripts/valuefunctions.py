@@ -18,15 +18,15 @@ filename = u"../Output/VFTrajectory_0_opt.txt"
 u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
 ax1.plot(u, vf, '.', color = 'black')
 
-filename = u"../Output/VFTrajectory_0_to0.txt"
-u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
-ax1.plot(u, vf, '<', color = 'red')
-filename = u"../Output/VFTrajectory_0_to1.txt"
-u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
-ax1.plot(u, vf, '<', color = 'red')
-filename = u"../Output/VFTrajectory_0_to2.txt"
-u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
-ax1.plot(u, vf, '<', color = 'red')
+#filename = u"../Output/VFTrajectory_0_to0.txt"
+#u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
+#ax1.plot(u, vf, '<', color = 'red')
+#filename = u"../Output/VFTrajectory_0_to1.txt"
+#u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
+#ax1.plot(u, vf, '<', color = 'red')
+#filename = u"../Output/VFTrajectory_0_to2.txt"
+#u, vf = np.loadtxt(filename, delimiter = ' ', usecols=(2,1), unpack=True, dtype=float)
+#ax1.plot(u, vf, '<', color = 'red')
 
 
 filename = u"../Output/VFForm.txt"
