@@ -22,61 +22,43 @@ plt.plot(tt, p1, '-', color = 'black')
 plt.plot(tt, p2, '-', color = 'blue')
 plt.plot(tt, p3, '-', color = 'red')
 
-#arr = np.linspace(0, np.sqrt(2))
-#print(arr)
-
-def maxval(x):
-    for i in range(0, len(x)):
-        if(x[i] > 1): x[i] = 1
-    return x
-def minval(x):
-    for i in range(0, len(x)):
-        if(x[i] < 0): x[i] = 0
-    return x
-
-def lims(x):
-    if(x > 0.95): return 0.95
-    else:
-        if(x < 0.05): return 0.05
-        else: return x
 
 
-#def max(x,y):
-#    if(x > y): return x
-#    else: return y
+#def maxval(x):
+#    for i in range(0, len(x)):
+#        if(x[i] > 1): x[i] = 1
+#    return x
+#def minval(x):
+#    for i in range(0, len(x)):
+#        if(x[i] < 0): x[i] = 0
+#    return x
 
-#def min(x,y):
-#    if(x < y): return x
-#    else: return y
-
-#print (min(1,2))
-#print (max(1,2))
-
-#x = np.linspace(0, np.sqrt(10**2 + 25**2), 1000)
-x = np.linspace(0, 5.0, 1000)
-#plt.plot(x, exp(-10*x/2), color = 'black')
-#plt.plot(x, maxval(exp(-5+10*x/2)), color = 'blue')
-#plt.plot(x, minval(1.0 - exp(-10*x/2) - maxval(exp(-5+10*x/2))), color = 'red')
-#print (maxval(exp(-10+x)))
-
-def p(t):
-    return np.matrix([lims(exp(-t/2)), 1.0 - lims(exp(-t/2)) - lims(exp(-5+t/2)), lims(exp(-5+t/2))]);
-def P(t):
-    return np.vstack([p(t), p(t), p(t)]);
-def la(t):
-    return P(t) - np.identity(3);
-
-            #double p0 = Math.Max(Math.Min(1 / Math.Pow(dist + 1.0, 2), 0.95), 0.05);
-            #double p2 = Math.Max(Math.Min(1 / Math.Pow(5.0 - dist, 2), 0.95), 0.05);
+#def lims(x):
+#    if(x > 0.95): return 0.95
+#    else:
+#        if(x < 0.05): return 0.05
+#        else: return x
 
 
-print(la(0.0))
-print(la(2.0))
-print(la(4.0))
-print(la(6.0))
-print(la(8.0))
-print(la(10.0))
+#x = np.linspace(0, 5.0, 1000)
 
-show()
+
+#def p(t):
+#    return np.matrix([lims(exp(-t/2)), 1.0 - lims(exp(-t/2)) - lims(exp(-5+t/2)), lims(exp(-5+t/2))]);
+#def P(t):
+#    return np.vstack([p(t), p(t), p(t)]);
+#def la(t):
+#    return P(t) - np.identity(3);
+
+
+
+#print(la(0.0))
+#print(la(2.0))
+#print(la(4.0))
+#print(la(6.0))
+#print(la(8.0))
+#print(la(10.0))
+
 f.savefig("../Output/graph.pdf")
+#show()
 

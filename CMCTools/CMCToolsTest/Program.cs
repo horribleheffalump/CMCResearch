@@ -119,7 +119,8 @@ namespace CMCToolsTest
             double T = 10.0 * 60.0;
             //Coords[] BaseStations = new[] { new Coords(0.1, 0.5), new Coords(0.35, 1.7), new Coords(0.8, 1.3) };
             //Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.3, 0.9), new Coords(0.6, 0.6) };
-            Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.3, 0.7), new Coords(0.8, 0.2) };
+            //Coords[] BaseStations = new[] { new Coords(0.1, 0.4), new Coords(0.05, 1.0), new Coords(0.8, 0.2) };
+            Coords[] BaseStations = new[] { new Coords(0.2, 1.1), new Coords(0.7, 1.6), new Coords(0.8, 0.2) };
             Coords Pos0 = new Coords(0, 0);
             double h = 10e-3;
             Func<double, Coords> PosDynamics = (t) => new Coords(t / 600.0, 10.0 * t / 600.0 - t * t / 36000.0);
@@ -181,26 +182,26 @@ namespace CMCToolsTest
 
             test.UString = "[1/3; 1/3; 1/3]";
             test.Name = "uniform";
-            //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateAndSaveTrajectory();
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 1.0, 0.0, 0.0 };
             test.UString = "[1; 0; 0]";
             test.Name = "all_to_0";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 1.0, 0.0 };
             test.UString = "[0; 1; 0]";
             test.Name = "all_to_1";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 0.0, 1.0 };
             test.UString = "[0; 0; 1]";
             test.Name = "all_to_2";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             //
             test.U = (t, pi, X, dists, dN) =>
@@ -216,7 +217,7 @@ namespace CMCToolsTest
             test.UString = "[apr prop]";
             test.Name = "a_priori_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
 
 
@@ -232,7 +233,7 @@ namespace CMCToolsTest
             test.UString = "[apr conc]";
             test.Name = "a_priori_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -249,7 +250,7 @@ namespace CMCToolsTest
             test.UString = "[fb prop]";
             test.Name = "feedback_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -263,7 +264,7 @@ namespace CMCToolsTest
             test.UString = "[fb conc]";
             test.Name = "feedback_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             ////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
             double[,] a = new double[,] { { 1.0, 1.0, 1.0 }, { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } };
@@ -325,7 +326,7 @@ namespace CMCToolsTest
             test.UString = "[suboptimal]";
             test.Name = "suboptimal";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
             test.doCalculateFilter = false;
             b = new double[] { 1.0, 0.0, 0.0, 0.0 };
@@ -364,7 +365,7 @@ namespace CMCToolsTest
             test.UString = "[best]";
             test.Name = "best";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 5);
+            test.GenerateSeriesAndSaveCrits(200, 10);
 
 
 
@@ -532,6 +533,10 @@ namespace CMCToolsTest
                                                     string.Format(Properties.Settings.Default.ValueFunctionTrajectory, tr.Crits.FindIndex(s => s == c)), every
                     );
             }
+            List<double> result = tr.Crits.Select(c => c.J).ToList();
+            result.Add(tr.Channels.Sum(c => c.CPOS.Observation.N));
+            result.Add(tr.Crits.Last().J - 2 * tr.Channels.Sum(c => c.CPOS.Observation.N));
+
         }
 
         public void GenerateSeriesAndSaveCrits(int samplesCount, int packCount)

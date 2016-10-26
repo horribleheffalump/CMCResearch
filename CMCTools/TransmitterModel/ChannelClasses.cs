@@ -73,8 +73,8 @@ namespace TransmitterModel
             dist = Math.Max(minDist, dist);
             //dist = dist * 2.0;
             dist = dist * 2.0;
-            double p0 = Math.Max(Math.Min(1 / Math.Pow(dist + 1.0, 2.0), 0.95), 0.05);
-            double p2 = Math.Max(Math.Min(1 / Math.Pow(5.0 - dist, 2.0), 0.95), 0.05);
+            double p0 = Math.Max(Math.Min(1 / Math.Pow(dist, 2.0), 0.95), 0.05);
+            double p2 = Math.Max(Math.Min(1 / Math.Pow(5.5 - dist, 2.0), 0.95), 0.05);
             //double p0 = Math.Max(Math.Min(Math.Exp(-dist / 2.0), 0.95), 0.05);
             //double p2 = Math.Max(Math.Min(Math.Exp(-5 + dist / 2.0), 0.95), 0.05);
             double p1 = 1.0 - p0 - p2;

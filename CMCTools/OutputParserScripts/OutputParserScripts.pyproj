@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>212ac384-4c11-4f81-aebf-a26404881d3f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Filter.py</StartupFile>
+    <StartupFile>Trajectory.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
