@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>212ac384-4c11-4f81-aebf-a26404881d3f</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Trajectory.py</StartupFile>
+    <StartupFile>_fig3_onlygood.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -42,6 +42,19 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="valuefunctions.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="_fig1.py" />
+    <Compile Include="_fig2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="_fig3.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="_fig3_onlygood.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="_fig4.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

@@ -182,26 +182,26 @@ namespace CMCToolsTest
 
             test.UString = "[1/3; 1/3; 1/3]";
             test.Name = "uniform";
-            test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateAndSaveTrajectory();
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 1.0, 0.0, 0.0 };
             test.UString = "[1; 0; 0]";
             test.Name = "all_to_0";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 1.0, 0.0 };
             test.UString = "[0; 1; 0]";
             test.Name = "all_to_1";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 0.0, 1.0 };
             test.UString = "[0; 0; 1]";
             test.Name = "all_to_2";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             //
             test.U = (t, pi, X, dists, dN) =>
@@ -217,7 +217,7 @@ namespace CMCToolsTest
             test.UString = "[apr prop]";
             test.Name = "a_priori_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
 
 
@@ -233,7 +233,7 @@ namespace CMCToolsTest
             test.UString = "[apr conc]";
             test.Name = "a_priori_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -242,7 +242,7 @@ namespace CMCToolsTest
                 {
                     for (int i = 0; i < dN.Count(); i++)
                     {
-                        U[i] = (double)dN[i] / (double)dN.Sum();
+                        U[i] = 0.5 - 0.5*(double)dN[i] / (double)dN.Sum();
                     }
                 }
                 return U;
@@ -250,7 +250,7 @@ namespace CMCToolsTest
             test.UString = "[fb prop]";
             test.Name = "feedback_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -258,18 +258,18 @@ namespace CMCToolsTest
                 double[] U1 = new[] { 0.0, 1.0, 0.0 };
                 double[] U2 = new[] { 0.0, 0.0, 1.0 };
                 if (dN[0] < Math.Min(dN[1], dN[2])) return U0;
-                else if (dN[1] < Math.Min(dN[0], dN[2])) return U1;
-                else return U2;
+                else if (dN[2] < Math.Min(dN[0], dN[1])) return U2;
+                else return U1;
             };
             test.UString = "[fb conc]";
             test.Name = "feedback_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             ////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
             double[,] a = new double[,] { { 1.0, 1.0, 1.0 }, { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } };
             //double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
-            double[] b = new double[] { 1.0, -0.01, -0.01, -0.01 };
+            double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
 
             test.doCalculateFilter = true;
             test.h = 10e-4;
@@ -325,8 +325,8 @@ namespace CMCToolsTest
             };
             test.UString = "[suboptimal]";
             test.Name = "suboptimal";
-            //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            test.GenerateAndSaveTrajectory();
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
             test.doCalculateFilter = false;
             b = new double[] { 1.0, 0.0, 0.0, 0.0 };
@@ -365,7 +365,7 @@ namespace CMCToolsTest
             test.UString = "[best]";
             test.Name = "best";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(200, 10);
+            //test.GenerateSeriesAndSaveCrits(10, 10);
 
 
 
