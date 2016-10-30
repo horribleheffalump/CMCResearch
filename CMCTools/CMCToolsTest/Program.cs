@@ -167,6 +167,32 @@ namespace CMCToolsTest
 
             };
 
+            Func<double, Vector<double>[], double[], int[], double> ValueFunctionRight = (t, pi, U, Obs) =>
+            {
+                double J = 0;
+                for (int k0 = 0; k0 < 3; k0++)
+                    for (int k1 = 0; k1 < 3; k1++)
+                        for (int k2 = 0; k2 < 3; k2++)
+                        {
+                            J += 4.0 * (1 - 1 / (1 +
+                                                (1 - Costs(t))[k0] * U[0] +
+                                                (1 - Costs(t))[k1] * U[1] +
+                                                (1 - Costs(t))[k2] * U[2])
+                                                ) * pi[0][k0] * pi[1][k1] * pi[2][k2];
+                        }
+
+
+                double energylosses = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    energylosses += (1 + Costs(t)).ConjugateDotProduct(pi[i]) * U[i];
+                }
+
+                J -= energylosses / (1 + Costs(t).Min());
+                return J;
+
+            };
+
 
             List<Func<double, Vector<double>[], double[], int[], double>> ValueFunctions = new List<Func<double, Vector<double>[], double[], int[], double>>();
             ValueFunctions.Add(ValueFunction);
@@ -183,25 +209,25 @@ namespace CMCToolsTest
             test.UString = "[1/3; 1/3; 1/3]";
             test.Name = "uniform";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 1.0, 0.0, 0.0 };
             test.UString = "[1; 0; 0]";
             test.Name = "all_to_0";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 1.0, 0.0 };
             test.UString = "[0; 1; 0]";
             test.Name = "all_to_1";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 0.0, 1.0 };
             test.UString = "[0; 0; 1]";
             test.Name = "all_to_2";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             //
             test.U = (t, pi, X, dists, dN) =>
@@ -217,7 +243,7 @@ namespace CMCToolsTest
             test.UString = "[apr prop]";
             test.Name = "a_priori_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
 
 
@@ -233,7 +259,7 @@ namespace CMCToolsTest
             test.UString = "[apr conc]";
             test.Name = "a_priori_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -242,7 +268,7 @@ namespace CMCToolsTest
                 {
                     for (int i = 0; i < dN.Count(); i++)
                     {
-                        U[i] = 0.5 - 0.5*(double)dN[i] / (double)dN.Sum();
+                        U[i] = 0.5 - 0.5 * (double)dN[i] / (double)dN.Sum();
                     }
                 }
                 return U;
@@ -250,38 +276,34 @@ namespace CMCToolsTest
             test.UString = "[fb prop]";
             test.Name = "feedback_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
                 double[] U0 = new[] { 1.0, 0.0, 0.0 };
                 double[] U1 = new[] { 0.0, 1.0, 0.0 };
                 double[] U2 = new[] { 0.0, 0.0, 1.0 };
-                if (dN[0] < Math.Min(dN[1], dN[2])) return U0;
-                else if (dN[1] < Math.Min(dN[0], dN[2])) return U2;
-                else return U2;
+                if (dN[1] < Math.Min(dN[0], dN[2])) return U1;
+                else if (dN[2] < Math.Min(dN[0], dN[1])) return U2;
+                else return U0;
             };
             test.UString = "[fb conc]";
             test.Name = "feedback_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
 
             ////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
             double[,] a = new double[,] { { 1.0, 1.0, 1.0 }, { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } };
             //double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
-            double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
+            double[] b = new double[] { 1.0, -0.05, -0.05, -0.5 };
 
             test.doCalculateFilter = true;
             test.h = 10e-4;
             test.U = (t, pi, X, dists, dN) =>
             {
-                double f111=
 
-
-                // sum_{k1,...,kM} f_K(u) prod_1^M < pi^i, e_ki > - sum_1^M <lambda^i, pi^i> u^i
-
-                LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunction(t, pi, (u as double[]), null));
+                LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunctionRight(t, pi, (u as double[]), null));
                 Lincoa optimizer = new Lincoa(F, a, b);
 
                 double[] U0 = new[] { 0.90, 0.05, 0.05 };
@@ -308,77 +330,48 @@ namespace CMCToolsTest
             test.UString = "[suboptimal]";
             test.Name = "suboptimal";
             test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
 
-            //////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
-            //double[,] a = new double[,] { { 1.0, 1.0, 1.0 }, { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } };
-            ////double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
-            //double[] b = new double[] { 1.0, -0.05, -0.05, -0.05 };
+            test.doCalculateFilter = true;
+            test.h = 10e-4;
+            test.U = (t, pi, X, dists, dN) =>
+            {
+                LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunction(t, pi, (u as double[]), null));
+                Lincoa optimizer = new Lincoa(F, a, b);
 
-            //test.doCalculateFilter = true;
-            //test.h = 10e-4;
-            //test.U = (t, pi, X, dists, dN) =>
-            //{
-            //    LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunction(t, pi, (u as double[]), null));
-            //    Lincoa optimizer = new Lincoa(F, a, b);
+                double[] U0 = new[] { 0.90, 0.05, 0.05 };
+                double[] U1 = new[] { 0.05, 0.90, 0.05 };
+                double[] U2 = new[] { 0.05, 0.05, 0.90 };
+                double[] U_start;
+                if (dists[0] < Math.Min(dists[1], dists[2])) U_start = U0;
+                else if (dists[1] < Math.Min(dists[0], dists[2])) U_start = U1;
+                else U_start = U2;
 
-            //    double[] U0 = new[] { 0.90, 0.05, 0.05 };
-            //    double[] U1 = new[] { 0.05, 0.90, 0.05 };
-            //    double[] U2 = new[] { 0.05, 0.05, 0.90 };
-            //    double[] U_start;
-            //    if (dists[0] < Math.Min(dists[1], dists[2])) U_start = U0;
-            //    else if (dists[1] < Math.Min(dists[0], dists[2])) U_start = U1;
-            //    else U_start = U2;
-
-            //    //var result = optimizer.FindMinimum(new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
-            //    var result = optimizer.FindMinimum(U_start);
-            //    double[] res;// = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
-            //    if (result.Status == OptimizationStatus.Normal)
-            //    {
-            //        res = result.X;
-            //    }
-            //    else
-            //    {
-            //        throw new Exception();
-            //    }
-            //    //double[] res2;
-            //    //double[] res3;
-
-            //    //double[] U0 = new[] { 0.9, 0.05, 0.05 };
-            //    //double[] U1 = new[] { 0.05, 0.9, 0.05 };
-            //    //double[] U2 = new[] { 0.05, 0.05, 0.9 };
-            //    //double[] U01 = new[] { 1.0, 0.0, 0.0 };
-            //    //double[] U11 = new[] { 0.0, 1.0, 0.0 };
-            //    //double[] U21 = new[] { 0.0, 0.0, 1.0 };
-            //    //double kappa0 = Costs(t).ConjugateDotProduct(pi[0]);// pi[0].ConjugateDotProduct(Costs(t));
-            //    //double kappa1 = Costs(t).ConjugateDotProduct(pi[1]);// pi[1].ConjugateDotProduct(Costs(t));
-            //    //double kappa2 = Costs(t).ConjugateDotProduct(pi[2]);// pi[2].ConjugateDotProduct(Costs(t));
-            //    //if (kappa0 < Math.Min(kappa1, kappa2)) { res2 = U0; res3 = U01; }
-            //    //else if (kappa1 < Math.Min(kappa0, kappa2)) { res2 = U1; res3 = U11; }
-            //    //else { res2 = U2; res3 = U21; }
-
-            //    //if (res != res2)
-            //    //{
-            //    //    double v1 = ValueFuncion(t, pi, res, null);
-            //    //    double v2 = ValueFuncion(t, pi, res2, null);
-            //    //    double v3 = ValueFuncion(t, pi, res3, null);
-
-            //    //    return res;
-            //    //}
-            //    return res;
-            //};
-            //test.UString = "[suboptimal]";
-            //test.Name = "suboptimal";
+                //var result = optimizer.FindMinimum(new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
+                var result = optimizer.FindMinimum(U_start);
+                double[] res;// = new[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
+                if (result.Status == OptimizationStatus.Normal)
+                {
+                    res = result.X;
+                }
+                else
+                {
+                    throw new Exception();
+                }
+                return res;
+            };
+            test.UString = "[subsuboptimal]";
+            test.Name = "subsuboptimal";
             //test.GenerateAndSaveTrajectory();
-            //test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.doCalculateFilter = false;
             b = new double[] { 1.0, 0.0, 0.0, 0.0 };
             test.h = 10e-3;
             test.U = (t, pi, X, dists, dN) =>
             {
-                LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunction(t, X, (u as double[]), null));
+                LincoaObjectiveFunctionDelegate F = new LincoaObjectiveFunctionDelegate((n, u, flag) => -ValueFunctionRight(t, X, (u as double[]), null));
                 Lincoa optimizer = new Lincoa(F, a, b);
 
                 double[] U0 = new[] { 0.90, 0.05, 0.05 };
@@ -410,7 +403,7 @@ namespace CMCToolsTest
             test.UString = "[best]";
             test.Name = "best";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(5, 5);
+            test.GenerateSeriesAndSaveCrits(20, 10);
 
 
 
