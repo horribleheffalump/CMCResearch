@@ -49,7 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MCIntensityMatrix\CMCHelperClasses.csproj">
+    <ProjectReference Include="..\CMCClasses\CMCHelperClasses.csproj">
       <Project>{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}</Project>
       <Name>CMCHelperClasses</Name>
     </ProjectReference>
