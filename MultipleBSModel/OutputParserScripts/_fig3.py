@@ -68,5 +68,5 @@ for n in range(0,3):
     ax1.set_xlim(0,600)
     ax2.set_xlim(0,600)
     ax3.set_xlim(0,600)
-    plt.savefig(u"../Output/ForIFAC/filter_" + str(n) + ".pdf")
-    #plt.show()
+    #plt.savefig(u"../Output/ForIFAC.final/filter_" + str(n) + ".pdf")
+    plt.show()

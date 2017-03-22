@@ -3,16 +3,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 matplotlib.rc('text', usetex = True)
 import pylab
+import matplotlib.gridspec as gridspec
 
 f = plt.figure(num=None, figsize=(7,6), dpi=150, facecolor='w', edgecolor='k')
-plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
+#plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 
-ax0 = plt.subplot(311)
-ax1 = plt.subplot(312)
-ax2 = plt.subplot(313)
-#ax4 = plt.subplot(414)
+gs = gridspec.GridSpec(3, 2,
+                       width_ratios=[20,1],
+                       height_ratios=[1,1,1]
+                       )
+
+gs.update(left=0.07, bottom=0.07, right=0.95, top=0.99, wspace=0.03, hspace=0.13)
+
+ax0 = plt.subplot(gs[0])
+ax01 = plt.subplot(gs[1])
+ax1 = plt.subplot(gs[2])
+ax11 = plt.subplot(gs[3])
+ax2 = plt.subplot(gs[4])
+ax21 = plt.subplot(gs[5])
+
+
+#ax0 = plt.subplot(311)
+#ax1 = plt.subplot(312)
+#ax2 = plt.subplot(313)
+
 
 ax = [ax0, ax1, ax2]
+axleft = [ax01,ax11,ax21]
 
 for n in range(0,3):   
     filename = u"../Output/ForIFAC/MCTrajectory_" + str(n) + ".txt"
@@ -61,6 +78,10 @@ for n in range(0,3):
     #ax1.plot(t, p1, color = 'blue')
     #ax0.plot(t, p2, color = 'blue')
     
+    axleft[n].fill_between([0,1], 0, 1, color='black', alpha = 0.2, linewidth=0.0);
+    axleft[n].text(0.2, 0.6, 'good', rotation=-90)
+    axleft[n].set_axis_off()
+
     
     #ax4.plot(t, u*0.3 + 0.03 + 0.33 *n, color='black')
 
@@ -74,4 +95,17 @@ ax0.axes.get_yaxis().set_visible(False)
 ax1.axes.get_yaxis().set_visible(False)
 ax2.axes.get_yaxis().set_visible(False)
 
-plt.savefig(u"../Output/ForIFAC/fig_filter.pdf")
+
+axleft[2].text(1.3, 2.4, "The states of transmission channels MCs", rotation=-90);
+
+#ax1[2].yaxis.set_label_coords(1.05, 0.5)
+ax[2].set_xlabel("Time, $t$")
+
+ax0.text(-20, 0.5, r'$\langle\pi_t^1,e_1\rangle$', rotation=90)
+ax1.text(-20, 0.5, r'$\langle\pi_t^2,e_1\rangle$', rotation=90)
+ax2.text(-20, 0.5, r'$\langle\pi_t^3,e_1\rangle$', rotation=90)
+
+ax2.text(-43, 2.9, r'The conditional probabilities $\langle\pi_t^i,e_1\rangle$ of the $i$th channel state ``good"', rotation=90)
+
+#plt.show()
+plt.savefig(u"../Output/ForIFAC.final/fig_filter.pdf")

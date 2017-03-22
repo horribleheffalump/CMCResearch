@@ -3,17 +3,34 @@ import matplotlib.pyplot as plt
 import numpy as np
 matplotlib.rc('text', usetex = True)
 import pylab
+import matplotlib.gridspec as gridspec
 
 f = plt.figure(num=None, figsize=(7,6), dpi=150, facecolor='w', edgecolor='k')
-plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
+#plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 
-ax0 = plt.subplot(311)
-ax1 = plt.subplot(312)
-ax2 = plt.subplot(313)
-#ax4 = plt.subplot(414)
+#ax0 = plt.subplot(311)
+#ax1 = plt.subplot(312)
+#ax2 = plt.subplot(313)
+
+
+gs = gridspec.GridSpec(3, 2,
+                       width_ratios=[20,1],
+                       height_ratios=[1,1,1]
+                       )
+
+gs.update(left=0.07, bottom=0.07, right=0.95, top=0.99, wspace=0.03, hspace=0.13)
+
+ax0 = plt.subplot(gs[0])
+ax01 = plt.subplot(gs[1])
+ax1 = plt.subplot(gs[2])
+ax11 = plt.subplot(gs[3])
+ax2 = plt.subplot(gs[4])
+ax21 = plt.subplot(gs[5])
+
+
 
 ax = [ax0, ax1, ax2]
-
+axleft = [ax01,ax11,ax21]
 for n in range(0,3):   
     filename = u"../Output/ForIFAC/MCTrajectory_" + str(n) + ".txt"
     t, X = np.loadtxt(filename, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
@@ -64,6 +81,10 @@ for n in range(0,3):
     
     ax[n].plot(t, u, color='black')
 
+    axleft[n].fill_between([0,1], 0, 1, color='black', alpha = 0.2, linewidth=0.0);
+    axleft[n].text(0.2, 0.6, 'good', rotation=-90)
+    axleft[n].set_axis_off()
+
     #ax4.fill_between(Utplot, Ulevelzero, Ulevelone, where=Uplot>Uones, color='black', alpha = 0.5, linewidth=0.0);
     #ax3.plot(t, u, color = 'red')
 
@@ -74,4 +95,20 @@ ax0.axes.get_yaxis().set_visible(False)
 ax1.axes.get_yaxis().set_visible(False)
 ax2.axes.get_yaxis().set_visible(False)
 
-plt.savefig(u"../Output/ForIFAC/fig_control.pdf")
+
+
+axleft[2].text(1.3, 2.4, "The states of transmission channels MCs", rotation=-90);
+
+#ax1[2].yaxis.set_label_coords(1.05, 0.5)
+ax[2].set_xlabel("Time, $t$")
+
+ax0.text(-20, 0.5, r'$\hat{u}^{1}_t$', rotation=90)
+ax1.text(-20, 0.5, r'$\hat{u}^{2}_t$', rotation=90)
+ax2.text(-20, 0.5, r'$\hat{u}^{3}_t$', rotation=90)
+
+ax2.text(-43, 2.3, r'The optimal control $\hat{u}^{i}_t$ for the $i$th channel', rotation=90)
+
+
+
+#plt.show()
+plt.savefig(u"../Output/ForIFAC.final/fig_control.pdf")
