@@ -31,7 +31,7 @@ y2 = 10.0 * t2 / 600.0 - t2 * t2 / 36000.0
 from pylab import *
 
 f = plt.figure(num=None, figsize=(3, 1), dpi=150, facecolor='w', edgecolor='k')
-plt.subplots_adjust(left=0.06, bottom=0.07, right=0.98, top=0.95, wspace=0.1)
+plt.subplots_adjust(left=0.06, bottom=0.01, right=0.98, top=0.99, wspace=0.1)
 #ax1 = plt.subplot(411)
 ax1 = plt.subplot(111)
 ax1.plot(x, y, '-', color = 'black', linewidth = 1.0)
@@ -46,4 +46,4 @@ plt.text(0.22, 1.15, 'BS1', fontdict = {'size' : 10})
 plt.text(0.57, 1.65, 'BS2', fontdict = {'size' : 10})
 plt.text(0.82, 0.25, 'BS3', fontdict = {'size' : 10})
 
-plt.savefig("../Output/ForIFAC/fig_trajectory.pdf")
+plt.savefig("../Output/ForIFAC.final/fig_trajectory.pdf")

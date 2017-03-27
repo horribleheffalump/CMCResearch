@@ -8,7 +8,7 @@ import matplotlib.gridspec as gridspec
 filename = u"../Output/ForIFAC/TrTrajectory.txt"
 t, x, y, d1, d2, d3 = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4,5), unpack=True, dtype=float)
 
-f = plt.figure(num=None, figsize=(7, 6), dpi=150, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(7, 5), dpi=150, facecolor='w', edgecolor='k')
 #plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 
 
@@ -17,7 +17,7 @@ gs = gridspec.GridSpec(3, 2,
                        height_ratios=[1,1,1]
                        )
 
-gs.update(left=0.07, bottom=0.07, right=0.95, top=0.99, wspace=0.03, hspace=0.13)
+gs.update(left=0.07, bottom=0.04, right=0.95, top=0.99, wspace=0.02, hspace=0.02)
 
 ax2 = plt.subplot(gs[0])
 ax21 = plt.subplot(gs[1])
@@ -89,16 +89,22 @@ for n in range(0,3):
     #ax_N[n].plot(tN, N, color = 'blue')
     #for tl in ax_N[n].get_yticklabels():
     #    tl.set_color('b')
-ax1[2].text(1.3, 7.3, "The states of transmission channels MCs", rotation=-90);
+ax1[2].text(1.3, 7.3, "States of transmission channels MCs", rotation=-90);
 
 #ax1[2].yaxis.set_label_coords(1.05, 0.5)
-ax[2].set_xlabel("Time, $t$")
+#ax[2].set_xlabel("Time, $t$")
 
 ax[0].text(-20, 1.6, '$r_1(t)$', rotation=90)
 ax[1].text(-20, 1.6, '$r_2(t)$', rotation=90)
 ax[2].text(-20, 1.6, '$r_3(t)$', rotation=90)
 
-ax[2].text(-43, 8.3, 'The distance between the UAV and the base stations $r_i(t)$', rotation=90)
+
+plt.setp(ax[0].get_xticklabels(), visible=False)
+plt.setp(ax[1].get_xticklabels(), visible=False)
+
+
+
+ax[2].text(-43, 8.4, 'Distance between the UAV and the base stations $r_i(t)$', rotation=90)
 
 
 #plt.show()

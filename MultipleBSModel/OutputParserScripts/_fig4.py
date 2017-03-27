@@ -5,7 +5,7 @@ matplotlib.rc('text', usetex = True)
 import pylab
 import matplotlib.gridspec as gridspec
 
-f = plt.figure(num=None, figsize=(7,6), dpi=150, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
 #plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 
 #ax0 = plt.subplot(311)
@@ -18,7 +18,8 @@ gs = gridspec.GridSpec(3, 2,
                        height_ratios=[1,1,1]
                        )
 
-gs.update(left=0.07, bottom=0.07, right=0.95, top=0.99, wspace=0.03, hspace=0.13)
+#gs.update(left=0.07, bottom=0.07, right=0.95, top=0.99, wspace=0.03, hspace=0.13)
+gs.update(left=0.07, bottom=0.04, right=0.95, top=0.99, wspace=0.02, hspace=0.02)
 
 ax0 = plt.subplot(gs[0])
 ax01 = plt.subplot(gs[1])
@@ -97,16 +98,21 @@ ax2.axes.get_yaxis().set_visible(False)
 
 
 
-axleft[2].text(1.3, 2.4, "The states of transmission channels MCs", rotation=-90);
+axleft[2].text(1.3, 2.4, "States of transmission channels MCs", rotation=-90);
 
 #ax1[2].yaxis.set_label_coords(1.05, 0.5)
-ax[2].set_xlabel("Time, $t$")
+#ax[2].set_xlabel("Time, $t$")
 
 ax0.text(-20, 0.5, r'$\hat{u}^{1}_t$', rotation=90)
 ax1.text(-20, 0.5, r'$\hat{u}^{2}_t$', rotation=90)
 ax2.text(-20, 0.5, r'$\hat{u}^{3}_t$', rotation=90)
 
-ax2.text(-43, 2.3, r'The optimal control $\hat{u}^{i}_t$ for the $i$th channel', rotation=90)
+
+plt.setp(ax[0].get_xticklabels(), visible=False)
+plt.setp(ax[1].get_xticklabels(), visible=False)
+
+
+ax2.text(-43, 2.3, r'Suboptimal control for the $i$th channel', rotation=90)
 
 
 
