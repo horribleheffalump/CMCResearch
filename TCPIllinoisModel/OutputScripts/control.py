@@ -6,11 +6,15 @@ import pylab
 
 
 filename = u"../out/control.txt"
-t, u, rtt, rttmin, rttmax, dm = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4,5), unpack=True, dtype=float)
+t, u, rtt, rttmin, rttmax, dm, dh, dl,ss, thresh = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4,5,6,7,8,9), unpack=True, dtype=float)
 
 f = plt.figure(num=None, figsize=(7, 6), dpi=150, facecolor='w', edgecolor='k')
 
-plt.plot(t, u, '--', color = 'blue')
+plt.plot(t, u, '-', color = 'blue')
+plt.plot(t, dh, 'o', color = 'black')
+plt.plot(t, dl, 'x', color = 'red')
+plt.plot(t, ss, '--', color = 'green')
+plt.plot(t, thresh, ':', color = 'yellow')
 plt.show()
 
 #plt.plot(t, rtt, '--', color = 'red')

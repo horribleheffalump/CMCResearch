@@ -9,7 +9,7 @@ namespace TCPIllinoisAgent
     public class Sender
     {
         double W_0 = 1;                     // min windiw size
-        double W_1 = 10;                    // slow start -> congestion avoidance threshold
+        public double W_1 = 10;                    // slow start -> congestion avoidance threshold
         double W;                          // ccurrent window size
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
@@ -27,7 +27,7 @@ namespace TCPIllinoisAgent
             T_max = double.NaN;
         }
 
-        int SSIndicator
+        public int SSIndicator
         {
             get { return W < W_1 ? 1 : 0; }
         }
@@ -44,15 +44,16 @@ namespace TCPIllinoisAgent
             double d = Rtt - T_min;
 
             W = W
-                + SSIndicator * alpha_ss * W * h //slow start additive encrease 
-                + (1 - SSIndicator) * alpha(d) / W * h //congestion avoidance additive encrease
+                + SSIndicator * alpha_ss / W * h //slow start additive increase 
+                + (1 - SSIndicator) * alpha(d) / W * h //congestion avoidance additive increase
                 - SSIndicator * beta_ss * W * dh //multiple decrease when loss occurs in slow start
-                - (1 - SSIndicator) * beta(d) * W * dh //multiple decrease when loss occurs in congavoid
-                + (W_0 - W) * dl; // setting W_0 equal to W/2 and entering the SS phase when timout occurs
+                - (1 - SSIndicator) * beta(d) * W * dh; //multiple decrease when loss occurs in congavoid // ????? beta или 1-beta?
+            W = Math.Max(W, W_0);
 
             if (dl > 0)
             {
                 W_1 = W / 2;
+                W = W_0; // setting W_1 equal to W/2 and entering the SS phase when timout occurs
             }
             return W;
         }
