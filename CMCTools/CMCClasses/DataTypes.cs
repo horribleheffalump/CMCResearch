@@ -53,4 +53,24 @@ namespace CMCTools
 
     }
 
+    public class ScalarContinuousState
+    {
+        public double t;
+        public double x;
+        public ScalarContinuousState(double _t, double _x)
+        {
+            t = _t;
+            x = _x;
+        }
+
+        public override string ToString()
+        {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+            string result = string.Format(provider, "{0} {1}", t, x);
+            return result;
+        }
+
+    }
+
 }

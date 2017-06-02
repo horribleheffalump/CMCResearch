@@ -10,6 +10,7 @@ namespace TCPIllinoisAgent
     {
         double W_0 = 1;                     // min windiw size
         public double W_1 = 10;                    // slow start -> congestion avoidance threshold
+        double W_max = 50;              // maximum window size (bottleneck threshhold)
         double W;                          // ccurrent window size
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
@@ -17,11 +18,11 @@ namespace TCPIllinoisAgent
         public double T_min { get; set; } // min RTT in session 
         public double T_max { get; set; } // max RTT in session 
 
-        double h; //discretization step
+        //double h; //discretization step
 
-        public Sender(double _h)
+        public Sender()//(double _h)
         {
-            h = _h;
+            //h = _h;
             W = W_0;
             T_min = double.NaN;
             T_max = double.NaN;
@@ -31,7 +32,7 @@ namespace TCPIllinoisAgent
         {
             get { return W < W_1 ? 1 : 0; }
         }
-        public double step(double Rtt, int dh, int dl) //parameters: RTT, loss increment, timeout increment; returns: current control (window size)
+        public double step(double h, double Rtt, int dh, int dl) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
         {
             if (double.IsNaN(T_min) || double.IsNaN(T_max))
             {
@@ -48,7 +49,7 @@ namespace TCPIllinoisAgent
                 + (1 - SSIndicator) * alpha(d) / W * h //congestion avoidance additive increase
                 - SSIndicator * beta_ss * W * dh //multiple decrease when loss occurs in slow start
                 - (1 - SSIndicator) * beta(d) * W * dh; //multiple decrease when loss occurs in congavoid // ????? beta или 1-beta?
-            W = Math.Max(W, W_0);
+            W = Math.Min(Math.Max(W, W_0), W_max);
 
             if (dl > 0)
             {
