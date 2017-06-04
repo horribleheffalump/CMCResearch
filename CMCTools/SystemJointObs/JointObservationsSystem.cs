@@ -14,7 +14,7 @@ namespace SystemJointObs
         public ControllableCountingProcess[] CPObservations;
         public ControllableContinuousProcess ContObservations;
 
-        public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _Q, bool _saveHistory = false)
+        public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, bool _saveHistory = false)
         {
             State = new ControllableMarkovChain(_N, _t0, _T, _X0, _h, (t, u) => _A(t,u), _saveHistory);
             CPObservations = new ControllableCountingProcess[_c.Length];
@@ -22,7 +22,7 @@ namespace SystemJointObs
             {
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, (t, u) => _c[i](t,u)[State.X], _saveHistory);
             }
-            ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _Q(t, u)[State.X], _saveHistory);
+            ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _saveHistory);
         }
 
         public double Step(double u)

@@ -11,12 +11,31 @@ namespace Channel
 {
     public class HMMChannel
     {
-        int N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
+        int N;
+        double delta_p;
+        Vector<double> D;
+        Vector<double> K;
+        Vector<double> P;
+        Vector<double> Q;
+
         JointObservationsSystem JOS;
 
         public HMMChannel(int _N, double _t0, double _T, double _h, bool _saveHistory)
         {
-            JOS = new JointObservationsSystem(_N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, Q, _saveHistory);
+            JOS = new JointObservationsSystem(_N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveHistory);
+
+            N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
+            // RTT = delta_p + D X_t + w_t K X_t
+            delta_p = 0.01; // delta_p - signal propagation time
+            D = Vector(0.00, 0.01, 0.02, 0.02); // D X_t - queueing time because of the other senders transmission
+            K = Vector(0.00, 0.01, 0.02, 0.02); // w_t K X_t - queueing time because of senders own transmission
+
+            //loss intensity mu_t = R_t diag(P)
+            P = Vector(0.01, 0.05, 0.15, 0.15);
+            //timeout intensity nu_t = R_t diag(Q)
+            Q = Vector(0.001, 0.005, 0.015, 0.015);
+
+
         }
 
 
@@ -47,19 +66,48 @@ namespace Channel
 
         public Vector<double> LossIntensity(double t, double u)
         {
-            return Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 0 });
+            return Diag(P) * R(t,u);
         }
+
         public Vector<double> TimeoutIntensity(double t, double u)
         {
-            return Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 0 });
+            return  Diag(Q) * R(t, u);
         }
+
         public Vector<double> R(double t, double u)
         {
-            return Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 0 });
+            return Vector(
+                1.0 / (delta_p + D[0] + u * K[0]),
+                1.0 / (delta_p + D[1] + u * K[1]),
+                1.0 / (delta_p + D[2] + u * K[2]),
+                1.0 / (delta_p + D[3] + u * K[3])
+                );
         }
-        public Vector<double> Q(double t, double u)
+        public Vector<double> G(double t, double u)
         {
-            return Vector<double>.Build.DenseOfArray(new double[] { 0, 0, 0, 0 });
+            return Vector(
+                1.0 / Math.Sqrt(D[0] + u * K[0]),
+                1.0 / Math.Sqrt(D[1] + u * K[1]),
+                1.0 / Math.Sqrt(D[2] + u * K[2]),
+                1.0 / Math.Sqrt(D[3] + u * K[3])
+                );
         }
+
+        static Vector<double> Vector(params double[] val)
+        {
+            return Vector<double>.Build.Dense(val);
+        }
+
+        static Matrix<double> Diag(params double[] val)
+        {
+            return Matrix<double>.Build.DenseDiagonal(val.Length, val.Length, (i) => val[i]);
+        }
+
+        static Matrix<double> Diag(Vector<double> val)
+        {
+            return Matrix<double>.Build.DenseDiagonal(val.Count, val.Count, (i) => val[i]);
+        }
+
+
     }
 }
