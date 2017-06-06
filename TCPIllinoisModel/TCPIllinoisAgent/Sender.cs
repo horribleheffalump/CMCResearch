@@ -10,7 +10,7 @@ namespace TCPIllinoisAgent
     {
         double W_0 = 1;                     // min windiw size
         public double W_1 = 10;                    // slow start -> congestion avoidance threshold
-        double W_max = 50;              // maximum window size (bottleneck threshhold)
+        double W_max = 1000;              // maximum window size (bottleneck threshhold)
         double W;                          // ccurrent window size
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
@@ -45,7 +45,7 @@ namespace TCPIllinoisAgent
             double d = Rtt - T_min;
 
             W = W
-                + SSIndicator * alpha_ss / W * h //slow start additive increase 
+                + SSIndicator * alpha_ss * W * h //slow start additive increase 
                 + (1 - SSIndicator) * alpha(d) / W * h //congestion avoidance additive increase
                 - SSIndicator * beta_ss * W * dh //multiple decrease when loss occurs in slow start
                 - (1 - SSIndicator) * beta(d) * W * dh; //multiple decrease when loss occurs in congavoid // ????? beta или 1-beta?

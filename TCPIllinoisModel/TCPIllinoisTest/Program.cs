@@ -27,13 +27,14 @@ namespace TCPIllinoisTest
 
             for (double t = 0; t <= 1000; t += h)
             {
-                double p_loss = 0.025;
-                double p_to = 0.005;
+                double p_loss = 0.00025;
+                double p_to = 0.0005;
                 int dh = ContinuousUniform.Sample(0.0, 1.0) < p_loss * h ? 1 : 0;
                 int dl = ContinuousUniform.Sample(0.0, 1.0) < p_to * h ? 1 : 0;
-                double rtt = (100.0 + Normal.Sample(0, 5.0)) / 1000.0;
-                if (t > 500)
-                rtt = (100.0 + Normal.Sample(0, 5.0)) / 100.0;
+                double rtt = 0.01;
+                //double rtt = (100.0 + Normal.Sample(0, 5.0)) / 1000.0;
+                //if (t > 500)
+                //rtt = (100.0 + Normal.Sample(0, 5.0)) / 100.0;
                 double u = s.step(h, rtt, dh, dl);
                 NumberFormatInfo provider = new NumberFormatInfo();
                 provider.NumberDecimalSeparator = ".";
