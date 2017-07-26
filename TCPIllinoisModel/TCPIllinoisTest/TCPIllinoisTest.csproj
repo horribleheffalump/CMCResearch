@@ -51,9 +51,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CMCTools\CMCClasses\CMCHelperClasses.csproj">
+      <Project>{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}</Project>
+      <Name>CMCHelperClasses</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CMCTools\SystemJointObs\SystemJointObs.csproj">
+      <Project>{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}</Project>
+      <Name>SystemJointObs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TCPIllinoisAgent\TCPIllinoisAgent.csproj">
       <Project>{9c98482a-f20d-492d-b596-3593117088a0}</Project>
       <Name>TCPIllinoisAgent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TCPModel\TCPModel.csproj">
+      <Project>{CFA48E32-422F-4F9C-99BD-CE455C4ECFB1}</Project>
+      <Name>TCPModel</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

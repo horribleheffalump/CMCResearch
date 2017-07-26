@@ -20,9 +20,14 @@ namespace SystemJointObs
             CPObservations = new ControllableCountingProcess[_c.Length];
             for (int i = 0; i < _c.Length; i++)
             {
-                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, (t, u) => _c[i](t,u)[State.X], _saveHistory);
+                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c), _saveHistory);
             }
             ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _saveHistory);
+        }
+
+        public Func<double, double, double> C_i(int i, Func<double, double, Vector<double>>[] _c) // so that we use the proper i
+        {
+            return (t, u) => _c[i](t, u)[State.X];
         }
 
         public double Step(double u)

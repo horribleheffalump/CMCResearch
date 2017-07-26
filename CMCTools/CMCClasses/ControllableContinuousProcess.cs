@@ -40,13 +40,13 @@ namespace CMCTools
             SaveHistory = _SaveHistory;
             //if (SaveHistory)
             Trajectory.Add(new ScalarContinuousState(t0, x0));
-            Noise = new Normal(0, Math.Sqrt(h));
+            Noise = new Normal(0, 1);
         }
 
         public double Step(double u)
         {
             t += h;
-            x = x + A(t, u) * h + B(t, u) * Noise.Sample();
+            x = x + A(t, u) * h + B(t, u) * Noise.Sample() * Math.Sqrt(h);
             Trajectory.Add(new ScalarContinuousState(t, x));
             return x;
         }

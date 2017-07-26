@@ -9,7 +9,7 @@ namespace TCPIllinoisAgent
     public class Sender
     {
         double W_0 = 1;                     // min windiw size
-        public double W_1 = 10;                    // slow start -> congestion avoidance threshold
+        public double W_1 = 0;                    // slow start -> congestion avoidance threshold
         double W_max = 1000;              // maximum window size (bottleneck threshhold)
         double W;                          // ccurrent window size
         double alpha_ss = 1;            // growth coefficient in slow start
