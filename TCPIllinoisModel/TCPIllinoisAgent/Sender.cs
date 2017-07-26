@@ -48,8 +48,8 @@ namespace TCPIllinoisAgent
                 + SSIndicator * alpha_ss * W * h //slow start additive increase 
                 + (1 - SSIndicator) * alpha(d) / W * h //congestion avoidance additive increase
                 - SSIndicator * beta_ss * W * dh //multiple decrease when loss occurs in slow start
-                - (1 - SSIndicator) * beta(d) * W * dh; //multiple decrease when loss occurs in congavoid // ????? beta или 1-beta?
-            W = Math.Min(Math.Max(W, W_0), W_max);
+                - (1 - SSIndicator) * beta(d) * W * dh; //multiple decrease when loss occurs in congavoid
+            W = Math.Min(Math.Max(W, W_0), W_max); // make W in [W_0, W_max]
 
             if (dl > 0)
             {
@@ -59,7 +59,7 @@ namespace TCPIllinoisAgent
             return W;
         }
 
-        public double d_m                      // maximum average queueing delay = T_max-T_min
+        public double d_m   // maximum average queueing delay = T_max-T_min
         {
             get
             {
