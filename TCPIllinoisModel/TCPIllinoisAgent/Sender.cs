@@ -15,25 +15,54 @@ namespace TCPIllinoisAgent
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
 
+        public double rawrtt;   // row rtt obtained from received acks. We calculate dt - a time spent to get df acks, where df has a minimum of f_step, then calculate rawrtt = df / dt. 
+        public double rtt;      // rtt estimate obtained from rawrtt data by means of ecpontntial smoothing
+        double gamma = 0.9; // exponential smoothing parameter
+        int f_step = 10; // akk discretization step
+        double df = 0.0; // number of acks since last moment we've updated rtt
+        double dt = 0.0; // time spent to get at least f_step acks
+
+
+
         public double T_min { get; set; } // min RTT in session 
         public double T_max { get; set; } // max RTT in session 
 
         //double h; //discretization step
 
-        public Sender()//(double _h)
+        public Sender(double _rawrtt) // parameters: start point for RTT estimation
         {
             //h = _h;
             W = W_0;
             T_min = double.NaN;
             T_max = double.NaN;
+            rawrtt = _rawrtt;
+            rtt = rawrtt;
         }
 
         public int SSIndicator
         {
             get { return W < W_1 ? 1 : 0; }
         }
-        public double step(double h, double Rtt, int dh, int dl) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+
+
+        public double estimateRTT(double h, double _df) //parameters: time increment, acks received increment. Returns exponential smooth estimate of RTT
         {
+            dt += h;
+            df += _df;
+            if (df > f_step)
+            {
+                rawrtt = dt / df;
+                rtt = (1 - gamma) * rawrtt + (gamma) * rtt; // exponential smoothing
+                df = 0;
+                dt = 0;
+            }
+            return rtt;
+        }
+
+        public double step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        {
+            if (double.IsNaN(Rtt)) Rtt = rtt;
+
             if (double.IsNaN(T_min) || double.IsNaN(T_max))
             {
                 T_min = Rtt;

@@ -23,7 +23,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="alpha_beta.py" />
+    <Compile Include="Points.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="control.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="rtt.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

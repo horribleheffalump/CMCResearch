@@ -19,6 +19,7 @@ namespace CMCTools
         public double T;        // observation end time
         public double x0 = 0;      // initial state
         public double x;           // current state
+        public double dx = 0.0;    // current state increment
         public double h = 1e-3; // discretization step
         public bool SaveHistory;
 
@@ -46,7 +47,8 @@ namespace CMCTools
         public double Step(double u)
         {
             t += h;
-            x = x + A(t, u) * h + B(t, u) * Noise.Sample() * Math.Sqrt(h);
+            dx = A(t, u) * h + B(t, u) * Noise.Sample() * Math.Sqrt(h);
+            x = x + dx;
             Trajectory.Add(new ScalarContinuousState(t, x));
             return x;
         }
