@@ -40,21 +40,24 @@ namespace CMCTools
         {
             double p = Intensity(t, u) * h;
             t += h;
-            int nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
-            if (nojump == 0)
+            if (p > 0) // for the case when we got zero or less intencity due to the simultaneous jumps modelling
             {
-                N++;
-                var J = new Jump(t, N);
-                //if (SaveHistory)
+                int nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
+                if (nojump == 0)
+                {
+                    N++;
+                    var J = new Jump(t, N);
+                    //if (SaveHistory)
                     Jumps.Add(J);
-            }
-            if (deltaT > 0.0) // if deltaT assigned, dN is equal to one if it was a jump during [t-deltaT, t]
-            {
-                dN = N - Jumps.FindLast(j => j.t <= Math.Max(0, t - deltaT)).X;
-            }
-            else // if deltaT is not assigned, dN is equal to one if it was a jump right now
-            {
-                dN = nojump == 0 ? 1 : 0;
+                }
+                if (deltaT > 0.0) // if deltaT assigned, dN is equal to one if it was a jump during [t-deltaT, t]
+                {
+                    dN = N - Jumps.FindLast(j => j.t <= Math.Max(0, t - deltaT)).X;
+                }
+                else // if deltaT is not assigned, dN is equal to one if it was a jump right now
+                {
+                    dN = nojump == 0 ? 1 : 0;
+                }
             }
             return N;
         }

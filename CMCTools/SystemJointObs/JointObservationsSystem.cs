@@ -30,7 +30,7 @@ namespace SystemJointObs
             return (t, u) => _c[i](t, u)[State.X];
         }
 
-        public double Step(double u)
+        public virtual double Step(double u)
         {
             State.Step(u);
             for (int i = 0; i < CPObservations.Length; i++)
