@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace SystemJointObs
 {
-    class SimultaneousJumpsIntencity
+    public class SimultaneousJumpsIntencity
     {
         public int From;
         public int To;
         public Func<double, double, double> Intencity;
 
 
-        SimultaneousJumpsIntencity(int _from, int _to, Func<double, double, double> _intencity)
+        public SimultaneousJumpsIntencity(int _from, int _to, Func<double, double, double> _intencity)
         {
             From = _from;
             To = _to;
@@ -23,7 +23,7 @@ namespace SystemJointObs
         }
     }
 
-    class JointObservationsSystemSimultaniousJumps : JointObservationsSystem
+    public class JointObservationsSystemSimultaniousJumps : JointObservationsSystem
     {
         /// <summary>
         /// This class inherits the JointObservationSystem.
@@ -34,6 +34,8 @@ namespace SystemJointObs
         /// Each element of the list specifies the MC transision (from -> to) which may result in simultaneous CP jump and the corresponding intencity.
         /// </summary>
 
+        public List<SimultaneousJumpsIntencity>[] SimultaneousJumpsIntencities;
+
         public JointObservationsSystemSimultaniousJumps(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, bool _saveHistory = false) :
             base(_N, _t0, _T, _X0, _h, _A, _c, _R, _G, _saveHistory)
         {
@@ -43,26 +45,45 @@ namespace SystemJointObs
             }
             for (int i = 0; i < _c.Length; i++)
             {
-                Func<double, double, double> SummarizedIntencity = (t, u) =>
-                {
-                    double result = 0;
-                    foreach (SimultaneousJumpsIntencity _i in _I[i])
-                    {
-                        result += _i.Intencity(t, u);
-                    }
-                    return result;
-                };
-                CPObservations[i].Intensity = (t, u) => C_i(i, _c)(t, u) - SummarizedIntencity(t,u); // the intencity of the independent jumps of a counting process should be lessend by the intencities of the simultaneous jumps
+                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveHistory);
             }
+            SimultaneousJumpsIntencities = _I;
+        }
+
+        public Func<double, double, double> C_i(int i, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I) // so that we use the proper i
+        {
+            Func<double, double, double> SummarizedIntencity = (t, u) =>
+            {
+                double result = 0;
+                foreach (SimultaneousJumpsIntencity _i in _I[i])
+                {
+                    result += _i.Intencity(t, u);
+                }
+                return result;
+            };
+            return (t, u) => _c[i](t, u)[State.X] - SummarizedIntencity(t, u); // the intencity of the independent jumps of a counting process should be lessend by the intencities of the simultaneous jumps
         }
 
         public override double Step(double u)
         {
+            int x_ = State.X;
             State.Step(u);
+            int x = State.X;
             for (int i = 0; i < CPObservations.Length; i++)
             {
                 CPObservations[i].Step(u); // the independent jumps
-  
+                if (CPObservations[i].dN == 0 && x_ != x) // if there was no independent jump, simulate the simultaneous jumps caused by Markov chain state change
+                {
+                    foreach (var sim in SimultaneousJumpsIntencities[i].Where(s => s.From == x_ && s.To == x))
+                    {
+                        double p = sim.Intencity(State.t, u) / State.TransitionRateMatrix(State.t, u)[x_, x]; // Bayes theorem: P(A|B) = P(AB)/P(B); A - MC jump, B - CPO jump. P(AB) =  SimultaneousJumpsIntencitiy(x_ -> x) * h, P(B) = TransitionRateMatrix(x_ -> x) * h
+                        int nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
+                        if (nojump == 0)
+                        {
+                            CPObservations[i].Jump();
+                        }
+                    }
+                }
             }
             ContObservations.Step(u);
             return State.t;

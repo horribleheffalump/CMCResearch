@@ -33,7 +33,7 @@ namespace CMCTools
             Intensity = _Intensity;
             SaveHistory = _SaveHistory;
             //if (SaveHistory)
-                Jumps.Add(new Jump(t0, N0));
+            Jumps.Add(new Jump(t0, N0));
         }
 
         public int Step(double u)
@@ -59,7 +59,26 @@ namespace CMCTools
                     dN = nojump == 0 ? 1 : 0;
                 }
             }
+            else
+                dN = 0;
+
             return N;
+        }
+
+        public void Jump()
+        {
+            N++;
+            var J = new Jump(t, N, true);
+            //if (SaveHistory)
+            Jumps.Add(J);
+            if (deltaT > 0.0) // if deltaT assigned, dN is equal to one if it was a jump during [t-deltaT, t]
+            {
+                dN = N - Jumps.FindLast(j => j.t <= Math.Max(0, t - deltaT)).X;
+            }
+            else // if deltaT is not assigned, dN is equal to one if it was a jump right now
+            {
+                dN = 1;
+            }
         }
 
         //public Jump GetNextState(Func<double, double> u)

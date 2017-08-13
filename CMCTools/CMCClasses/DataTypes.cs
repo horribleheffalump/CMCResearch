@@ -11,22 +11,25 @@ namespace CMCTools
     {
         public double t;
         public int X;
+        public bool isSimultaneous;
 
-        public Jump(double _t, int _X)
+        public Jump(double _t, int _X, bool _isSimultaneous = false)
         {
             t = _t;
             X = _X;
+            isSimultaneous = _isSimultaneous;
         }
 
         public override string ToString()
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1}", t, X);
+            string result = string.Format(provider, "{0} {1} {2}", t, X, isSimultaneous ? "sim" : "");
             return result;
         }
 
     }
+
 
     public class Estimate
     {
