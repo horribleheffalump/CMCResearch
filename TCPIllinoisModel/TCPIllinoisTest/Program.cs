@@ -16,7 +16,7 @@ namespace TCPIllinoisTest
         {
             double h = 1e-4;
             double t0 = 0.0;
-            double T = 1000.0;
+            double T = 50.0;
             //StringBuilder res = new StringBuilder();
             List<string> res = new List<string>();
 
@@ -40,7 +40,8 @@ namespace TCPIllinoisTest
             string statepath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\channel_state.txt");
             string cpobspath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\CP_obs_{num}.txt");
             string contobspath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\cont_obs.txt");
-            channel.JOS.SaveAll(statepath, cpobspath, contobspath, every);
+            string filterpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\filter.txt");
+            channel.JOS.SaveAll(statepath, cpobspath, contobspath, filterpath, every);
 
             string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\control.txt");
             using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(controlpath))

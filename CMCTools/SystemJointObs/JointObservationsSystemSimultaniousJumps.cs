@@ -8,21 +8,6 @@ using System.Threading.Tasks;
 
 namespace SystemJointObs
 {
-    public class SimultaneousJumpsIntencity
-    {
-        public int From;
-        public int To;
-        public Func<double, double, double> Intencity;
-
-
-        public SimultaneousJumpsIntencity(int _from, int _to, Func<double, double, double> _intencity)
-        {
-            From = _from;
-            To = _to;
-            Intencity = _intencity;
-        }
-    }
-
     public class JointObservationsSystemSimultaniousJumps : JointObservationsSystem
     {
         /// <summary>
@@ -48,6 +33,7 @@ namespace SystemJointObs
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveHistory);
             }
             SimultaneousJumpsIntencities = _I;
+            Filter = new OptimalFilter(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveHistory);
         }
 
         public Func<double, double, double> C_i(int i, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I) // so that we use the proper i
@@ -86,6 +72,7 @@ namespace SystemJointObs
                 }
             }
             ContObservations.Step(u);
+            Filter.Step(u, CPObservations.Select(co => co.dN).ToArray(), ContObservations.dx, true);
             return State.t;
         }
 

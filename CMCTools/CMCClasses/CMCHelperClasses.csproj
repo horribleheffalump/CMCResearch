@@ -48,7 +48,9 @@
     <Compile Include="ControllableMarkovChain.cs" />
     <Compile Include="Criterion.cs" />
     <Compile Include="DataTypes.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FiniteDiscreteDistribution.cs" />
+    <Compile Include="OptimalFilter.cs" />
     <Compile Include="SuboptimalFilter.cs" />
     <Compile Include="TransitionRateMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

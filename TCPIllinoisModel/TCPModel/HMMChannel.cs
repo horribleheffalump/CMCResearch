@@ -31,14 +31,14 @@ namespace Channel
 
             // RTT = delta_p + D X_t + w_t K X_t
             delta_p = 0.01; // delta_p - signal propagation time
-            D = Vector(0.001, 0.01, 0.02, 0.04); // D X_t - queueing time because of the other senders transmission
-            K = Vector(0.001, 0.01, 0.02, 0.04); // w_t K X_t - queueing time because of senders own transmission
+            D = Extensions.Vector(0.001, 0.01, 0.02, 0.04); // D X_t - queueing time because of the other senders transmission
+            K = Extensions.Vector(0.001, 0.01, 0.02, 0.04); // w_t K X_t - queueing time because of senders own transmission
 
             //loss intensity mu_t = R_t diag(P)
-            P = Vector(0.0005, 0.0025, 0.0075, 0.02);
+            P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.02);
             //P = Vector(0.0, 0.0, 0.0, 0.0);
             //timeout intensity nu_t = R_t diag(Q)
-            Q = Vector(0.0001, 0.0005, 0.0015, 0.005);
+            Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.005);
             //Q = Vector(0.0, 0.0, 0.0, 0.0);
             if (doSimulateSimultaneousJumps)
             {
@@ -94,18 +94,18 @@ namespace Channel
 
         public Vector<double> LossIntensity(double t, double u)
         {
-            return Diag(P) * R(t,u);
+            return Extensions.Diag(P) * R(t,u);
         }
 
 
         public Vector<double> TimeoutIntensity(double t, double u)
         {
-            return  Diag(Q) * R(t, u);
+            return Extensions.Diag(Q) * R(t, u);
         }
 
         public Vector<double> R(double t, double u)
         {
-            return Vector(
+            return Extensions.Vector(
                 1.0 / (delta_p + D[0] + u * K[0]),
                 1.0 / (delta_p + D[1] + u * K[1]),
                 1.0 / (delta_p + D[2] + u * K[2]),
@@ -114,7 +114,7 @@ namespace Channel
         }
         public Vector<double> G(double t, double u)
         {
-            return Vector(
+            return Extensions.Vector(
                 1.0 / Math.Sqrt(D[0] + u * K[0]),
                 1.0 / Math.Sqrt(D[1] + u * K[1]),
                 1.0 / Math.Sqrt(D[2] + u * K[2]),
@@ -122,20 +122,6 @@ namespace Channel
                 );
         }
 
-        static Vector<double> Vector(params double[] val)
-        {
-            return Vector<double>.Build.Dense(val);
-        }
-
-        static Matrix<double> Diag(params double[] val)
-        {
-            return Matrix<double>.Build.DenseDiagonal(val.Length, val.Length, (i) => val[i]);
-        }
-
-        static Matrix<double> Diag(Vector<double> val)
-        {
-            return Matrix<double>.Build.DenseDiagonal(val.Count, val.Count, (i) => val[i]);
-        }
 
 
     }
