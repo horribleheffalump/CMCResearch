@@ -89,6 +89,17 @@ namespace CMCTools
             return x;
         }
 
+        public void Transit(int x)
+        {
+            if (x != X)
+            {
+                X = x;
+                var J = new Jump(t, X);
+                if (SaveHistory)
+                    Jumps.Add(J);
+            }
+        }
+
         //public Jump GetNextState(Func<double, Vector<double>> U) // here U is vector, because it is assumed to be predefined Markov control, i.e. vector of determined functions one for each state
         //{
         //    while (t < T)

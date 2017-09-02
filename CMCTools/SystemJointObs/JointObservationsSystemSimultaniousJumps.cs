@@ -67,6 +67,7 @@ namespace SystemJointObs
                         if (nojump == 0)
                         {
                             CPObservations[i].Jump();
+                            State.Transit(x);
                         }
                     }
                 }

@@ -71,16 +71,18 @@ namespace CMCTools
                 //var mu = Matrix<double>.Build.DenseOfColumnVectors(c.Select(v => v(t, u)));
 
                 var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
-                var x_part = pi + lambda.TransposeThisAndMultiply(pi)*h;
+                var x_part = lambda.TransposeThisAndMultiply(pi)*h;
                 var y_part = Extensions.Zero(N);
                 for (int i = 0; i < dy.Length; i++)
                 {
-                    var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) => I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0);
-                    var y_part_coeff = k * c[i](t, u);
-                    for (int j = 0; j < N; j++)
+                    var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
                     {
-                        y_part_coeff = y_part_coeff + pi[j] * IM.Column(j);
-                    }
+                        if (ii != jj)
+                            return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0;
+                        else
+                            return - I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intencity(t, u)) ?? 0.0;
+                    });
+                    var y_part_coeff = k * c[i](t, u) + IM * pi;
                     if (dy[i] > 0)
                     {
                         y_part = y_part + dy[i] * y_part_coeff / (c[i](t, u).DotProduct(pi));
@@ -96,11 +98,11 @@ namespace CMCTools
 
                 if (dy.Sum() == 0)
                 {
-                    pi = x_part + y_part + z_part;
+                    pi = pi + x_part + y_part + z_part;
                 }
                 else
                 {
-                    pi = y_part;
+                    pi = pi + y_part;
                 }
 
                 //var y_part = k * mu.Transpose() + 

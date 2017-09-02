@@ -16,7 +16,7 @@ namespace TCPIllinoisTest
         {
             double h = 1e-4;
             double t0 = 0.0;
-            double T = 50.0;
+            double T = 1000.0;
             //StringBuilder res = new StringBuilder();
             List<string> res = new List<string>();
 
@@ -33,6 +33,10 @@ namespace TCPIllinoisTest
                 channel.JOS.Step(u);
 
                 res.Add(string.Format(provider, "{0} {1} {2} {3} {4} {5}", t, u, sender.SSIndicator, sender.W_1, sender.rawrtt, sender.rtt));
+                if (t - Math.Truncate(t) < h)
+                {
+                    Console.WriteLine(t);
+                }
             }
             //File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\control.txt"), res.ToString());
 
