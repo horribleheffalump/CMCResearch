@@ -1,4 +1,4 @@
-﻿# Controllable Markov chains tools
+# Controllable Markov chains tools
 
 A set of tools for finite-state Markov processes (MP) state estimation and control with applications to data transmission (TCP) performance evaluation and control.
 
