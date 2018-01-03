@@ -18,4 +18,10 @@ class Points():
         self.y = yplot
     def toones(self):
         self.y = np.ones(len(self.y))
+    def val(self,x):
+        for i in range(0, len(self.x)):
+            if (self.x[i] >= x):
+                return self.y[i]
+
+        
 

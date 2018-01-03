@@ -23,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="alpha_beta.py" />
+    <Compile Include="contobs.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="filter.py">
       <SubType>Code</SubType>
     </Compile>

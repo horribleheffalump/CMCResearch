@@ -14,9 +14,10 @@ namespace TCPIllinoisTest
     {
         static void Main(string[] args)
         {
-            double h = 1e-4;
+            double h = 1e-5;
+            double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 1000.0;
+            double T = 200.0;
             //StringBuilder res = new StringBuilder();
             List<string> res = new List<string>();
 
@@ -33,7 +34,7 @@ namespace TCPIllinoisTest
                 channel.JOS.Step(u);
 
                 res.Add(string.Format(provider, "{0} {1} {2} {3} {4} {5}", t, u, sender.SSIndicator, sender.W_1, sender.rawrtt, sender.rtt));
-                if (t - Math.Truncate(t) < h)
+                if (t/h_write - Math.Truncate(t/h_write) < h/h_write)
                 {
                     Console.WriteLine(t);
                 }

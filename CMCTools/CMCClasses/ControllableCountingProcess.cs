@@ -50,11 +50,11 @@ namespace CMCTools
                     //if (SaveHistory)
                     Jumps.Add(J);
                 }
-                if (deltaT > 0.0) // if deltaT assigned, dN is equal to one if it was a jump during [t-deltaT, t]
+                if (deltaT > 0.0) // if deltaT assigned, dN is equal to one if there was a jump during [t-deltaT, t]
                 {
                     dN = N - Jumps.FindLast(j => j.t <= Math.Max(0, t - deltaT)).X;
                 }
-                else // if deltaT is not assigned, dN is equal to one if it was a jump right now
+                else // if deltaT is not assigned, dN is equal to one if there was a jump right now
                 {
                     dN = nojump == 0 ? 1 : 0;
                 }

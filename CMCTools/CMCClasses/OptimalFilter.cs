@@ -62,7 +62,7 @@ namespace CMCTools
             ///
             /// u  - control
             /// y  - counting process observations; 
-            /// z  - continuous proxess observations
+            /// z  - continuous process observations
             ///
             t += h;
             if (_doCalculateFilter)
@@ -93,8 +93,7 @@ namespace CMCTools
                     }
                 }
 
-                var z_part = 0.0; // !!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!
-
+                var z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz - R(t, u).DotProduct(pi) * h);
 
                 if (dy.Sum() == 0)
                 {

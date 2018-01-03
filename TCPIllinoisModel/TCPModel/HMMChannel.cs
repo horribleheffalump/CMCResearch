@@ -31,9 +31,9 @@ namespace Channel
 
             // RTT = delta_p + D X_t + w_t K X_t
             delta_p = 0.01; // delta_p - signal propagation time
-            D = Extensions.Vector(0.001, 0.01, 0.02, 0.04); // D X_t - queueing time because of the other senders transmission
-            K = Extensions.Vector(0.001, 0.01, 0.02, 0.04); // w_t K X_t - queueing time because of senders own transmission
-
+            D = Extensions.Vector(0.001, 0.01, 0.05, 0.1); // D X_t - queueing time because of the other senders transmission
+            K = Extensions.Vector(0.0005, 0.005, 0.025, 0.05); // w_t K X_t - queueing time because of senders own transmission
+            //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
             //loss intensity mu_t = R_t diag(P)
             P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.02);
             //P = Vector(0.0, 0.0, 0.0, 0.0);
