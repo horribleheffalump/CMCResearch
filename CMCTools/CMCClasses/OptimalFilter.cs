@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MathNet.Numerics.Distributions;
 
 namespace CMCTools
 {
@@ -99,11 +100,17 @@ namespace CMCTools
                     }
                 }
 
-                var z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz - R(t, u).DotProduct(pi) * h);
+                //var z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz - R(t, u).DotProduct(pi) * h);
 
                 if (dy.Sum() == 0)
                 {
-                    pi = pi + x_part + y_part + z_part;
+                    //pi = pi + x_part + y_part + z_part;
+                    pi = pi + x_part + y_part;
+                    for (int j = 0; j < pi.Count; j++)
+                    {
+                        pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * h, G(t, u)[j] * Math.Sqrt(h), dz);
+                    }
+                    pi = pi.Normalize(1.0);
                 }
                 else
                 {
