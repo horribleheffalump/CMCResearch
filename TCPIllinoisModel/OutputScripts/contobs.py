@@ -30,10 +30,10 @@ delta_p = 0.01
 D = [0.001, 0.01, 0.05, 0.1]
 K = [0.0005, 0.005, 0.025, 0.05]
 
-R = np.zeros(len(t))
-G = np.zeros(len(t))
+R = np.zeros(t.size)
+G = np.zeros(t.size)
 
-for i in range(0, len(t)):
+for i in range(0, t.size):
     x = int(Xpoints.val(t[i]))
     R[i] = 1.0 / (delta_p + D[x] + u[i] * K[x])
     G[i] = 1.0 / np.sqrt(D[x] + u[i] * K[x])

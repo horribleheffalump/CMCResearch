@@ -21,8 +21,8 @@ namespace SystemJointObs
 
         public List<SimultaneousJumpsIntencity>[] SimultaneousJumpsIntencities;
 
-        public JointObservationsSystemSimultaniousJumps(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, bool _saveHistory = false) :
-            base(_N, _t0, _T, _X0, _h, _A, _c, _R, _G, _saveHistory)
+        public JointObservationsSystemSimultaniousJumps(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _saveEvery = 0) :
+            base(_N, _t0, _T, _X0, _h, _A, _c, _R, _G, _saveEvery)
         {
             if (_c.Length != _I.Length)
             {
@@ -30,10 +30,10 @@ namespace SystemJointObs
             }
             for (int i = 0; i < _c.Length; i++)
             {
-                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveHistory);
+                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveEvery > 0);
             }
             SimultaneousJumpsIntencities = _I;
-            Filter = new OptimalFilter(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveHistory);
+            Filter = new OptimalFilter(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery);
         }
 
         public Func<double, double, double> C_i(int i, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I) // so that we use the proper i

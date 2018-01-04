@@ -76,6 +76,30 @@ namespace CMCTools
 
     }
 
+    public class Control
+    {
+        public double t;
+        public double u;
+        public double[] p;
+
+        public Control(double t, double u, params double[] p)
+        {
+            this.t = t;
+            this.u = u;
+            this.p = p;
+        }
+
+        public override string ToString()
+        {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+            string result = string.Format(provider, "{0} {1} {2}", t, u, string.Join(" ", p.Select(e => e.ToString(provider))));
+            return result;
+        }
+
+    }
+
+
     public class SimultaneousJumpsIntencity
     {
         public int From;

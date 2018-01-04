@@ -22,7 +22,7 @@ namespace Channel
 
         public JointObservationsSystem JOS;
 
-        public HMMChannel(double _t0, double _T, double _h, bool _saveHistory)
+        public HMMChannel(double _t0, double _T, double _h, int _saveEvery)
         {
 
             N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
@@ -56,12 +56,12 @@ namespace Channel
                 TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => 1 / 6.0 / Others * Math.Min(TransitionMatrix(t, u)[1, 3], TimeoutIntensity(t, u)[1])));
                 TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => 1 / 6.0 / Others * Math.Min(TransitionMatrix(t, u)[1, 2], TimeoutIntensity(t, u)[1])));
 
-                JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveHistory);
+                JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveEvery);
 
             }
             else
             {
-                JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveHistory);
+                JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery);
             }
         }
 

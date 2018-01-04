@@ -21,13 +21,14 @@ namespace CMCTools
         public double x;           // current state
         public double dx = 0.0;    // current state increment
         public double h = 1e-3; // discretization step
-        public bool SaveHistory;
+        public int SaveEvery;
+        private int saveCounter = 0;
 
         public List<ScalarContinuousState> Trajectory; // sequence of jumps
 
         Normal Noise;
 
-        public ControllableContinuousProcess(double _t0, double _T, double _x0, double _h, Func<double, double, double> _a, Func<double, double, double> _b, bool _SaveHistory = false)
+        public ControllableContinuousProcess(double _t0, double _T, double _x0, double _h, Func<double, double, double> _a, Func<double, double, double> _b, int _SaveEvery = 0)
         {
             t0 = _t0;
             t = t0;
@@ -38,9 +39,9 @@ namespace CMCTools
             h = _h;
             A = _a;
             B = _b;
-            SaveHistory = _SaveHistory;
-            //if (SaveHistory)
-            Trajectory.Add(new ScalarContinuousState(t0, x0));
+            SaveEvery = _SaveEvery;
+            if (SaveEvery > 0)
+                Trajectory.Add(new ScalarContinuousState(t0, x0));
             Noise = new Normal(0, 1);
         }
 
@@ -49,15 +50,25 @@ namespace CMCTools
             t += h;
             dx = A(t, u) * h + B(t, u) * Noise.Sample() * Math.Sqrt(h);
             x = x + dx;
-            Trajectory.Add(new ScalarContinuousState(t, x));
+            Save();
             return x;
         }
 
-        public void SaveTrajectory(string path, int every = 1)
+        private void Save()
+        {
+            saveCounter++;
+            if (SaveEvery > 0 && saveCounter % SaveEvery == 0)
+            {
+                Trajectory.Add(new ScalarContinuousState(t, x));
+            }
+        }
+
+        public void SaveTrajectory(string path) //, int every = 1)
         {
             using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                foreach (ScalarContinuousState j in Trajectory.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                //foreach (ScalarContinuousState j in Trajectory.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                foreach (ScalarContinuousState j in Trajectory.OrderBy(s => s.t))
                 {
                     outputfile.WriteLine(j.ToString());
                 }

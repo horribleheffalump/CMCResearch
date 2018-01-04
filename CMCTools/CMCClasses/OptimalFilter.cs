@@ -25,13 +25,17 @@ namespace CMCTools
         public Vector<double> pi;      // current estimate
         public double h = 1e-3; // discretization step
         public int Obs = 0;     // current observation
+        public double U; // current control
 
         public double Nu = 0;   // RHS martingale
 
-        public bool SaveHistory;
+        //public bool SaveHistory;
+        public int SaveEvery;
         public List<Estimate> estimates; // estimates list
 
-        public OptimalFilter(int _N, double _t0, double _T, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, bool _SaveHistory = false)
+        private int saveCounter = 0;
+
+        public OptimalFilter(int _N, double _t0, double _T, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0)
         {
             N = _N;
             t0 = _t0;
@@ -50,8 +54,8 @@ namespace CMCTools
             pi = pi0;
 
             estimates = new List<Estimate>();
-            SaveHistory = _SaveHistory;
-            if (SaveHistory)
+            SaveEvery = _SaveEvery;
+            if (SaveEvery > 0)
             {
                 estimates.Add(new Estimate(t0, pi0, 0));
             }
@@ -64,6 +68,8 @@ namespace CMCTools
             /// y  - counting process observations; 
             /// z  - continuous process observations
             ///
+
+            U = u;
             t += h;
             if (_doCalculateFilter)
             {
@@ -110,18 +116,26 @@ namespace CMCTools
                 //    if (pi[i] < 0) pi[i] = 0;
                 //pi = pi.Normalize(1.0);
             }
-            var estimate = new Estimate(t, pi, u);
-            if (SaveHistory)
-                estimates.Add(estimate);
-
+            Save();
             return pi;
         }
 
-        public void SaveTrajectory(string path, int every)
+        private void Save()
+        {
+            saveCounter++;
+            if (SaveEvery > 0 && saveCounter % SaveEvery == 0)
+            {
+                var estimate = new Estimate(t, pi, U);
+                estimates.Add(estimate);
+            }
+        }
+
+        public void SaveTrajectory(string path) //, int every)
         {
             using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
             {
-                foreach (Estimate e in estimates.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                //foreach (Estimate e in estimates.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                foreach (Estimate e in estimates.OrderBy(s => s.t))
                 {
                     outputfile.WriteLine(e.ToString());
                 }

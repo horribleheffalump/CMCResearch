@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CMCTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,15 +22,17 @@ namespace TCPIllinoisAgent
         int f_step = 10; // akk discretization step
         double df = 0.0; // number of acks since last moment we've updated rtt
         double dt = 0.0; // time spent to get at least f_step acks
-
-
+        double t = 0.0; // current time
+        public int SaveEvery;
+        private int saveCounter = 0;
 
         public double T_min { get; set; } // min RTT in session 
         public double T_max { get; set; } // max RTT in session 
 
+        public List<Control> controls;
         //double h; //discretization step
 
-        public Sender(double _rawrtt) // parameters: start point for RTT estimation
+        public Sender(double _rawrtt, int _saveEvery = 0) // parameters: start point for RTT estimation
         {
             //h = _h;
             W = W_0;
@@ -37,6 +40,9 @@ namespace TCPIllinoisAgent
             T_max = double.NaN;
             rawrtt = _rawrtt;
             rtt = rawrtt;
+            SaveEvery = _saveEvery;
+
+            controls = new List<Control>();
         }
 
         public int SSIndicator
@@ -61,6 +67,7 @@ namespace TCPIllinoisAgent
 
         public double step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
         {
+            t += h;
             if (double.IsNaN(Rtt)) Rtt = rtt;
 
             if (double.IsNaN(T_min) || double.IsNaN(T_max))
@@ -85,8 +92,36 @@ namespace TCPIllinoisAgent
                 W_1 = W / 2;
                 W = W_0; // setting W_1 equal to W/2 and entering the SS phase when timout occurs
             }
+
+            Save();
             return W;
         }
+
+        private void Save()
+        {
+            saveCounter++;
+            if (SaveEvery > 0 && saveCounter % SaveEvery == 0)
+            {
+                var control = new Control(t, W, SSIndicator, W_1, rawrtt, rtt);
+                controls.Add(control);
+            }
+        }
+
+        public void SaveTrajectory(string path) //, int every)
+        {
+            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
+            {
+                //foreach (Estimate e in estimates.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                foreach (Control e in controls.OrderBy(s => s.t))
+                {
+                    outputfile.WriteLine(e.ToString());
+                }
+                outputfile.Close();
+            }
+        }
+
+
+
 
         public double d_m   // maximum average queueing delay = T_max-T_min
         {

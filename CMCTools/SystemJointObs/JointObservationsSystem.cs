@@ -15,16 +15,16 @@ namespace SystemJointObs
         public ControllableContinuousProcess ContObservations;
         public OptimalFilter Filter;
 
-        public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, bool _saveHistory = false)
+        public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0)
         {
-            State = new ControllableMarkovChain(_N, _t0, _T, _X0, _h, (t, u) => _A(t,u), _saveHistory);
+            State = new ControllableMarkovChain(_N, _t0, _T, _X0, _h, (t, u) => _A(t,u), _SaveEvery > 0);
             CPObservations = new ControllableCountingProcess[_c.Length];
             for (int i = 0; i < _c.Length; i++)
             {
-                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c), _saveHistory);
+                CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c), _SaveEvery > 0);
             }
-            ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _saveHistory);
-            Filter = new OptimalFilter(_N, _t0, _T, _h, _A, _c, null, _R, _G, _saveHistory);
+            ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _SaveEvery);
+            Filter = new OptimalFilter(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery);
 
         }
 
@@ -45,7 +45,7 @@ namespace SystemJointObs
             return State.t;
         }
 
-        public void SaveAll(string MCFileName, string CPObsFileNameTemplate, string ContObsFileName, string FilterFileName, int every = 1)
+        public void SaveAll(string MCFileName, string CPObsFileNameTemplate, string ContObsFileName, string FilterFileName)
         {
             if (State.Jumps.Count > 0)
             {
@@ -54,8 +54,8 @@ namespace SystemJointObs
                 {
                     CPObservations[i].SaveTrajectory(CPObsFileNameTemplate.Replace("{num}", i.ToString()));
                 }
-                ContObservations.SaveTrajectory(ContObsFileName, every);
-                Filter.SaveTrajectory(FilterFileName, every);
+                ContObservations.SaveTrajectory(ContObsFileName);
+                Filter.SaveTrajectory(FilterFileName);
             }
         }
         //public void GenerateTrajectory(Func<double, Vector<double>> U)
