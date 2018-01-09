@@ -33,7 +33,9 @@ namespace SystemJointObs
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveEvery > 0);
             }
             SimultaneousJumpsIntencities = _I;
-            Filter = new OptimalFilter(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery);
+            Filters = new Dictionary<string, OptimalFilter>();
+            Filters.Add("Discrete", new OptimalFilter(_N, _t0, _T, _h, _A, _c, _I, _saveEvery));
+            Filters.Add("DiscreteContinuous", new OptimalFilter(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery));
         }
 
         public Func<double, double, double> C_i(int i, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I) // so that we use the proper i
@@ -73,7 +75,10 @@ namespace SystemJointObs
                 }
             }
             ContObservations.Step(u);
-            Filter.Step(u, CPObservations.Select(co => co.dN).ToArray(), ContObservations.dx, true);
+            foreach (var f in Filters)
+            {
+                f.Value.Step(u, CPObservations.Select(co => co.dN).ToArray(), ContObservations.dx);
+            }
             return State.t;
         }
 

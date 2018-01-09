@@ -45,7 +45,7 @@ namespace TCPIllinoisTest
             string statepath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\channel_state.txt");
             string cpobspath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\CP_obs_{num}.txt");
             string contobspath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\cont_obs.txt");
-            string filterpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\filter.txt");
+            string filterpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\filter_{name}.txt");
             channel.JOS.SaveAll(statepath, cpobspath, contobspath, filterpath);
 
             string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\control.txt");

@@ -36,7 +36,7 @@ namespace CMCTools
 
         private int saveCounter = 0;
 
-        public OptimalFilter(int _N, double _t0, double _T, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0)
+        public OptimalFilter(int _N, double _t0, double _T, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, int _SaveEvery = 0)
         {
             N = _N;
             t0 = _t0;
@@ -47,9 +47,6 @@ namespace CMCTools
             A = _A;
             c = _c;
             I = _I;
-            R = _R;
-            G = _G;
-
             //pi0 = Vector<double>.Build.Dense(N, 1.0 / N); //!!!!!! TODO  !!!!!!!!!!!!!!!!
             pi0 = Vector<double>.Build.Dense(N, 0.0); pi0[0] = 1.0; //!!!!!! TODO  !!!!!!!!!!!!!!!!
             pi = pi0;
@@ -62,7 +59,15 @@ namespace CMCTools
             }
         }
 
-        public Vector<double> Step(double u, int[] dy, double dz, bool _doCalculateFilter) 
+
+        public OptimalFilter(int _N, double _t0, double _T, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0)
+            : this(_N, _t0, _T, _h, _A, _c, _I, _SaveEvery)
+        {
+            R = _R;
+            G = _G;
+        }
+
+        public Vector<double> Step(double u, int[] dy, double dz)
         {
             ///
             /// u  - control
@@ -72,45 +77,45 @@ namespace CMCTools
 
             U = u;
             t += h;
-            if (_doCalculateFilter)
-            {
-                var lambda = A(t, u);
-                //var mu = Matrix<double>.Build.DenseOfColumnVectors(c.Select(v => v(t, u)));
+            var lambda = A(t, u);
+            //var mu = Matrix<double>.Build.DenseOfColumnVectors(c.Select(v => v(t, u)));
 
-                var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
-                var x_part = lambda.TransposeThisAndMultiply(pi)*h;
-                var y_part = Extensions.Zero(N);
-                for (int i = 0; i < dy.Length; i++)
+            var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
+            var x_part = lambda.TransposeThisAndMultiply(pi) * h;
+            var y_part = Extensions.Zero(N);
+            for (int i = 0; i < dy.Length; i++)
+            {
+                var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
                 {
-                    var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
-                    {
-                        if (ii != jj)
-                            return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0;
-                        else
-                            return - I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intencity(t, u)) ?? 0.0;
-                    });
-                    var y_part_coeff = k * c[i](t, u) + IM * pi;
-                    if (dy[i] > 0)
-                    {
-                        y_part = y_part + dy[i] * y_part_coeff / (c[i](t, u).DotProduct(pi));
-                    }
+                    if (ii != jj)
+                        return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0;
                     else
-                    {
-                        y_part = y_part - h * y_part_coeff;
-                    }
+                        return -I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intencity(t, u)) ?? 0.0;
+                });
+                var y_part_coeff = k * c[i](t, u) + IM * pi;
+                if (dy[i] > 0)
+                {
+                    y_part = y_part + dy[i] * y_part_coeff / (c[i](t, u).DotProduct(pi));
+                }
+                else
+                {
+                    y_part = y_part - h * y_part_coeff;
                 }
 
                 //var z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz - R(t, u).DotProduct(pi) * h);
 
                 if (dy.Sum() == 0)
                 {
-                    //pi = pi + x_part + y_part + z_part;
-                    pi = pi + x_part + y_part;
-                    for (int j = 0; j < pi.Count; j++)
+                    if (R != null && G != null)
                     {
-                        pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * h, G(t, u)[j] * Math.Sqrt(h), dz);
+                        //pi = pi + x_part + y_part + z_part;
+                        pi = pi + x_part + y_part;
+                        for (int j = 0; j < pi.Count; j++)
+                        {
+                            pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * h, G(t, u)[j] * Math.Sqrt(h), dz);
+                        }
+                        pi = pi.Normalize(1.0);
                     }
-                    pi = pi.Normalize(1.0);
                 }
                 else
                 {
