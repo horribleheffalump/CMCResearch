@@ -101,33 +101,33 @@ namespace CMCTools
                 {
                     y_part = y_part - h * y_part_coeff;
                 }
-
-                //var z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz - R(t, u).DotProduct(pi) * h);
-
-                if (dy.Sum() == 0)
-                {
-                    if (R != null && G != null)
-                    {
-                        //pi = pi + x_part + y_part + z_part;
-                        pi = pi + x_part + y_part;
-                        for (int j = 0; j < pi.Count; j++)
-                        {
-                            pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * h, G(t, u)[j] * Math.Sqrt(h), dz);
-                        }
-                        pi = pi.Normalize(1.0);
-                    }
-                }
-                else
-                {
-                    pi = pi + y_part;
-                }
-
-                //var y_part = k * mu.Transpose() + 
-
-                //for (int i = 0; i < pi.Count; i++)
-                //    if (pi[i] < 0) pi[i] = 0;
-                //pi = pi.Normalize(1.0);
             }
+            //var z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz - R(t, u).DotProduct(pi) * h);
+
+            if (dy.Sum() == 0)
+            {
+                pi = pi + x_part + y_part;
+                if (R != null && G != null)
+                {
+                    //pi = pi + x_part + y_part + z_part;
+                    //pi = pi + x_part + y_part;
+                    for (int j = 0; j < pi.Count; j++)
+                    {
+                        pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * h, G(t, u)[j] * Math.Sqrt(h), dz);
+                    }
+                    pi = pi.Normalize(1.0);
+                }
+            }
+            else
+            {
+                pi = pi + y_part;
+            }
+
+            //var y_part = k * mu.Transpose() + 
+
+            //for (int i = 0; i < pi.Count; i++)
+            //    if (pi[i] < 0) pi[i] = 0;
+            //pi = pi.Normalize(1.0);
             Save();
             return pi;
         }
