@@ -1,5 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 import numpy as np
 matplotlib.rc('text', usetex = True)
 import pylab
@@ -12,7 +13,8 @@ from Points import *
 
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
 plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
-    
+gs = gridspec.GridSpec(5, 1, height_ratios=[10, 10, 10, 10, 1])     
+
 filename = u"../out/channel_state.txt"
 data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "X"])
 X = data.as_matrix()
@@ -51,21 +53,22 @@ data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), 
 t_dcg = data.t.as_matrix()
 p_dcg = data[["p0", "p1", "p2", "p3"]].as_matrix()
 
-#filename_dh = u"../out/CP_obs_0.txt"
-#t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
-#filename_dl = u"../out/CP_obs_1.txt"
-#t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
+filename_dh = u"../out/CP_obs_0.txt"
+t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
+filename_dl = u"../out/CP_obs_1.txt"
+t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
-#dhpoints = Points(t_dh, dh)
-#dhpoints.toones()
+dhpoints = Points(t_dh, dh)
+dhpoints.toones()
 
-#dlpoints = Points(t_dl, dl)
-#dlpoints.toones()
+dlpoints = Points(t_dl, dl)
+dlpoints.toones()
 
-ax0 = plt.subplot(411)
-ax1 = plt.subplot(412)
-ax2 = plt.subplot(413)
-ax3 = plt.subplot(414)
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax2 = plt.subplot(gs[2])
+ax3 = plt.subplot(gs[3])
+ax4 = plt.subplot(gs[4])
 
 plots = [ax3, ax2, ax1, ax0]
 
@@ -89,10 +92,11 @@ for i in range(0, 4):
     plots[i].plot(t_dcg, p_dcg[:,i], color = 'blue')
     plots[i].plot(t_di, p_di[:,i], color = 'yellow')
 
-
-#ax3.plot(dhpoints.x, dhpoints.y, 'o', color = 'black')
-#ax3.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
-
+ax4.set_xlim(0,max(t_d))
+ax4.plot(dhpoints.x, dhpoints.y, 'o', color = 'black')
+ax4.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
+ax4.set_ylim(0.99,1.01)
+ax4.set_axis_off()
 
 
 ##plt.savefig(u"../Output/ForIFAC.final/filter_" + str(n) + ".pdf")

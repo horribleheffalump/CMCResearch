@@ -25,14 +25,9 @@ namespace CMC.Filters
         public override Vector<double> Step(double u, int[] dy, double? dz)
         {
             t += h;
-            var lambda = A(t, u);
+            var lambda = A(t-h, u);
 
             var x_part = lambda.TransposeThisAndMultiply(pi) * h;
-
-
-            for (int i = 0; i < pi.Count; i++)
-                if (pi[i] < 0) pi[i] = 0;
-            pi = pi.Normalize(1.0);
 
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
@@ -43,6 +38,10 @@ namespace CMC.Filters
             }
 
             pi = pi + x_part + y_part;
+
+            for (int i = 0; i < pi.Count; i++)
+                if (pi[i] < 0) pi[i] = 0;
+            pi = pi.Normalize(1.0);
 
             Save();
             return pi;

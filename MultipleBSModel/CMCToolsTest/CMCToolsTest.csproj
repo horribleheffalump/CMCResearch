@@ -59,9 +59,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CMCTools\CMCClasses\CMCHelperClasses.csproj">
+    <ProjectReference Include="..\..\CMCTools\CMCClasses\CMC.csproj">
       <Project>{5b5a0eda-1870-438c-8c3d-7f163c56dec1}</Project>
-      <Name>CMCHelperClasses</Name>
+      <Name>CMC</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\CMCTools\SystemCPObs\SystemCPObs.csproj">
       <Project>{72ffd5f9-3533-4530-a7e9-7bb5bcc23978}</Project>

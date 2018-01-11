@@ -17,7 +17,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 200.0;
+            double T = 1000.0;
             int saveEvery = 100;
             //StringBuilder res = new StringBuilder();
             List<string> res = new List<string>();

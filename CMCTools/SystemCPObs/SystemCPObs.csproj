@@ -48,13 +48,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CMCClasses\CMCHelperClasses.csproj">
-      <Project>{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}</Project>
-      <Name>CMCHelperClasses</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\CMCClasses\CMC.csproj">
+      <Project>{5b5a0eda-1870-438c-8c3d-7f163c56dec1}</Project>
+      <Name>CMC</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
