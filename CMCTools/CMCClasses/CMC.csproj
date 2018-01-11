@@ -7,8 +7,8 @@
     <ProjectGuid>{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CMCTools</RootNamespace>
-    <AssemblyName>MCTransitionRateMatrix</AssemblyName>
+    <RootNamespace>CMC</RootNamespace>
+    <AssemblyName>CMC</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -49,8 +49,12 @@
     <Compile Include="Criterion.cs" />
     <Compile Include="DataTypes.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Filters\Filter.cs" />
+    <Compile Include="Filters\FilterDiscrete.cs" />
+    <Compile Include="Filters\FilterDiscreteContinuous.cs" />
+    <Compile Include="Filters\FilterDiscreteContinuousGaussian.cs" />
+    <Compile Include="Filters\FilterDiscreteMeasureChange.cs" />
     <Compile Include="FiniteDiscreteDistribution.cs" />
-    <Compile Include="OptimalFilter.cs" />
     <Compile Include="SuboptimalFilter.cs" />
     <Compile Include="TransitionRateMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -58,9 +62,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Filters\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,6 +6,10 @@ using System.Text;
 
 namespace CMC
 {
+    /// <summary>
+    /// Backward compatibility with Multiple base stations model. TODO.
+    /// </summary>
+
     public class SuboptimalFilter
     {
         public int N;           // state space
@@ -43,7 +47,7 @@ namespace CMC
             SaveHistory = _SaveHistory;
             if (SaveHistory)
             {
-                estimates.Add(new Estimate(t0, pi0, 0));
+                estimates.Add(new Estimate(t0, pi0));
             }
         }
 
@@ -63,7 +67,7 @@ namespace CMC
                     if (pi[i] < 0) pi[i] = 0;
                 pi = pi.Normalize(1.0);
             }
-            var estimate = new Estimate(t, pi, u);
+            var estimate = new Estimate(t, pi);
             if (SaveHistory)
                 estimates.Add(estimate);
 

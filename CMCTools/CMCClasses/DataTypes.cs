@@ -37,12 +37,10 @@ namespace CMC
         public Vector<double> pi;
         public double u;
 
-        public Estimate(double _t, Vector<double> _pi, double _u)
+        public Estimate(double _t, Vector<double> _pi)
         {
             t = _t;
             pi = _pi;
-            u = _u;
-
         }
 
         public override string ToString()

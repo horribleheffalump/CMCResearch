@@ -1,4 +1,5 @@
 ﻿using CMC;
+using CMC.Filters;
 using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace SystemJointObs
         public ControllableMarkovChain State;
         public ControllableCountingProcess[] CPObservations;
         public ControllableContinuousProcess ContObservations;
-        public Dictionary<String, OptimalFilter> Filters;
+        public Dictionary<String, Filter> Filters;
 
         public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0)
         {
@@ -24,8 +25,8 @@ namespace SystemJointObs
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c), _SaveEvery > 0);
             }
             ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _SaveEvery);
-            Filters = new Dictionary<string, OptimalFilter>();
-            Filters.Add("DiscreteContinuous", new OptimalFilter(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery));
+            Filters = new Dictionary<string, Filter>();
+            Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery));
 
         }
 
