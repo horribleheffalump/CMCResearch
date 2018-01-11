@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using MathNet.Numerics.Distributions;
 
-namespace CMCTools
+namespace CMC
 {
     /// <summary>
     /// Optimal filter for controllable Markov chain with scalar continuous observations
@@ -24,7 +24,7 @@ namespace CMCTools
         public double T;        // observation end time
         Vector<double> pi0;      // initial state
         public Vector<double> pi;      // current estimate
-        public double h = 1e-3; // discretization step
+        public double h = 1e-4; // discretization step
         public int Obs = 0;     // current observation
         public double U; // current control
 

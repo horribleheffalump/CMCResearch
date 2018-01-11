@@ -2,8 +2,8 @@ import numpy as np
 
 class Points():
     def __init__(self, x , y):
-        self.x = np.array(x);
-        self.y = np.array(y);
+        self.x = np.array(x)
+        self.y = np.array(y)
     def multiply(self):
         xplot = np.zeros(self.x.size * 2 - 1)
         yplot = np.zeros(self.x.size * 2 - 1)

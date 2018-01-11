@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CMCTools;
+using CMC;
 using SystemJointObs;
 
 namespace Channel
@@ -36,9 +36,11 @@ namespace Channel
             //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
             //loss intensity mu_t = R_t diag(P)
             P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.02);
+            P = P * 1.5;
             //P = Vector(0.0, 0.0, 0.0, 0.0);
             //timeout intensity nu_t = R_t diag(Q)
             Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.005);
+            Q = Q * 1.5;
             //Q = Vector(0.0, 0.0, 0.0, 0.0);
             if (doSimulateSimultaneousJumps)
             {
@@ -70,13 +72,13 @@ namespace Channel
         public Matrix<double> TransitionMatrix(double t, double w)
         {
             double lambda14 = 0.01;
-            double lambda41 = 0.01;
+            double lambda41 = 0.02;
             double lambda24 = 0.01;
-            double lambda42 = 0.01;
-            double lambda12 = 0.01 + 0.1 * w;
-            double lambda21 = Math.Max(0.0, 0.1 - 0.01 * w);
-            double lambda23 = 0.01 + 0.01 * w;
-            double lambda32 = Math.Max(0.0, 0.1 - 0.01 * w); ;
+            double lambda42 = 0.02;
+            double lambda12 = 0.01 + 0.001 * w;
+            double lambda21 = Math.Max(0.01, 0.02 - 0.0005 * w);
+            double lambda23 = 0.01 + 0.001 * w;
+            double lambda32 = Math.Max(0.01, 0.02 - 0.0005 * w); ;
             Matrix<double> Lambda = Matrix<double>.Build.DenseOfArray(new[,]{{-(lambda12 + lambda14), lambda12, 0, lambda14 },
                                                                              { lambda21, -(lambda21 + lambda23 + lambda24 ), lambda23, lambda24 },
                                                                              { 0, lambda32, -lambda32, 0 },

@@ -47,9 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CMCTools\CMCClasses\CMCHelperClasses.csproj">
+    <ProjectReference Include="..\..\CMCTools\CMCClasses\CMC.csproj">
       <Project>{5b5a0eda-1870-438c-8c3d-7f163c56dec1}</Project>
-      <Name>CMCHelperClasses</Name>
+      <Name>CMC</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\CMCTools\SystemJointObs\SystemJointObs.csproj">
       <Project>{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}</Project>

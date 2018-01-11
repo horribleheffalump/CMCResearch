@@ -14,7 +14,7 @@ namespace TCPIllinoisTest
     {
         static void Main(string[] args)
         {
-            double h = 1e-4;
+            double h = 1e-5;
             double h_write = 1e-1;
             double t0 = 0.0;
             double T = 1000.0;

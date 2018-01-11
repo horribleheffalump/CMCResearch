@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace CMCTools
+namespace CMC
 {
     public class Jump
     {

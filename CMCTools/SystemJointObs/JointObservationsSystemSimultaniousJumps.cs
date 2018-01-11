@@ -1,4 +1,4 @@
-﻿using CMCTools;
+﻿using CMC;
 using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Collections.Generic;

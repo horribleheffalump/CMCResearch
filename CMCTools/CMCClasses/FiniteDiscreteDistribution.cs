@@ -5,7 +5,7 @@ using System.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Random;
 
-namespace CMCTools
+namespace CMC
 {
     public static class FiniteDiscreteDistribution
     {

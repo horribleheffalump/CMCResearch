@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPIllinoisTest", "TCPIllinoisTest\TCPIllinoisTest.csproj", "{7BA96D6D-8334-42FE-97BF-2E4B56749DA7}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPIllinoisAgent", "TCPIlli
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "OutputScripts", "OutputScripts\OutputScripts.pyproj", "{DB162A6C-F3E0-42C2-A00E-478E6664D4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMCHelperClasses", "..\CMCTools\CMCClasses\CMCHelperClasses.csproj", "{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMC", "..\CMCTools\CMCClasses\CMC.csproj", "{5B5A0EDA-1870-438C-8C3D-7F163C56DEC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPModel", "TCPModel\TCPModel.csproj", "{CFA48E32-422F-4F9C-99BD-CE455C4ECFB1}"
 EndProject
@@ -46,5 +46,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B607219-5A8E-49B1-A4C1-83BF113CE03E}
 	EndGlobalSection
 EndGlobal

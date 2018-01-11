@@ -7,7 +7,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using MathNet.Numerics.LinearAlgebra.Storage;
 
-namespace CMCTools
+namespace CMC
 {
     public static class TransitionRateMatrix
     {
