@@ -17,7 +17,7 @@ namespace CMC.Filters
         List<SimultaneousJumpsIntencity>[] I; // Intencities of simultaneous MC transitions and CP jumps
 
 
-        public FilterDiscrete(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, int SaveEvery = 0)
+        public FilterDiscrete(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, int SaveEvery = 1)
             : base(N, t0, T, h, A, SaveEvery)
         {
             this.c = c;
@@ -31,7 +31,8 @@ namespace CMC.Filters
             var lambda = A(t, u);
 
             var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
-            var x_part = lambda.TransposeThisAndMultiply(pi) * h;
+            //var x_part = lambda.TransposeThisAndMultiply(pi) * h;
+            var x_part = lambda * pi * h;
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
             {
@@ -66,6 +67,9 @@ namespace CMC.Filters
                 pi = pi + y_part;
             }
 
+            for (int i = 0; i < pi.Count; i++)
+                if (pi[i] < 0) pi[i] = 0;
+            pi.Normalize(1.0);
             Save();
             return pi;
         }

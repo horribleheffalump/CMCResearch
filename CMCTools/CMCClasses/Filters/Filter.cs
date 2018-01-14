@@ -37,7 +37,7 @@ namespace CMC.Filters
         /// <param name="h">discretization step</param>
         /// <param name="A">Markov chain transition rates matrix function A(t,u)</param>
         /// <param name="_SaveEvery"></param>
-        public Filter(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, int _SaveEvery = 0)
+        public Filter(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, int _SaveEvery = 1)
         {
             this.N = N;
             this.t0 = t0;

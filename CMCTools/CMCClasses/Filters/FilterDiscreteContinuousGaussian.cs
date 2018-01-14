@@ -19,7 +19,7 @@ namespace CMC.Filters
         Func<double, double, Vector<double>> R; // Continuous observations drift matrix
         Func<double, double, Vector<double>> G; // Continous observations diffusion matrix
 
-        public FilterDiscreteContinuousGaussian(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 0)
+        public FilterDiscreteContinuousGaussian(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1)
             : base(N, t0, T, h, A, SaveEvery)
         {
             this.c = c;
@@ -35,7 +35,8 @@ namespace CMC.Filters
             var lambda = A(t, u);
 
             var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
-            var x_part = lambda.TransposeThisAndMultiply(pi) * h;
+            //var x_part = lambda.TransposeThisAndMultiply(pi) * h;
+            var x_part = lambda * pi * h;
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
             {
@@ -79,9 +80,9 @@ namespace CMC.Filters
 
             //var y_part = k * mu.Transpose() + 
 
-            //for (int i = 0; i < pi.Count; i++)
-            //    if (pi[i] < 0) pi[i] = 0;
-            //pi = pi.Normalize(1.0);
+            for (int i = 0; i < pi.Count; i++)
+                if (pi[i] < 0) pi[i] = 0;
+            pi = pi.Normalize(1.0);
             Save();
             return pi;
         }

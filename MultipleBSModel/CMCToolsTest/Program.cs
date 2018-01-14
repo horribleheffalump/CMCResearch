@@ -209,25 +209,25 @@ namespace CMCToolsTest
             test.UString = "[1/3; 1/3; 1/3]";
             test.Name = "uniform";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 1.0, 0.0, 0.0 };
             test.UString = "[1; 0; 0]";
             test.Name = "all_to_0";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 1.0, 0.0 };
             test.UString = "[0; 1; 0]";
             test.Name = "all_to_1";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) => new[] { 0.0, 0.0, 1.0 };
             test.UString = "[0; 0; 1]";
             test.Name = "all_to_2";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             //
             test.U = (t, pi, X, dists, dN) =>
@@ -243,7 +243,7 @@ namespace CMCToolsTest
             test.UString = "[apr prop]";
             test.Name = "a_priori_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
 
 
@@ -259,7 +259,7 @@ namespace CMCToolsTest
             test.UString = "[apr conc]";
             test.Name = "a_priori_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -276,7 +276,7 @@ namespace CMCToolsTest
             test.UString = "[fb prop]";
             test.Name = "feedback_proportional";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.U = (t, pi, X, dists, dN) =>
             {
@@ -290,7 +290,7 @@ namespace CMCToolsTest
             test.UString = "[fb conc]";
             test.Name = "feedback_concentrated";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
 
             ////Vector<double> C = Vector<double>.Build.DenseOfArray(new[] { 160.0 * 0.03, 160.0 * 0.07, 160.0 * 0.15 }); // 160p/s ~ 2Mbps (MTU = 1500 bytes). Loss: 1%, 4%, 10%
@@ -330,7 +330,7 @@ namespace CMCToolsTest
             test.UString = "[suboptimal]";
             test.Name = "suboptimal";
             test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
 
             test.doCalculateFilter = true;
@@ -364,7 +364,7 @@ namespace CMCToolsTest
             test.UString = "[subsuboptimal]";
             test.Name = "subsuboptimal";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
             test.doCalculateFilter = false;
             b = new double[] { 1.0, 0.0, 0.0, 0.0 };
@@ -403,7 +403,7 @@ namespace CMCToolsTest
             test.UString = "[best]";
             test.Name = "best";
             //test.GenerateAndSaveTrajectory();
-            test.GenerateSeriesAndSaveCrits(20, 10);
+            //test.GenerateSeriesAndSaveCrits(20, 10);
 
 
 
