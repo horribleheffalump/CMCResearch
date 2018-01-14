@@ -35,8 +35,7 @@ namespace CMC.Filters
             var lambda = A(t, u);
 
             var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
-            //var x_part = lambda.TransposeThisAndMultiply(pi) * h;
-            var x_part = lambda * pi * h;
+            var x_part = lambda.TransposeThisAndMultiply(pi) * h;
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
             {

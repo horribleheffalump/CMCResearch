@@ -24,7 +24,7 @@ for n in range(0,3):
     levelzero = np.ones(len(tplot))*0.0
     levelone = np.ones(len(tplot))*1.0
 
-    filename = u"../Output/Filter_" + str(n) + "_Discrete.txt" #_DiscreteMC
+    filename = u"../Output/Filter_" + str(n) + ".txt" #_DiscreteMC
     t, p0, p1, p2, u = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4), unpack=True, dtype=float)
 
     Utplot = np.zeros(len(t)*2-1)
@@ -65,5 +65,5 @@ for n in range(0,3):
     ax1.set_xlim(0,600)
     ax2.set_xlim(0,600)
     ax3.set_xlim(0,600)
-    plt.savefig(u"../Output/filter_" + str(n) + "_Discrete.pdf") #_DiscreteMC
+    plt.savefig(u"../Output/filter_" + str(n) + ".pdf") #_DiscreteMC
     #plt.show()

@@ -27,8 +27,7 @@ namespace CMC.Filters
             t += h;
             var lambda = A(t-h, u);
 
-            //var x_part = lambda.TransposeThisAndMultiply(pi) * h;
-            var x_part = lambda * pi * h;
+            var x_part = lambda.TransposeThisAndMultiply(pi) * h;
 
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
