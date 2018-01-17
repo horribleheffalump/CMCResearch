@@ -12,19 +12,21 @@ namespace CMC
         public double t;
         public int X;
         public bool isSimultaneous;
+        public double[] p;
 
-        public Jump(double _t, int _X, bool _isSimultaneous = false)
+        public Jump(double t, int X, bool isSimultaneous = false, params double[] p)
         {
-            t = _t;
-            X = _X;
-            isSimultaneous = _isSimultaneous;
+            this.t = t;
+            this.X = X;
+            this.isSimultaneous = isSimultaneous;
+            this.p = p;
         }
 
         public override string ToString()
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1} {2}", t, X, isSimultaneous ? "sim" : "");
+            string result = string.Format(provider, "{0} {1} {3} {2}", t, X, isSimultaneous ? "sim" : "", string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 
@@ -35,12 +37,13 @@ namespace CMC
     {
         public double t;
         public Vector<double> pi;
-        public double u;
+        public double[] p;
 
-        public Estimate(double _t, Vector<double> _pi)
+        public Estimate(double t, Vector<double> pi, params double[] p)
         {
-            t = _t;
-            pi = _pi;
+            this.t = t;
+            this.pi = pi;
+            this.p = p;
         }
 
         public override string ToString()
@@ -48,7 +51,7 @@ namespace CMC
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
             string piString = pi.ToRowMatrix().ToMatrixString(null, provider).Trim().Replace("  "," ");
-            string result = string.Format(provider, "{0} {1} {2}", t, piString, u);
+            string result = string.Format(provider, "{0} {1} {2}", t, piString, string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 
@@ -58,17 +61,20 @@ namespace CMC
     {
         public double t;
         public double x;
-        public ScalarContinuousState(double _t, double _x)
+        public double[] p;
+
+        public ScalarContinuousState(double t, double x, params double[] p)
         {
-            t = _t;
-            x = _x;
+            this.t = t;
+            this.x = x;
+            this.p = p;
         }
 
         public override string ToString()
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1}", t, x);
+            string result = string.Format(provider, "{0} {1} {2}", t, x, string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 

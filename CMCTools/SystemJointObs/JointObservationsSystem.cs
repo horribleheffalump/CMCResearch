@@ -16,7 +16,7 @@ namespace SystemJointObs
         public ControllableContinuousProcess ContObservations;
         public Dictionary<String, Filter> Filters;
 
-        public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0)
+        public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0, double _hObs = 0)
         {
             State = new ControllableMarkovChain(_N, _t0, _T, _X0, _h, (t, u) => _A(t,u), _SaveEvery > 0);
             CPObservations = new ControllableCountingProcess[_c.Length];
@@ -24,7 +24,7 @@ namespace SystemJointObs
             {
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c), _SaveEvery > 0);
             }
-            ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _SaveEvery);
+            ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _SaveEvery, _hObs);
             Filters = new Dictionary<string, Filter>();
             Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery));
 
@@ -45,7 +45,7 @@ namespace SystemJointObs
             ContObservations.Step(u);
             foreach (var f in Filters)
             {
-                f.Value.Step(u, CPObservations.Select(co => co.dN).ToArray(), ContObservations.dx);
+                f.Value.Step(u, CPObservations.Select(co => co.dN).ToArray(), ContObservations.dx_thin);
             }
             return State.t;
         }

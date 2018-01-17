@@ -18,14 +18,19 @@ namespace CMC.Filters
         List<SimultaneousJumpsIntencity>[] I; // Intencities of simultaneous MC transitions and CP jumps
         Func<double, double, Vector<double>> R; // Continuous observations drift matrix
         Func<double, double, Vector<double>> G; // Continous observations diffusion matrix
+        double hObs;
 
-        public FilterDiscreteContinuousGaussian(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1)
+        public FilterDiscreteContinuousGaussian(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1, double hObs = 0)
             : base(N, t0, T, h, A, SaveEvery)
         {
             this.c = c;
             this.I = I;
             this.R = R;
             this.G = G;
+
+            this.hObs = h;
+            if (hObs > h)
+                this.hObs = hObs;
         }
 
 
@@ -67,7 +72,7 @@ namespace CMC.Filters
                     //pi = pi + x_part + y_part;
                     for (int j = 0; j < pi.Count; j++)
                     {
-                        pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * h, G(t, u)[j] * Math.Sqrt(h), dz.Value);
+                        pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
                     }
                     pi = pi.Normalize(1.0);
                 }
@@ -82,7 +87,7 @@ namespace CMC.Filters
             for (int i = 0; i < pi.Count; i++)
                 if (pi[i] < 0) pi[i] = 0;
             pi = pi.Normalize(1.0);
-            Save();
+            Save((R(t,u).Stack(G(t,u))).ToArray());
             return pi;
         }
     }

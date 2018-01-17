@@ -34,7 +34,7 @@ namespace SystemCPObs
             Filter.Step(u, Observation.N, _doCalculateFilter);
             FilterD.Step(u, new int[] { Observation.dN }, null);
             FilterDMC.Step(u, new int[] { Observation.dN }, null);
-            //double err = (FilterDMC.pi - Filter.pi).L2Norm();
+            double err = (FilterDMC.pi - Filter.pi).L2Norm();
             return State.t;
         }
 
@@ -46,7 +46,7 @@ namespace SystemCPObs
                 Observation.SaveTrajectory(ObsFileName);
                 Filter.SaveTrajectory(FilterFileName, every);
                 FilterD.SaveTrajectory(FilterFileName.Replace(".txt", "_Discrete.txt"));
-//                FilterDMC.SaveTrajectory(FilterFileName.Replace(".txt", "_DiscreteMC.txt"));
+                FilterDMC.SaveTrajectory(FilterFileName.Replace(".txt", "_DiscreteMC.txt"));
             }
         }
         //public void GenerateTrajectory(Func<double, Vector<double>> U)

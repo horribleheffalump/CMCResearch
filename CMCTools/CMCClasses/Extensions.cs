@@ -27,5 +27,19 @@ namespace CMC
         {
             return Vector<double>.Build.Dense(N, 0.0);
         }
+
+        public static Vector<double> Stack(this Vector<double> v1, Vector<double> v2)
+        {
+            Vector<double> result = Vector<double>.Build.Dense(v1.Count + v2.Count);
+            for (int i = 0; i < v1.Count; i++)
+            {
+                result[i] = v1[i];
+            }
+            for (int i = 0; i < v2.Count; i++)
+            {
+                result[i + v1.Count] = v2[i];
+            }
+            return result;
+        }
     }
 }

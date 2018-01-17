@@ -37,7 +37,7 @@ namespace CMC.Filters
         /// <param name="h">discretization step</param>
         /// <param name="A">Markov chain transition rates matrix function A(t,u)</param>
         /// <param name="_SaveEvery"></param>
-        public Filter(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, int _SaveEvery = 1)
+        public Filter(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, int SaveEvery = 1)
         {
             this.N = N;
             this.t0 = t0;
@@ -51,11 +51,11 @@ namespace CMC.Filters
             pi = pi0;
 
             estimates = new List<Estimate>();
-            SaveEvery = _SaveEvery;
-            if (SaveEvery > 0)
-            {
-                estimates.Add(new Estimate(t0, pi0));
-            }
+            this.SaveEvery = SaveEvery;
+            //if (SaveEvery > 0)
+            //{
+            //    estimates.Add(new Estimate(t0, pi0));
+            //}
         }
 
         /// <summary>
@@ -70,12 +70,12 @@ namespace CMC.Filters
         /// <summary>
         /// Save estimates to list according to thinning settings (SaveEvery)
         /// </summary>
-        public void Save()
+        public void Save(params double[] p)
         {
             saveCounter++;
             if (SaveEvery > 0 && saveCounter % SaveEvery == 0)
             {
-                var estimate = new Estimate(t, pi);
+                var estimate = new Estimate(t, pi, p);
                 estimates.Add(estimate);
             }
         }

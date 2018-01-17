@@ -17,14 +17,19 @@ namespace CMC.Filters
         List<SimultaneousJumpsIntencity>[] I; // Intencities of simultaneous MC transitions and CP jumps
         Func<double, double, Vector<double>> R; // Continuous observations drift matrix
         Func<double, double, Vector<double>> G; // Continous observations diffusion matrix
+        double hObs;
 
-        public FilterDiscreteContinuous(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1)
+        public FilterDiscreteContinuous(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1, double hObs = 0)
             : base(N, t0, T, h, A, SaveEvery)
         {
             this.c = c;
             this.I = I;
             this.R = R;
             this.G = G;
+
+            this.hObs = h;
+            if (hObs > h)
+                this.hObs = hObs;
         }
 
 
@@ -59,7 +64,7 @@ namespace CMC.Filters
             var z_part = Extensions.Zero(N);
             if (dz.HasValue)
             {
-                z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz.Value - R(t, u).DotProduct(pi) * h);
+                z_part = k * R(t, u) / G(t, u).DotProduct(G(t, u)) * (dz.Value - R(t, u).DotProduct(pi) * hObs);
             }
 
             if (dy.Sum() == 0)

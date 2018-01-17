@@ -31,10 +31,16 @@
     <Compile Include="filter.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="G.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Points.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="control.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="R.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="rtt.py">

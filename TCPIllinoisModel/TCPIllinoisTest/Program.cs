@@ -17,7 +17,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 1000.0;
+            double T = 100.0;
             int saveEvery = 100;
             //StringBuilder res = new StringBuilder();
             List<string> res = new List<string>();
@@ -31,6 +31,8 @@ namespace TCPIllinoisTest
             for (double t = t0; t <= T; t += h)
             {
                 double rtt = sender.estimateRTT(h, channel.JOS.ContObservations.dx);
+                // to estimate RTT we use continuous observations with the same discretization step as defined for all the system. 
+                // but for continuous filters we use thinned continuous observations
                 double u = sender.step(h, channel.JOS.CPObservations[0].dN, channel.JOS.CPObservations[1].dN);
                 channel.JOS.Step(u);
 

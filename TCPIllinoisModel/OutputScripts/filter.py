@@ -88,9 +88,9 @@ for i in range(0, 4):
     plots[i].set_xlim(0,max(t_d))
     plots[i].plot(t_d, p_d[:,i], color = 'red')
     plots[i].plot(t_dc, p_dc[:,i], color = 'cyan')
-    plots[i].plot(t_dmc, p_dmc[:,i], color = 'magenta')
+    #plots[i].plot(t_dmc, p_dmc[:,i], color = 'magenta')
     plots[i].plot(t_dcg, p_dcg[:,i], color = 'blue')
-    plots[i].plot(t_di, p_di[:,i], color = 'yellow')
+    #plots[i].plot(t_di, p_di[:,i], color = 'yellow')
 
 ax4.set_xlim(0,max(t_d))
 ax4.plot(dhpoints.x, dhpoints.y, 'o', color = 'black')

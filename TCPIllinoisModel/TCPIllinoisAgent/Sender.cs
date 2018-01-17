@@ -18,7 +18,7 @@ namespace TCPIllinoisAgent
 
         public double rawrtt;   // row rtt obtained from received acks. We calculate dt - a time spent to get df acks, where df has a minimum of f_step, then calculate rawrtt = df / dt. 
         public double rtt;      // rtt estimate obtained from rawrtt data by means of ecpontntial smoothing
-        double gamma = 0.9; // exponential smoothing parameter
+        double gamma = 0.99; // exponential smoothing parameter
         int f_step = 10; // akk discretization step
         double df = 0.0; // number of acks since last moment we've updated rtt
         double dt = 0.0; // time spent to get at least f_step acks
