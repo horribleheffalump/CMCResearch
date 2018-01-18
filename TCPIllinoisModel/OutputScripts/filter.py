@@ -38,15 +38,15 @@ data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), 
 t_dc = data.t.as_matrix()
 p_dc = data[["p0", "p1", "p2", "p3"]].as_matrix()
 
-filename = u"../out/filter_DiscreteMeasureChange.txt"
-data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
-t_dmc = data.t.as_matrix()
-p_dmc = data[["p0", "p1", "p2", "p3"]].as_matrix()
+#filename = u"../out/filter_DiscreteMeasureChange.txt"
+#data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
+#t_dmc = data.t.as_matrix()
+#p_dmc = data[["p0", "p1", "p2", "p3"]].as_matrix()
 
-filename = u"../out/filter_DiscreteIndependent.txt"
-data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
-t_di = data.t.as_matrix()
-p_di = data[["p0", "p1", "p2", "p3"]].as_matrix()
+#filename = u"../out/filter_DiscreteIndependent.txt"
+#data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
+#t_di = data.t.as_matrix()
+#p_di = data[["p0", "p1", "p2", "p3"]].as_matrix()
 
 filename = u"../out/filter_DiscreteContinuousGaussian.txt"
 data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
@@ -85,15 +85,15 @@ ax0.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color=
 #ax0.plot(t_dc, p3_dc, color = 'blue')
 
 for i in range(0, 4):
-    plots[i].set_xlim(0,max(t_d))
+    plots[i].set_xlim(0,max(X[:,0]))
     plots[i].plot(t_d, p_d[:,i], color = 'red')
+    #plots[i].plot(t_di, p_di[:,i], color = 'yellow')
     plots[i].plot(t_dc, p_dc[:,i], color = 'cyan')
     #plots[i].plot(t_dmc, p_dmc[:,i], color = 'magenta')
     plots[i].plot(t_dcg, p_dcg[:,i], color = 'blue')
-    #plots[i].plot(t_di, p_di[:,i], color = 'yellow')
 
-ax4.set_xlim(0,max(t_d))
-ax4.plot(dhpoints.x, dhpoints.y, 'o', color = 'black')
+ax4.set_xlim(0,max(X[:,0]))
+ax4.plot(dhpoints.x, dhpoints.y, '.', color = 'black')
 ax4.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
 ax4.set_ylim(0.99,1.01)
 ax4.set_axis_off()

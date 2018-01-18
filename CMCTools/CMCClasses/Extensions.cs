@@ -28,6 +28,12 @@ namespace CMC
             return Vector<double>.Build.Dense(N, 0.0);
         }
 
+        public static Matrix<double> Eye(int N)
+        {
+            return Matrix<double>.Build.Dense(N, N, (ii, jj) => ii == jj ? 1.0 : 0.0);
+        }
+
+
         public static Vector<double> Stack(this Vector<double> v1, Vector<double> v2)
         {
             Vector<double> result = Vector<double>.Build.Dense(v1.Count + v2.Count);
@@ -41,5 +47,16 @@ namespace CMC
             }
             return result;
         }
+
+        public static Vector<double> Stack(params Vector<double>[] v)
+        {
+            Vector<double> result = v[0];
+            for (int i = 1; i < v.Length; i++)
+            {
+                result = result.Stack(v[i]);
+            }
+            return result;
+        }
+
     }
 }

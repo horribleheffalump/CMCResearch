@@ -44,13 +44,21 @@ namespace CMC.Filters
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
             {
-                var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
+                Matrix<double> IM;
+                if (I == null)
                 {
-                    if (ii != jj)
-                        return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0;
-                    else
-                        return -I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intencity(t, u)) ?? 0.0;
-                });
+                    IM = Extensions.Eye(N);
+                }
+                else
+                {
+                    IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
+                    {
+                        if (ii != jj)
+                            return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0;
+                        else
+                            return -I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intencity(t, u)) ?? 0.0;
+                    });
+                }
                 var y_part_coeff = k * c[i](t, u) + IM * pi;
                 if (dy[i] > 0)
                 {
@@ -87,7 +95,7 @@ namespace CMC.Filters
             for (int i = 0; i < pi.Count; i++)
                 if (pi[i] < 0) pi[i] = 0;
             pi = pi.Normalize(1.0);
-            Save((R(t,u).Stack(G(t,u))).ToArray());
+            Save();
             return pi;
         }
     }

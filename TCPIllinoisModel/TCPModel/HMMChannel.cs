@@ -14,7 +14,7 @@ namespace Channel
         int N;
         int Others;
         double ContinuousObservationsDiscretizationStep;
-        bool doSimulateSimultaneousJumps;
+        public bool doSimulateSimultaneousJumps;
         public double delta_p;
         public Vector<double> D;
         public Vector<double> K;
@@ -29,7 +29,7 @@ namespace Channel
         {
 
             N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
-            doSimulateSimultaneousJumps = true; // simulating the simultaneous jumps of the Markov chain and the observable counting processes
+            doSimulateSimultaneousJumps = false; // simulating the simultaneous jumps of the Markov chain and the observable counting processes
             Others = 6; // number of other users of the channel (affects the simultaneous jumps intensity)
 
             // RTT = delta_p + D X_t + w_t K X_t
@@ -40,12 +40,12 @@ namespace Channel
             Psi = K * 0.25; // Variance deviation of queueing time because of senders own transmission
             //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
             //loss intensity mu_t = R_t diag(P)
-            P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.02);
-            P = P * 10;
+            P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.05);
+            P = P * 3;
             //P = Vector(0.0, 0.0, 0.0, 0.0);
             //timeout intensity nu_t = R_t diag(Q)
-            Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.005);
-            Q = Q * 10;
+            Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.01);
+            Q = Q * 1;
             //Q = Vector(0.0, 0.0, 0.0, 0.0);
 
             //ContinuousObservationsDiscretizationStep = _h;
@@ -57,15 +57,15 @@ namespace Channel
                 //     Loss may occure at the same time as the Markov chain jumps e1->e4, e2->e4 of e2->e3. 
                 //     The intencity of the simultaneous jump and loss is equal to 1 / ( 6.0 * Others) * min (lambda_ij, mu)
                 List<SimultaneousJumpsIntencity> LossSimultaneousIntencity = new List<SimultaneousJumpsIntencity>();
-                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => 1 / Others * Math.Min(TransitionMatrix(t, u)[0, 3], LossIntensity(t, u)[0])));
-                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => 1 / Others * Math.Min(TransitionMatrix(t, u)[1, 3], LossIntensity(t, u)[1])));
-                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => 1 / Others * Math.Min(TransitionMatrix(t, u)[1, 2], LossIntensity(t, u)[1])));
+                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 0, 3)));
+                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 1, 3)));
+                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 1, 2)));
                 //     Timeout may occure at the same time as the Markov chain jumps e1->e4, e2->e4 of e2->e3. 
                 //     The intencity of the simultaneous jump and timeout is equal to 1/(6*Others) min (lambda_ij, nu)
                 List<SimultaneousJumpsIntencity> TimeoutSimultaneousIntencity = new List<SimultaneousJumpsIntencity>();
-                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => 1 / Others * Math.Min(TransitionMatrix(t, u)[0, 3], TimeoutIntensity(t, u)[0])));
-                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => 1 / Others * Math.Min(TransitionMatrix(t, u)[1, 3], TimeoutIntensity(t, u)[1])));
-                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => 1 / Others * Math.Min(TransitionMatrix(t, u)[1, 2], TimeoutIntensity(t, u)[1])));
+                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 0, 3)));
+                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 3)));
+                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 2)));
 
                 JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep);
 
@@ -81,9 +81,9 @@ namespace Channel
         public Matrix<double> TransitionMatrix(double t, double w)
         {
             double lambda14 = 0.01;
-            double lambda41 = 0.02;
+            double lambda41 = 0.03;
             double lambda24 = 0.01;
-            double lambda42 = 0.02;
+            double lambda42 = 0.005;
             double lambda12 = 0.01 + 0.001 * w;
             double lambda21 = Math.Max(0.01, 0.02 - 0.0005 * w);
             double lambda23 = 0.01 + 0.001 * w;
@@ -102,6 +102,23 @@ namespace Channel
 
         }
 
+        public double SimultaneousJumpAndLossIntensity(double t, double u, int i, int j)
+        {
+            // return 1 / Others * Math.Min(TransitionMatrix(t, u)[i, j], TimeoutIntensity(t, u)[i]);
+            if ((LossIntensity(t, u)[i] + TimeoutIntensity(t, u)[i]) / Others <= TransitionMatrix(t, u)[i, j])
+                return LossIntensity(t, u)[i] / Others;
+            else
+                return (LossIntensity(t, u)[i] * TransitionMatrix(t, u)[i, j]) / Others / (LossIntensity(t, u)[i] + TimeoutIntensity(t, u)[i]);
+        }
+
+        public double SimultaneousJumpAndTimeoutIntensity(double t, double u, int i, int j)
+        {
+            // return 1 / Others * Math.Min(TransitionMatrix(t, u)[i, j], TimeoutIntensity(t, u)[i]);
+            if ((LossIntensity(t, u)[i] + TimeoutIntensity(t, u)[i]) / Others <= TransitionMatrix(t, u)[i, j])
+                return TimeoutIntensity(t, u)[i] / Others;
+            else
+                return (TimeoutIntensity(t, u)[i] * TransitionMatrix(t, u)[i, j]) / Others / (LossIntensity(t, u)[i] + TimeoutIntensity(t, u)[i]);
+        }
 
         public Vector<double> LossIntensity(double t, double u)
         {
