@@ -27,7 +27,7 @@ f = plt.figure(num=None, figsize=(20, 6), dpi=150, facecolor='w', edgecolor='k')
 Xpoints = Points(t_X, X)
 Xpoints.multiply()
 
-filename = u"../out/filter_DiscreteContinuousGaussian.txt"
+filename = u"../out/filter_Dummy.txt"
 data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 5, 6, 7, 8, 9, 10, 11, 12), dtype=float, names = ["t", "R0", "R1", "R2", "R3", "G0", "G1", "G2", "G3"])
 t_RG = data.t.as_matrix()
 R = data[["R0", "R1", "R2", "R3"]].as_matrix()
@@ -79,18 +79,18 @@ levelone = np.ones(n)*100.0
 
 
 
-#ax1 = plt.subplot(111)
-#ax1.plot(t_RG, R[:,0], '-', color = 'blue', alpha = 0.2, linewidth = 3.0)
-#ax1.plot(t_RG, R[:,1], '-', color = 'blue', alpha = 0.4, linewidth = 3.0)
-#ax1.plot(t_RG, R[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
-#ax1.plot(t_RG, R[:,3], '-', color = 'blue', alpha = 0.8, linewidth = 3.0)
-#ax1.plot(t_RG, Rreal, '-', color = 'red', alpha = 1, linewidth = 1.0)
+ax1 = plt.subplot(111)
+ax1.plot(t_RG, R[:,0], '-', color = 'blue', alpha = 0.2, linewidth = 3.0)
+ax1.plot(t_RG, R[:,1], '-', color = 'blue', alpha = 0.4, linewidth = 3.0)
+ax1.plot(t_RG, R[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
+ax1.plot(t_RG, R[:,3], '-', color = 'blue', alpha = 0.8, linewidth = 3.0)
+ax1.plot(t_RG, Rreal, '-', color = 'red', alpha = 1, linewidth = 1.0)
 
-#ax1.plot(t_RG, G[:,0], '-', color = 'green', alpha = 0.2, linewidth = 2.0)
-#ax1.plot(t_RG, G[:,1], '-', color = 'green', alpha = 0.4, linewidth = 2.0)
-#ax1.plot(t_RG, G[:,2], '-', color = 'green', alpha = 0.6, linewidth = 2.0)
-#ax1.plot(t_RG, G[:,3], '-', color = 'green', alpha = 0.8, linewidth = 2.0)
-#ax1.plot(t_RG, Greal, '-', color = 'green', alpha = 1, linewidth = 1.0)
+ax1.plot(t_RG, G[:,0], '-', color = 'green', alpha = 0.2, linewidth = 2.0)
+ax1.plot(t_RG, G[:,1], '-', color = 'green', alpha = 0.4, linewidth = 2.0)
+ax1.plot(t_RG, G[:,2], '-', color = 'green', alpha = 0.6, linewidth = 2.0)
+ax1.plot(t_RG, G[:,3], '-', color = 'green', alpha = 0.8, linewidth = 2.0)
+ax1.plot(t_RG, Greal, '-', color = 'green', alpha = 1, linewidth = 1.0)
 #print(R)
 #print(G)
 #print(data)

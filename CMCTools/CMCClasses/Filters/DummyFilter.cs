@@ -28,6 +28,8 @@ namespace CMC.Filters
             this.I = I;
             this.R = R;
             this.G = G;
+            this.ci0 = ci0;
+            this.ci1 = ci1;
         }
 
 

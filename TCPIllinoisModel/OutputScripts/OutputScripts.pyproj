@@ -34,6 +34,9 @@
     <Compile Include="G.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="nu.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Points.py">
       <SubType>Code</SubType>
     </Compile>
@@ -44,6 +47,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="rtt.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="sigma.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

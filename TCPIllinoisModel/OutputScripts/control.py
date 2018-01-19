@@ -35,7 +35,7 @@ plt.plot(t, u, '-', color = 'blue')
 plt.plot(t, ss, '--', color = 'green')
 plt.plot(t, thresh, ':', color = 'yellow')
 plt.plot(Xpoints.x, Xpoints.y, '-', color = 'black')
-plt.plot(dhpoints.x, dhpoints.y, 'o', color = 'black')
+plt.plot(dhpoints.x, dhpoints.y, '.', color = 'black')
 plt.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
 
 #plt.plot(t, intf, '-', color = 'green')

@@ -48,7 +48,7 @@ namespace SystemJointObs
             Func<double, double, double> SummarizedIntencity = (t, u) =>
             {
                 double result = 0;
-                foreach (SimultaneousJumpsIntencity _i in _I[i])
+                foreach (SimultaneousJumpsIntencity _i in _I[i].Where(e => e.From == State.X))
                 {
                     result += _i.Intencity(t, u);
                 }
