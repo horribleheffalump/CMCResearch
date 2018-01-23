@@ -30,7 +30,7 @@ namespace Channel
 
             N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
             doSimulateSimultaneousJumps = true; // simulating the simultaneous jumps of the Markov chain and the observable counting processes
-            Others = 6; // number of other users of the channel (affects the simultaneous jumps intensity)
+            Others = 1; // number of other users of the channel (affects the simultaneous jumps intensity)
 
             // RTT = delta_p + D X_t + w_t K X_t
             delta_p = 0.01; // delta_p - signal propagation time

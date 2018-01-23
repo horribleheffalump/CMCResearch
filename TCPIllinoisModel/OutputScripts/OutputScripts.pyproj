@@ -52,6 +52,12 @@
     <Compile Include="sigma.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="sigma_error.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="simultjumprates.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />

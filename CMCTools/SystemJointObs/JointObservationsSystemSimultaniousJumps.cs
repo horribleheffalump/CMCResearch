@@ -35,7 +35,7 @@ namespace SystemJointObs
             }
             SimultaneousJumpsIntencities = _I;
             Filters = new Dictionary<string, Filter>();
-            Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, _I, C_i(0, _c, _I), C_i(1, _c, _I), _R, _G, _saveEvery));
+            Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, _I, C_i(0, _c, _I), C_i(1, _c, _I), _R, _G, () => State.X, _saveEvery));
             Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, _I, _saveEvery));
             //Filters.Add("DiscreteIndependent", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery));
             //Filters.Add("DiscreteMeasureChange", new FilterDiscreteMeasureChange(_N, _t0, _T, _h, _A, _c, _saveEvery));

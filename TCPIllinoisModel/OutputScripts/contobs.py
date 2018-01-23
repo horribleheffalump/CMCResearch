@@ -28,7 +28,18 @@ Xpoints = Points(t_X, X)
 Xpoints.multiply()
 
 filename = u"../out/filter_Dummy.txt"
-data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 5, 6, 7, 8, 9, 10, 11, 12), dtype=float, names = ["t", "R0", "R1", "R2", "R3", "G0", "G1", "G2", "G3"])
+# 0 t
+# 1-4 pi (p0)
+# 5 X
+# 6-9 R
+# 10-13 G
+# 14-17 C0
+# 18-21 C1
+# 22 C0[X] - SimultJumpsRatesSum
+# 23 C1[X] - SimultJumpsRatesSum
+# 24-26 I0 SimultJumpsRates 0->3, 1->3, 1->2
+# 27-29 I1 SimultJumpsRates 0->3, 1->3, 1->2
+data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 6, 7, 8, 9, 10, 11, 12, 13), dtype=float, names = ["t", "R0", "R1", "R2", "R3", "G0", "G1", "G2", "G3"])
 t_RG = data.t.as_matrix()
 R = data[["R0", "R1", "R2", "R3"]].as_matrix()
 G = data[["G0", "G1", "G2", "G3"]].as_matrix()

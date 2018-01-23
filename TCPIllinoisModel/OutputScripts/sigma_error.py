@@ -1,4 +1,5 @@
 
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,17 +47,26 @@ I1 = data[["I1_03", "I1_13", "I1_12"]].as_matrix()
 C0real = np.zeros(t.size)
 C1real = np.zeros(t.size)
 
+C0err = np.zeros(t.size)
+C1err = np.zeros(t.size)
+
 
 for i in range(0, t.size):
     C0real[i] = C0[i,int(Xreal[i])]
     C1real[i] = C1[i,int(Xreal[i])]
+    C0err[i] = - CI0[i] + C0[i,int(Xreal[i])]
+    C1err[i] = - CI1[i] + C1[i,int(Xreal[i])]
+    if (int(Xreal[i]) == 0):
+        C0err[i] = C0err[i] - I0[i,0]
+        C1err[i] = C1err[i] - I1[i,0]
+    if (int(Xreal[i]) == 1):
+        C0err[i] = C0err[i] - I0[i,2] - I0[i,1]
+        C1err[i] = C1err[i] - I1[i,2] - I1[i,1]
 
-    #x = int(Xpoints.val(t[i]))
-    #C0real[i] = C0[i,x]
-    #C1real[i] = C1[i,x]
 
 
-
+np.savetxt('c0err.txt', C0err, delimiter=' ')
+np.savetxt('c1err.txt', C1err, delimiter=' ')
 
 dhpoints = Points(t_dh, dh)
 dhpoints.toones()
@@ -76,42 +86,49 @@ dlpoints.toones()
 n = len(Xpoints.x)
 o = np.zeros(n)
 ones = np.ones(n)
-levelzero = np.ones(n)*0.0
-levelone = np.ones(n)*C0.max()
+levelzero = np.ones(n)* C0err.min()
+levelone = np.ones(n) * C0err.max()
 
 
 
 
 ax1 = plt.subplot(111)
-ax1.plot(t, C0[:,0], '-', color = 'blue', alpha = 0.2, linewidth = 3.0)
-ax1.plot(t, C0[:,1], '-', color = 'blue', alpha = 0.4, linewidth = 3.0)
-ax1.plot(t, C0[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
-ax1.plot(t, C0[:,3], '-', color = 'blue', alpha = 0.8, linewidth = 3.0)
-ax1.plot(t, C0real, '-', color = 'red', alpha = 1, linewidth = 1.0)
+ax1.plot(t, C0err, '-', color = 'black')
+ax1.plot(t, C1err, '-', color = 'blue', alpha = 0.6,  linewidth = 2.0)
+
+#ax1.plot(t, C0[:,0], '-', color = 'blue', alpha = 0.2, linewidth = 3.0)
+#ax1.plot(t, C0[:,1], '-', color = 'blue', alpha = 0.4, linewidth = 3.0)
+#ax1.plot(t, C0[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
+#ax1.plot(t, C0[:,3], '-', color = 'blue', alpha = 0.8, linewidth = 3.0)
+#ax1.plot(t, C0real, '-', color = 'red', alpha = 1, linewidth = 1.0)
 #ax1.plot(t, CI0, '-', color = 'magenta', alpha = 1, linewidth = 1.0)
-#ax1.plot(t, I0[:,0], '-', color = 'yellow', alpha = 1, linewidth = 1.0)
-#ax1.plot(t, I0[:,1], '-', color = 'yellow', alpha = 1, linewidth = 1.0)
-#ax1.plot(t, I0[:,2], '-', color = 'yellow', alpha = 1, linewidth = 1.0)
+#ax1.plot(t, I0[:,0], '-', color = 'yellow', alpha = 0.4, linewidth = 3.0, label = "sigma: 0-3")
+#ax1.plot(t, I0[:,1], '-', color = 'green', alpha = 0.6, linewidth = 2.0, label = "sigma: 1-3")
+#ax1.plot(t, I0[:,2], '-', color = 'cyan', alpha = 1, linewidth = 1.0, label = "sigma: 1-2")
 
 #ax1.plot(t, C1[:,0], '-', color = 'green', alpha = 0.2, linewidth = 2.0)
 #ax1.plot(t, C1[:,1], '-', color = 'green', alpha = 0.4, linewidth = 2.0)
 #ax1.plot(t, C1[:,2], '-', color = 'green', alpha = 0.6, linewidth = 2.0)
 #ax1.plot(t, C1[:,3], '-', color = 'green', alpha = 0.8, linewidth = 2.0)
 #ax1.plot(t, C1real, '-', color = 'green', alpha = 1, linewidth = 1.0)
+#ax1.plot(t, I1[:,0], '-', color = 'magenta', alpha = 0.4, linewidth = 3.0, label = "nu: 0-3")
+#ax1.plot(t, I1[:,1], '-', color = 'blue', alpha = 0.6, linewidth = 2.0, label = "nu: 1-3")
+#ax1.plot(t, I1[:,2], '-', color = 'black', alpha = 1, linewidth = 1.0, label = "nu: 1-2")
 #print(R)
 #print(G)
 #print(data)
 
-ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==o, color='black', alpha = 0.2, linewidth=0.0);
-ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones, color='black', alpha = 0.4, linewidth=0.0);
-ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*2, color='black', alpha = 0.6, linewidth=0.0);
-ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color='black', alpha = 0.8, linewidth=0.0);
+#ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==o, color='black', alpha = 0.2, linewidth=0.0);
+#ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones, color='black', alpha = 0.4, linewidth=0.0);
+#ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*2, color='black', alpha = 0.6, linewidth=0.0);
+#ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color='black', alpha = 0.8, linewidth=0.0);
 
+#ax1.set_xlim(53, 55)
 
+ax1.legend()
 
 
 plt.show()
-
 
 #f.savefig("../output/alpha_beta.pdf")
 

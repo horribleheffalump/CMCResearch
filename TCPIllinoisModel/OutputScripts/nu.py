@@ -22,8 +22,20 @@ Xpoints = Points(t_X, X)
 Xpoints.multiply()
 
 filename = u"../out/filter_Dummy.txt"
-data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28), dtype=float, names = ["t", "C00", "C01", "C02", "C03", "C10", "C11", "C12", "C13", "CI0", "CI1", "I0_03", "I0_13", "I0_12", "I1_03", "I1_13", "I1_12"])
+# 0 t
+# 1-4 pi (p0)
+# 5 X
+# 6-9 R
+# 10-13 G
+# 14-17 C0
+# 18-21 C1
+# 22 C0[X] - SimultJumpsRatesSum
+# 23 C1[X] - SimultJumpsRatesSum
+# 24-26 I0 SimultJumpsRates 0->3, 1->3, 1->2
+# 27-29 I1 SimultJumpsRates 0->3, 1->3, 1->2
+data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 5, 14, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29), dtype=float, names = ["t", "X", "C00", "C01", "C02", "C03", "C10", "C11", "C12", "C13", "CI0", "CI1", "I0_03", "I0_13", "I0_12", "I1_03", "I1_13", "I1_12"])
 t = data.t.as_matrix()
+Xreal = data.X.as_matrix()
 C0 = data[["C00", "C01", "C02", "C03"]].as_matrix()
 C1 = data[["C10", "C11", "C12", "C13"]].as_matrix()
 CI0 = data.CI0.as_matrix()
@@ -36,9 +48,8 @@ C0real = np.zeros(t.size)
 C1real = np.zeros(t.size)
 
 for i in range(0, t.size):
-    x = int(Xpoints.val(t[i]))
-    C0real[i] = C0[i,x]
-    C1real[i] = C1[i,x]
+    C0real[i] = C0[i,int(Xreal[i])]
+    C1real[i] = C1[i,int(Xreal[i])]
 
 
 
