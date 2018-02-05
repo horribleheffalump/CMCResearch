@@ -41,11 +41,13 @@ namespace Channel
             //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
             //loss intensity mu_t = R_t diag(P)
             P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.05);
-            P = P * 3;
+            P = P * 0.1;
+            //P = P * 3;
             //P = Vector(0.0, 0.0, 0.0, 0.0);
             //timeout intensity nu_t = R_t diag(Q)
             Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.01);
-            Q = Q * 1;
+            Q = Q * 0.03;
+            //Q = Q * 1;
             //Q = Vector(0.0, 0.0, 0.0, 0.0);
 
             //ContinuousObservationsDiscretizationStep = _h;
@@ -80,14 +82,22 @@ namespace Channel
 
         public Matrix<double> TransitionMatrix(double t, double w)
         {
+            double Wmax = 20.0;
+            double lambda0 = 1e-5;
+            double C = 0.01 * 10.0;
+
             double lambda14 = 0.01;
             double lambda41 = 0.03;
             double lambda24 = 0.01;
             double lambda42 = 0.005;
-            double lambda12 = 0.01 + 0.001 * w;
-            double lambda21 = Math.Max(0.01, 0.02 - 0.0005 * w);
-            double lambda23 = 0.01 + 0.001 * w;
-            double lambda32 = Math.Max(0.01, 0.02 - 0.0005 * w); ;
+            double lambda12 = lambda0 + C / Math.Max(Wmax/2 - w, C);
+            //double lambda12 = 0.01 + 0.001 * w;
+            double lambda21 = C / w;
+            //double lambda21 = Math.Max(0.01, 0.03 - 0.002 * w);
+            double lambda23 = lambda0 + C / Math.Max(Wmax - w, C);
+            //double lambda23 = 0.01 + 0.001 * w;
+            double lambda32 = C / w;
+            //double lambda32 = Math.Max(0.01, 0.04 - 0.003 * w); ;
             Matrix<double> Lambda = Matrix<double>.Build.DenseOfArray(new[,]{{-(lambda12 + lambda14), lambda12, 0, lambda14 },
                                                                              { lambda21, -(lambda21 + lambda23 + lambda24 ), lambda23, lambda24 },
                                                                              { 0, lambda32, -lambda32, 0 },
@@ -122,13 +132,13 @@ namespace Channel
 
         public Vector<double> LossIntensity(double t, double u)
         {
-            return Extensions.Diag(P) * R(t, u);
+            return Extensions.Diag(P) * R(t, u) * u;
         }
 
 
         public Vector<double> TimeoutIntensity(double t, double u)
         {
-            return Extensions.Diag(Q) * R(t, u);
+            return Extensions.Diag(Q) * R(t, u) * u;
         }
 
         public Vector<double> R(double t, double u)
