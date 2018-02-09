@@ -28,6 +28,9 @@
     <Compile Include="contobs.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="crits.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="filter.py">
       <SubType>Code</SubType>
     </Compile>

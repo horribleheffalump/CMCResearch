@@ -103,6 +103,30 @@ namespace CMC
 
     }
 
+    public class Sample
+    {
+        public double t;
+        public double val;
+        public double sumU;
+        public double[] U;
+
+        public Sample(double t, double val, double[] U)
+        {
+            this.t = t;
+            this.val = val;
+            this.U = U;
+            sumU = U.Sum();
+        }
+
+        public override string ToString()
+        {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+            string result = string.Format(provider, "{0} {1} {2} {3}", t, val, sumU, string.Join(" ", U.Select(e => e.ToString(provider))));
+            return result;
+        }
+
+    }
 
     public class SimultaneousJumpsIntencity
     {

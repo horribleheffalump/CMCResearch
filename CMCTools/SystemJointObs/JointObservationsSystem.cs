@@ -25,6 +25,7 @@ namespace SystemJointObs
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c), _SaveEvery > 0);
             }
             ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _SaveEvery, _hObs);
+
             Filters = new Dictionary<string, Filter>();
             Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, null, C_i(0, _c), C_i(1, _c), _R, _G, () => State.X, _SaveEvery));
             Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _SaveEvery));

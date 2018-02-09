@@ -59,9 +59,9 @@
       <Project>{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}</Project>
       <Name>SystemJointObs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TCPIllinoisAgent\TCPIllinoisAgent.csproj">
+    <ProjectReference Include="..\TCPIllinoisAgent\TCPAgent.csproj">
       <Project>{9c98482a-f20d-492d-b596-3593117088a0}</Project>
-      <Name>TCPIllinoisAgent</Name>
+      <Name>TCPAgent</Name>
     </ProjectReference>
     <ProjectReference Include="..\TCPModel\TCPModel.csproj">
       <Project>{CFA48E32-422F-4F9C-99BD-CE455C4ECFB1}</Project>

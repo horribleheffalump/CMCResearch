@@ -7,8 +7,8 @@
     <ProjectGuid>{9C98482A-F20D-492D-B596-3593117088A0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TCPIllinoisAgent</RootNamespace>
-    <AssemblyName>TCPIllinoisAgent</AssemblyName>
+    <RootNamespace>TCPAgent</RootNamespace>
+    <AssemblyName>TCPAgent</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sender.cs" />
+    <Compile Include="BaseAgent.cs" />
+    <Compile Include="NewRenoSender.cs" />
+    <Compile Include="TCPIllinoisSender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

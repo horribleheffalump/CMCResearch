@@ -24,6 +24,8 @@ namespace Channel
         public Vector<double> Q;
 
         public JointObservationsSystem JOS;
+        public Dictionary<String, Criterion> Criterions;
+        public Dictionary<String, Func<double>> TerminalCriterions;
 
         public HMMChannel(double _t0, double _T, double _h, int _saveEvery)
         {
@@ -40,18 +42,59 @@ namespace Channel
             Psi = K * 0.25; // Variance deviation of queueing time because of senders own transmission
             //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
             //loss intensity mu_t = R_t diag(P)
-            P = Extensions.Vector(0.0005, 0.0025, 0.0075, 0.05);
-            P = P * 0.1;
+            P = Extensions.Vector(0.0015, 0.01, 0.05, 0.05);
+            //P = Extensions.Vector(0.0005, 0.0025, 0.005, 0.05);
+            //P = P * 0.1;
             //P = P * 3;
             //P = Vector(0.0, 0.0, 0.0, 0.0);
             //timeout intensity nu_t = R_t diag(Q)
-            Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.01);
-            Q = Q * 0.03;
+            Q = P * 0.2;
+            //Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.01);
+            //Q = Q * 0.03;
             //Q = Q * 1;
             //Q = Vector(0.0, 0.0, 0.0, 0.0);
 
             //ContinuousObservationsDiscretizationStep = _h;
             ContinuousObservationsDiscretizationStep = 1e-2;
+
+            Criterions = new Dictionary<string, Criterion>();
+
+            Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                double MTU = 1000; // packet size = 1000 bytes
+                double rtt = U[1];
+                if (rtt > 0)
+                {
+                    double Bps = U[0] * MTU / rtt; // instant bytes per second
+                    double Mbps = Bps * 8 / 1e6; // instant Mbps
+                    return Mbps; 
+
+                }
+                else
+                    return 0.0;
+            }, _saveEvery));
+
+            Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                return Math.Abs(X[0][0] - 1.0) < 1e-5 ? 1.0 : 0.0;
+            }, _saveEvery));
+            Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
+            }, _saveEvery));
+            Criterions.Add("TimeInBadState", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
+            }, _saveEvery));
+
+            TerminalCriterions = new Dictionary<string, Func<double>>();
+
+            TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
+            TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
+            TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
+            TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J);
+            TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J);
+            TerminalCriterions.Add("TotalTimeInBadState", () => Criterions["TimeInBadState"].J);
 
             if (doSimulateSimultaneousJumps)
             {
@@ -78,11 +121,32 @@ namespace Channel
             }
         }
 
+        public void CalculateCriterions(double u, double rtt)
+        {
+            foreach (var crit in Criterions)
+            {
+                crit.Value.Step(JOS.State.t, new Vector<double>[] { JOS.State.Xvec }, new double[] { u, rtt }, JOS.CPObservations.Select(x => x.dN).ToArray());
+            }
+        }
 
+        public void SaveCriterions(string CritFileNameTemplate)
+        {
+            foreach (var crit in Criterions)
+            {
+                crit.Value.SaveTrajectory(CritFileNameTemplate.Replace("{name}", crit.Key));
+            }
+
+            foreach (var crit in TerminalCriterions)
+                using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(CritFileNameTemplate.Replace("{name}", crit.Key)))
+                {
+                    outputfile.WriteLine(crit.Value().ToString());
+                    outputfile.Close();
+                }
+        }
 
         public Matrix<double> TransitionMatrix(double t, double w)
         {
-            double Wmax = 20.0;
+            double Wmax = 200.0;
             double lambda0 = 1e-5;
             double C = 0.01 * 10.0;
 
@@ -90,7 +154,7 @@ namespace Channel
             double lambda41 = 0.03;
             double lambda24 = 0.01;
             double lambda42 = 0.005;
-            double lambda12 = lambda0 + C / Math.Max(Wmax/2 - w, C);
+            double lambda12 = lambda0 + C / Math.Max(Wmax / 2 - w, C);
             //double lambda12 = 0.01 + 0.001 * w;
             double lambda21 = C / w;
             //double lambda21 = Math.Max(0.01, 0.03 - 0.002 * w);

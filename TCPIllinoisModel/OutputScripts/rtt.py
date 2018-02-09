@@ -7,14 +7,14 @@ from Points import *
 
 
 
-filename = u"../out/control.txt"
+filename = u"../out/NEWRENO/control.txt"
 t, u, ss, thresh, m, rtt = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4,5), unpack=True, dtype=float)
 
-filename_X = u"../out/channel_state.txt"
+filename_X = u"../out/NEWRENO/channel_state.txt"
 t_X, X = np.loadtxt(filename_X, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
 Xpoints = Points(t_X, X)
-Xpoints.multiply()
+Xpoints.multiply()  
 
 f = plt.figure(num=None, figsize=(20, 6), dpi=150, facecolor='w', edgecolor='k')
 
