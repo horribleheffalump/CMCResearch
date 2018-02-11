@@ -11,8 +11,8 @@ namespace TCPAgent
     {
         protected double W_0 = 1;                     // min windiw size
         public double W_1 = 10;                    // slow start -> congestion avoidance threshold
-        protected double W_max = 1000;              // maximum window size (bottleneck threshhold)
-        protected double W;                          // ccurrent window size
+        protected double W_max = 10000;              // maximum window size (bottleneck threshhold)
+        public double W;                          // ccurrent window size
         public int SaveEvery;
         private int saveCounter = 0;
 
@@ -57,14 +57,19 @@ namespace TCPAgent
             get { return W < W_1 ? 1 : 0; }
         }
 
-        public abstract double step(double h, int dh, int dl, double Rtt = double.NaN); //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        public abstract double Step(double h, int dh, int dl, double Rtt = double.NaN); //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
 
-        protected void Save()
+        protected void Save(params double[] p)
         {
             saveCounter++;
             if (SaveEvery > 0 && saveCounter % SaveEvery == 0)
             {
-                var control = new Control(t, W, SSIndicator, W_1, rawrtt, rtt);
+                double[] all_params = new double[] { SSIndicator, W_1, rawrtt, rtt };
+                if (p != null)
+                {
+                    all_params = all_params.Concat(p).ToArray();
+                }
+                var control = new Control(t, W, all_params);
                 controls.Add(control);
             }
         }

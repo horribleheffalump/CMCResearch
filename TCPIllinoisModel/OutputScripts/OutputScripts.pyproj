@@ -58,6 +58,9 @@
     <Compile Include="sigma_error.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="simple_control.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="simultjumprates.py">
       <SubType>Code</SubType>
     </Compile>

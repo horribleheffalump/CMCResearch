@@ -4,10 +4,11 @@ import numpy as np
 matplotlib.rc('text', usetex = True)
 import pylab
 from Points import *
-       
-subfolder = 'ILLINOIS/'
-interval = [1000,1100]
-bounds = [0,100]
+
+subfolder = ''
+#subfolder = 'ILLINOIS/'
+#interval = [0,3000]
+#bounds = [0,100]
 
 
 filename = u"../out/" + subfolder + "control.txt"
@@ -46,8 +47,8 @@ plt.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
 #plt.plot(t, intm, '-', color = 'red')
 #plt.plot(t, rtt, '-', color = 'blue')
 ax1 = plt.subplot(111)
-ax1.set_ylim(bounds[0],bounds[1])
-ax1.set_xlim(interval[0],interval[1])
+#ax1.set_ylim(bounds[0],bounds[1])
+#ax1.set_xlim(interval[0],interval[1])
 plt.show()
 
 #plt.plot(t, rtt, '--', color = 'red')

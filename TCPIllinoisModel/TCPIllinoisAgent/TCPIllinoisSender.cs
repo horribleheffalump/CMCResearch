@@ -26,7 +26,7 @@ namespace TCPAgent
         }
 
  
-        public override double step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        public override double Step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
         {
             t += h;
             if (double.IsNaN(Rtt)) Rtt = rtt;
@@ -54,9 +54,13 @@ namespace TCPAgent
                 W = W_0; // setting W_1 equal to W/2 and entering the SS phase when timout occurs
             }
 
-            Save();
+            Save(alpha(d), d, d_1, d_m, T_min, T_max, kappa_1);
             return W;
         }
+
+        // TODO:    Once d > d_1, we do not allow  to increase alpha to alpha_max unless d stays below d_1 for a certain amount of time.
+        //          TCP-Illinois chooses parameter Theta, and lets Theta * RTT be this amount of time.
+        //          Theta = 5 (standard)
 
         public double d_m   // maximum average queueing delay = T_max-T_min
         {
@@ -72,7 +76,7 @@ namespace TCPAgent
         double alpha_min = 0.1;
         double beta_max = 0.5;
         double beta_min = 0.125;
-        double eta_1 = 0.01;
+        double eta_1 = 0.01; // 0.01 according to Basar
         double eta_2 = 0.1;
         double eta_3 = 0.8;
 

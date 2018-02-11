@@ -19,7 +19,7 @@ namespace TCPAgent
         public TCPNewRenoSender(double _rawrtt, int _saveEvery = 0) : base(_rawrtt, _saveEvery) // parameters: start point for RTT estimation
         { }
 
-        public override double step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        public override double Step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
         {
             t += h;
 

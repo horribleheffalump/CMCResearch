@@ -42,7 +42,7 @@ namespace Channel
             Psi = K * 0.25; // Variance deviation of queueing time because of senders own transmission
             //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
             //loss intensity mu_t = R_t diag(P)
-            P = Extensions.Vector(0.0015, 0.01, 0.05, 0.05);
+            P = Extensions.Vector(0.00015, 0.001, 0.005, 0.005);
             //P = Extensions.Vector(0.0005, 0.0025, 0.005, 0.05);
             //P = P * 0.1;
             //P = P * 3;
