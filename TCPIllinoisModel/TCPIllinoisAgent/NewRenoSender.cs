@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TCPAgent
 {
-    public class TCPNewRenoSender : TCPSender
+    public class NewRenoSender : TCPSender
     {
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
@@ -16,11 +16,14 @@ namespace TCPAgent
         double beta_ca = 0.5;           // denominator in congestion avoidance
 
 
-        public TCPNewRenoSender(double _rawrtt, int _saveEvery = 0) : base(_rawrtt, _saveEvery) // parameters: start point for RTT estimation
+        public NewRenoSender(double _rawrtt, int _saveEvery = 0) : base(_rawrtt, _saveEvery) // parameters: start point for RTT estimation
         { }
 
-        public override double Step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        public override double Step(double h, int dh, int dl, double rawrtt) //parameters: time increment, loss increment, timeout increment, RTT; returns: current control (window size)
         {
+            this.rawrtt = rtt;
+            this.rtt = rawrtt;
+
             t += h;
 
             W = W

@@ -11,7 +11,7 @@ namespace CMC.Filters
     /// Filter base class for controllable Markov chain with scalar continuous observations
     /// and/or multiple counting process observations with possible simultaneous jumps and MC transitions
     /// </summary>
-    public abstract class Filter
+    public abstract class BaseFilter
     {
         public string Name;     // filter name 
         public int N;           // state space dimension
@@ -37,7 +37,7 @@ namespace CMC.Filters
         /// <param name="h">discretization step</param>
         /// <param name="A">Markov chain transition rates matrix function A(t,u)</param>
         /// <param name="_SaveEvery"></param>
-        public Filter(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, int SaveEvery = 1)
+        public BaseFilter(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, int SaveEvery = 1)
         {
             this.N = N;
             this.t0 = t0;

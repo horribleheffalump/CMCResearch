@@ -11,7 +11,7 @@ namespace CMC.Filters
     /// multiple counting process observations with independent jumps and MC transitions.
     /// The filter is derived with measure change techniques.
     /// </summary>
-    public class FilterDiscreteMeasureChange : Filter
+    public class FilterDiscreteMeasureChange : BaseFilter
     {
         Func<double, double, Vector<double>>[] c; // CP  observation intencities
 

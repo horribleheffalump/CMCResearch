@@ -9,8 +9,8 @@ import pandas as pd
 from Points import * 
 
 
-subfolder = 'NEWRENO/'
-interval = [100,900]
+subfolder = 'ILLINOIS/'
+#interval = [100,900]
 
 
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
@@ -88,7 +88,7 @@ ax0.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color=
 
 for i in range(0, 4):
     #plots[i].set_xlim(0,max(X[:,0]))
-    plots[i].set_xlim(interval[0], interval[1])
+    #plots[i].set_xlim(interval[0], interval[1])
     plots[i].plot(t_d, p_d[:,i], color = 'red')
     #plots[i].plot(t_di, p_di[:,i], color = 'yellow')
     plots[i].plot(t_dc, p_dc[:,i], color = 'cyan')
@@ -96,11 +96,11 @@ for i in range(0, 4):
     plots[i].plot(t_dcg, p_dcg[:,i], color = 'blue')
 
 #ax4.set_xlim(0,max(X[:,0]))
-ax4.set_xlim(interval[0], interval[1])
+#ax4.set_xlim(interval[0], interval[1])
 
 ax4.plot(dhpoints.x, dhpoints.y, '.', color = 'black')
 ax4.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
-ax4.set_ylim(0.99,1.01)
+#ax4.set_ylim(0.99,1.01)
 ax4.set_axis_off()
 
 

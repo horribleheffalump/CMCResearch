@@ -11,7 +11,7 @@ namespace CMC.Filters
     /// Optimal filter for controllable Markov chain with scalar continuous observations
     /// and multiple counting process observations with possible simultaneous jumps and MC transitions.
     /// </summary>
-    public class FilterDiscreteContinuous : Filter
+    public class FilterDiscreteContinuous : BaseFilter
     {
         Func<double, double, Vector<double>>[] c; // CP  observation intencities
         List<SimultaneousJumpsIntencity>[] I; // Intencities of simultaneous MC transitions and CP jumps

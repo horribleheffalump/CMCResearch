@@ -18,13 +18,8 @@ namespace TCPAgent
 
         public List<Control> controls;
 
-
-        public double rawrtt;   // row rtt obtained from received acks. We calculate dt - a time spent to get df acks, where df has a minimum of f_step, then calculate rawrtt = df / dt. 
-        public double rtt;      // rtt estimate obtained from rawrtt data by means of ecpontntial smoothing
-        protected double gamma = 0.99; // exponential smoothing parameter
-        int f_step = 10; // akk discretization step
-        protected double df = 0.0; // number of acks since last moment we've updated rtt
-        protected double dt = 0.0; // time spent to get at least f_step acks
+        public double rawrtt; // raw rtt observations
+        public double rtt;      // rtt smoothed (if required)
         protected double t = 0.0; // current time
 
         public TCPSender(double _rawrtt, int _saveEvery = 0)
@@ -39,25 +34,13 @@ namespace TCPAgent
             controls = new List<Control>();
         }
 
-        public double estimateRTT(double h, double _df) //parameters: time increment, acks received increment. Returns exponential smooth estimate of RTT
-        {
-            dt += h;
-            df += _df;
-            if (df > f_step)
-            {
-                rawrtt = dt / df;
-                rtt = (1 - gamma) * rawrtt + (gamma) * rtt; // exponential smoothing
-                df = 0;
-                dt = 0;
-            }
-            return rtt;
-        }
+
         public int SSIndicator
         {
             get { return W < W_1 ? 1 : 0; }
         }
 
-        public abstract double Step(double h, int dh, int dl, double Rtt = double.NaN); //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        public abstract double Step(double h, int dh, int dl, double rtt); //parameters: time increment, loss increment, timeout increment, RTT; returns: current control (window size)
 
         protected void Save(params double[] p)
         {

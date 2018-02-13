@@ -14,7 +14,7 @@ namespace SystemJointObs
         public ControllableMarkovChain State;
         public ControllableCountingProcess[] CPObservations;
         public ControllableContinuousProcess ContObservations;
-        public Dictionary<String, Filter> Filters;
+        public Dictionary<String, BaseFilter> Filters;
 
         public JointObservationsSystem(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _SaveEvery = 0, double _hObs = 0)
         {
@@ -26,7 +26,7 @@ namespace SystemJointObs
             }
             ContObservations = new ControllableContinuousProcess(_t0, _T, 0.0, _h, (t, u) => _R(t, u)[State.X], (t, u) => _G(t, u)[State.X], _SaveEvery, _hObs);
 
-            Filters = new Dictionary<string, Filter>();
+            Filters = new Dictionary<string, BaseFilter>();
             Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, null, C_i(0, _c), C_i(1, _c), _R, _G, () => State.X, _SaveEvery));
             Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _SaveEvery));
             Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery, _hObs));

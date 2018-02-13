@@ -39,10 +39,17 @@ namespace CMC
         public int Step(double u)
         {
             double p = Intensity(t, u) * h;
+
             t += h;
+
             if (p > 0) // for the case when we got zero or less intencity due to the simultaneous jumps modelling
             {
-                int nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
+                int nojump;
+                if (p >= 1)
+                    nojump = 0;
+                else
+                    nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
+
                 if (nojump == 0)
                 {
                     N++;

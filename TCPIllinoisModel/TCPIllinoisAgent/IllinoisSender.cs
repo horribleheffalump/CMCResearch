@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace TCPAgent
 {
-    public class TCPIllinoisSender : TCPSender
+    public class IllinoisSender : TCPSender
     {
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
+        protected double gamma = 0.99; // exponential smoothing parameter
 
 
         public double T_min { get; set; } // min RTT in session 
@@ -18,28 +19,36 @@ namespace TCPAgent
 
         //double h; //discretization step
 
-        public TCPIllinoisSender(double _rawrtt, int _saveEvery = 0) : base(_rawrtt, _saveEvery) // parameters: start point for RTT estimation
+        public IllinoisSender(double _rawrtt, int _saveEvery = 0) : base(_rawrtt, _saveEvery) // parameters: start point for RTT estimation
         {
             //h = _h;
             T_min = double.NaN;
             T_max = double.NaN;
         }
 
- 
-        public override double Step(double h, int dh, int dl, double Rtt = double.NaN) //parameters: time increment, RTT, loss increment, timeout increment; returns: current control (window size)
+        public double estimateRTT(double rawrtt) //parameters: time increment, acks received increment. Returns exponential smooth estimate of RTT
+        {
+            rtt = (1 - gamma) * rawrtt + (gamma) * rtt; // exponential smoothing
+            return rtt;
+        }
+
+        public override double Step(double h, int dh, int dl, double rawrtt) //parameters: time increment,loss increment, timeout increment, RTT; returns: current control (window size)
         {
             t += h;
-            if (double.IsNaN(Rtt)) Rtt = rtt;
+            this.rawrtt = rawrtt;
+            this.rtt = estimateRTT(rawrtt);
+            //if (double.IsNaN(Rtt)) Rtt = rtt;
 
             if (double.IsNaN(T_min) || double.IsNaN(T_max))
             {
-                T_min = Rtt;
-                T_max = Rtt;
+                T_min = rawrtt;
+                T_max = rawrtt;
             }
-            T_min = Math.Min(T_min, Rtt);
-            T_max = Math.Max(T_max, Rtt);
+            T_min = Math.Min(T_min, rawrtt);
+            T_max = Math.Max(T_max, rawrtt);
 
-            double d = Rtt - T_min;
+
+            double d = rtt - T_min;
 
             W = W
                 + SSIndicator * alpha_ss * W * h / rtt //slow start additive increase 

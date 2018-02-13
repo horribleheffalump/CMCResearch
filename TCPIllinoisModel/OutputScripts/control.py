@@ -5,8 +5,8 @@ matplotlib.rc('text', usetex = True)
 import pylab
 from Points import *
 
-subfolder = ''
-#subfolder = 'ILLINOIS/'
+#subfolder = ''
+subfolder = 'ILLINOIS/'
 #interval = [0,3000]
 #bounds = [0,100]
 

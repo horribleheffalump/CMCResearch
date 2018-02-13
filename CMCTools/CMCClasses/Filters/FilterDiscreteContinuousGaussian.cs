@@ -12,7 +12,7 @@ namespace CMC.Filters
     /// and multiple counting process observations with possible simultaneous jumps and MC transitions.
     /// Gaussian approximation is used to incorporate the continuous observation increments
     /// </summary>
-    public class FilterDiscreteContinuousGaussian : Filter
+    public class FilterDiscreteContinuousGaussian : BaseFilter
     {
         Func<double, double, Vector<double>>[] c; // CP  observation intencities
         List<SimultaneousJumpsIntencity>[] I; // Intencities of simultaneous MC transitions and CP jumps

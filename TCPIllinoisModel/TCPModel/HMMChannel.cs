@@ -9,7 +9,7 @@ using SystemJointObs;
 
 namespace Channel
 {
-    public class HMMChannel
+    public class HMMChannel : TCPChannel
     {
         int N;
         int Others;
@@ -27,7 +27,20 @@ namespace Channel
         public Dictionary<String, Criterion> Criterions;
         public Dictionary<String, Func<double>> TerminalCriterions;
 
-        public HMMChannel(double _t0, double _T, double _h, int _saveEvery)
+        private double df = 0.0; // number of acks since last moment we've updated rtt
+        private double dt = 0.0; // time spent to get at least f_step acks
+        int f_step = 10; // akk discretization step
+
+
+        public double bandwidth = 100; // channel bandwidth Mbps
+        double MTU = 1000; // packet size = 1000 bytes
+        private double maxU; // maximum window size corresponding to throughput = bandwidth
+        private double bandwidth_bps; // bandwidth bytes per second
+
+
+        private double currentRTT;
+
+        public HMMChannel(double _t0, double _T, double _h, int _saveEvery) : base()
         {
 
             N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
@@ -38,6 +51,13 @@ namespace Channel
             delta_p = 0.01; // delta_p - signal propagation time
             D = Extensions.Vector(0.001, 0.01, 0.05, 0.1); // mean queueing time because of the other senders transmission
             K = Extensions.Vector(0.0005, 0.005, 0.025, 0.05); // mean queueing time because of senders own transmission
+
+            RTT0 = delta_p + D[0];
+            currentRTT = RTT0;
+            bandwidth_bps = bandwidth * 1000.0 * 1000.0 / 8.0;
+            maxU = bandwidth_bps * RTT0 / MTU; // since throughput = W * MTU / RTT
+
+
             Phi = D * 0.25; // Variance of queueing time because of the other senders transmission
             Psi = K * 0.25; // Variance deviation of queueing time because of senders own transmission
             //Extensions.Vector(0.001, 0.01, 0.02, 0.04);
@@ -61,7 +81,6 @@ namespace Channel
 
             Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
             {
-                double MTU = 1000; // packet size = 1000 bytes
                 double rtt = U[1];
                 if (rtt > 0)
                 {
@@ -119,6 +138,27 @@ namespace Channel
             {
                 JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep);
             }
+
+            dt = 0;
+            df = 0;
+        }
+
+        public override (double rtt, int loss, int timeout) Step(double u)
+        {
+            dt += h;
+            df += JOS.ContObservations.dx;
+
+            // raw rtt obtained from received acks. We calculate dt - a time spent to get df acks, where df has a minimum of f_step, then calculate rawrtt = df / dt. 
+            if (df > f_step)
+            {
+                currentRTT = dt / df;
+                dt = 0;
+                df = 0;
+            }
+            JOS.Step(u);
+
+            CalculateCriterions(u, currentRTT);
+            return (currentRTT, JOS.CPObservations[0].dN, JOS.CPObservations[1].dN);
         }
 
         public void CalculateCriterions(double u, double rtt)
@@ -142,6 +182,19 @@ namespace Channel
                     outputfile.WriteLine(crit.Value().ToString());
                     outputfile.Close();
                 }
+        }
+
+        public override void SaveAll(string folderName)
+        {
+            string statepath = folderName + "\\channel_state.txt";
+            string cpobspath = folderName + "\\CP_obs_{num}.txt";
+            string contobspath = folderName + "\\cont_obs.txt";
+            string filterpath = folderName + "\\filter_{name}.txt";
+            JOS.SaveAll(statepath, cpobspath, contobspath, filterpath);
+
+            string criterionpath = folderName + "\\crit_{name}.txt";
+            SaveCriterions(criterionpath);
+
         }
 
         public Matrix<double> TransitionMatrix(double t, double w)

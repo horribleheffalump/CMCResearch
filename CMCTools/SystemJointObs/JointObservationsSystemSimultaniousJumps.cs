@@ -34,7 +34,7 @@ namespace SystemJointObs
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveEvery > 0);
             }
             SimultaneousJumpsIntencities = _I;
-            Filters = new Dictionary<string, Filter>();
+            Filters = new Dictionary<string, BaseFilter>();
             Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, _I, C_i(0, _c, _I), C_i(1, _c, _I), _R, _G, () => State.X, _saveEvery));
             Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, _I, _saveEvery));
             //Filters.Add("DiscreteIndependent", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery));

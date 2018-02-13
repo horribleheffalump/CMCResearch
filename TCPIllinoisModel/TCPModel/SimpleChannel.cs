@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Channel
 {
-    public class SimpleChannel
+    public class SimpleChannel : TCPChannel
     {
-        private double h; // discretization step
-        private double RTT0; // propagation delay in seconds
+
         public double bandwidth; // channel bandwidth Mbps
         public double MTU; // packet size in bytes
         public int buffersize; // size of link buffer
@@ -19,7 +18,7 @@ namespace Channel
         private double bandwidth_bps; // bandwidth bytes per second
 
 
-        public SimpleChannel(double h, double RTT0, double bandwidth, double MTU, int buffersize)
+        public SimpleChannel(double h, double RTT0, double bandwidth, double MTU, int buffersize): base()
         {
             this.h = h;
             this.RTT0 = RTT0;
@@ -31,21 +30,42 @@ namespace Channel
             maxU = bandwidth_bps * RTT0 / MTU; // since throughput = W * MTU / RTT
         }
 
-        public void Step(double u)
+        public override (double rtt, int loss, int timeout) Step(double u)
         {
-            current_buffersize += (u / RTT(u) - bandwidth_bps / MTU) * h;
+            current_buffersize += (u / RTT - bandwidth_bps / MTU) * h;
             if (current_buffersize < 0) current_buffersize = 0;
+            if (current_buffersize > buffersize) current_buffersize = buffersize;
+
+            return (RTT, LossIndicator, TimeoutIndicator); 
         }
 
-        public double RTT(double u)
+        public double RTT // rtt depends on queue size: rtt = propagation delay (constant RTT0) + queueing delay (queue size * packet size / bandwidth)
         {
-            //double current_buffersize = u / maxU * buffersize; // the part of buffer occupied is proportional to the window size. The buffer is full, when throughput = bandwidth
-            return RTT0 + current_buffersize * MTU / bandwidth_bps;
+            get
+            {
+                return RTT0 + current_buffersize * MTU / bandwidth_bps;
+            }
         }
-        public int LossIndicator(double u) //indicates loss in channel. A loss occures when throughput acheives its maximum
+        public int LossIndicator //indicates loss in channel. A loss occures when throughput acheives its maximum
         {
-            //return u > maxU + buffersize ? 1 : 0;
-            return current_buffersize > buffersize ? 1 : 0;
+            get
+            {
+                //return u > maxU + buffersize ? 1 : 0;
+                return current_buffersize >= buffersize ? 1 : 0;
+            }
+        }
+   
+        public int TimeoutIndicator //indicates timeout in channel. There is no timeout in simple channel :)
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public override void SaveAll(string folderName)
+        {
+            // TODO
         }
     }
 }
