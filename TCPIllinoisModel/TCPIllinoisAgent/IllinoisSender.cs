@@ -11,6 +11,7 @@ namespace TCPAgent
     {
         double alpha_ss = 1;            // growth coefficient in slow start
         double beta_ss = 0.5;           // denominator in slow start
+        //protected double gamma = 0.99; // exponential smoothing parameter
         protected double gamma = 0.99; // exponential smoothing parameter
 
 
@@ -35,20 +36,23 @@ namespace TCPAgent
         public override double Step(double h, int dh, int dl, double rawrtt) //parameters: time increment,loss increment, timeout increment, RTT; returns: current control (window size)
         {
             t += h;
-            this.rawrtt = rawrtt;
+            //this.rawrtt = rawrtt;
+            this.rawrtt = estimateRTT(rawrtt);
             this.rtt = estimateRTT(rawrtt);
             //if (double.IsNaN(Rtt)) Rtt = rtt;
 
             if (double.IsNaN(T_min) || double.IsNaN(T_max))
             {
-                T_min = rawrtt;
-                T_max = rawrtt;
+                T_min = this.rawrtt;
+                T_max = this.rawrtt;
             }
-            T_min = Math.Min(T_min, rawrtt);
-            T_max = Math.Max(T_max, rawrtt);
+            T_min = Math.Min(T_min, this.rawrtt);
+            T_max = Math.Max(T_max, this.rawrtt);
 
 
             double d = rtt - T_min;
+
+            
 
             W = W
                 + SSIndicator * alpha_ss * W * h / rtt //slow start additive increase 
@@ -64,6 +68,7 @@ namespace TCPAgent
             }
 
             Save(alpha(d), d, d_1, d_m, T_min, T_max, kappa_1);
+
             return W;
         }
 

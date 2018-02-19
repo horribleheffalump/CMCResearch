@@ -30,13 +30,13 @@ namespace Channel
             maxU = bandwidth_bps * RTT0 / MTU; // since throughput = W * MTU / RTT
         }
 
-        public override (double rtt, int loss, int timeout) Step(double u)
+        public override (int loss, int timeout, double? rtt, double? ack_received_count, double? ack_received_time) Step(double u)
         {
             current_buffersize += (u / RTT - bandwidth_bps / MTU) * h;
             if (current_buffersize < 0) current_buffersize = 0;
             if (current_buffersize > buffersize) current_buffersize = buffersize;
 
-            return (RTT, LossIndicator, TimeoutIndicator); 
+            return (LossIndicator, TimeoutIndicator, RTT, null, null); 
         }
 
         public double RTT // rtt depends on queue size: rtt = propagation delay (constant RTT0) + queueing delay (queue size * packet size / bandwidth)

@@ -8,12 +8,12 @@ from Points import *
        
 import pandas as pd
 
-filename_X = u"../out/channel_state.txt"
+filename_X = u"../out/ILLINOIS/channel_state.txt"
 t_X, X = np.loadtxt(filename_X, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
-filename_dh = u"../out/CP_obs_0.txt"
+filename_dh = u"../out/ILLINOIS/CP_obs_0.txt"
 t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
-filename_dl = u"../out/CP_obs_1.txt"
+filename_dl = u"../out/ILLINOIS/CP_obs_1.txt"
 t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
 f = plt.figure(num=None, figsize=(20, 6), dpi=150, facecolor='w', edgecolor='k')
@@ -21,7 +21,7 @@ f = plt.figure(num=None, figsize=(20, 6), dpi=150, facecolor='w', edgecolor='k')
 Xpoints = Points(t_X, X)
 Xpoints.multiply()
 
-filename = u"../out/filter_Dummy.txt"
+filename = u"../out/ILLINOIS/filter_Dummy.txt"
 # 0 t
 # 1-4 pi (p0)
 # 5 X

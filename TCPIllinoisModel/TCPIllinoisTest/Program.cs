@@ -17,7 +17,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 50.0;
+            double T = 100.0;
             int saveEvery = 100;
 
 
@@ -28,11 +28,11 @@ namespace TCPIllinoisTest
 
             //for (double t = t0; t <= T; t += h)
             //{
-            //    (double rtt_i, int loss_i, int timeout_i) = channel_i.Step(sender_i.W);
-            //    sender_i.Step(h, loss_i, timeout_i, rtt_i);
+            //    (int loss_i, int timeout_i, double? rtt_i, double? ack_received_count_i, double? ack_received_time_i) = channel_i.Step(sender_i.W);
+            //    sender_i.Step(h, loss_i, timeout_i, rtt_i.Value);
 
-            //    (double rtt_nr, int loss_nr, int timeout_nr) = channel_nr.Step(sender_nr.W);
-            //    sender_nr.Step(h, loss_nr, timeout_nr, rtt_nr);
+            //    (int loss_nr, int timeout_nr, double? rtt_nr, double? ack_received_count_nr, double? ack_received_time_nr) = channel_nr.Step(sender_nr.W);
+            //    sender_nr.Step(h, loss_nr, timeout_nr, rtt_nr.Value);
             //    if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
             //    {
             //        Console.WriteLine($"{t}");
@@ -69,11 +69,11 @@ namespace TCPIllinoisTest
             else
                 sender = null;
 
-
+            sender.W = 1300;
             for (double t = t0; t <= T; t += h)
             {
-                (double rtt, int loss, int timeout) = channel.Step(sender.W);
-                sender.Step(h, loss, timeout, rtt);
+                (int loss, int timeout, double? rtt, double? df, double? dt) = channel.Step(sender.W);
+                sender.Step(h, loss, timeout, rtt.Value);
                 //double rtt = sender.estimateRTT(h, channel.JOS.ContObservations.dx);
                 // to estimate RTT we use continuous observations with the same discretization step as defined for all the system. 
                 // but for continuous filters we use thinned continuous observations

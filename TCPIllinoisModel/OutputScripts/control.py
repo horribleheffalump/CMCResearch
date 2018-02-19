@@ -6,8 +6,8 @@ import pylab
 from Points import *
 
 #subfolder = ''
-subfolder = 'ILLINOIS/'
-#interval = [0,3000]
+subfolder = 'NEWRENO/'
+interval = [0,100]
 #bounds = [0,100]
 
 
@@ -22,10 +22,18 @@ t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, 
 filename_dl = u"../out/" + subfolder + "CP_obs_1.txt"
 t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
-f = plt.figure(num=None, figsize=(20, 6), dpi=150, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(10, 6), dpi=150, facecolor='w', edgecolor='k')
 
 Xpoints = Points(t_X, X)
 Xpoints.multiply()
+
+
+n = len(Xpoints.x)
+o = np.zeros(n)
+ones = np.ones(n)
+levelzero = np.ones(n)*0.0
+levelone = np.ones(n)*u.max()
+
 
 dhpoints = Points(t_dh, dh)
 dhpoints.toones()
@@ -36,19 +44,29 @@ dlpoints.toones()
 #print(Xpoints.x)
 #print(Xpoints.y)
 
-plt.plot(t, u, '-', color = 'blue')
+ax1 = plt.subplot(111)
+
+ax1.plot(t, ss * u, '-', color = 'blue')
+ax1.plot(t, (1-ss) * u, '-', color = 'green')
 #plt.plot(t, ss * max(u) / 2.0, '--', color = 'green')
-plt.plot(t, thresh, ':', color = 'yellow')
-plt.plot(Xpoints.x, Xpoints.y, '-', color = 'black')
-plt.plot(dhpoints.x, dhpoints.y, '.', color = 'black')
-plt.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
+#ax1.plot(t, thresh, ':', color = 'yellow')
+#plt.plot(Xpoints.x, Xpoints.y, '-', color = 'black')
+ax1.plot(dhpoints.x, dhpoints.y, '.', color = 'black')
+ax1.plot(dlpoints.x, dlpoints.y, 'x', color = 'red')
+
+ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==o, color='black', alpha = 0.2, linewidth=0.0);
+ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones, color='black', alpha = 0.4, linewidth=0.0);
+ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*2, color='black', alpha = 0.6, linewidth=0.0);
+ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color='black', alpha = 0.8, linewidth=0.0);
+
+ax2 = ax1.twinx()
+ax2.plot(t, rtt, '-', color = 'red')
 
 #plt.plot(t, intf, '-', color = 'green')
 #plt.plot(t, intm, '-', color = 'red')
-#plt.plot(t, rtt, '-', color = 'blue')
-ax1 = plt.subplot(111)
 #ax1.set_ylim(bounds[0],bounds[1])
-#ax1.set_xlim(interval[0],interval[1])
+ax1.set_xlim(interval[0],interval[1])
+ax2.set_xlim(interval[0],interval[1])
 plt.show()
 
 #plt.plot(t, rtt, '--', color = 'red')

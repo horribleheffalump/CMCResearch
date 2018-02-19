@@ -16,24 +16,36 @@ namespace CMC
             {
                 throw new ArgumentException("Sum of probabilities should be equal to 1");
             }
-            Vector<double> intervals = Vector<double>.Build.Dense(measure.ToArray());
-            //measure.CopyTo(intervals);
-            for (int i = 1; i < intervals.Count; i++)
-            {
-                intervals[i] += intervals[i - 1];
-            }
-
-            Random random = new SystemRandomSource(RandomSeed.Robust());
-            double sample = random.NextDouble();
             int result = int.MinValue;
-            for (int i = 0; i < intervals.Count; i++)
+
+            double max = measure.OrderByDescending(x => x).ElementAt(0);
+            double secondmax = measure.OrderByDescending(x => x).ElementAt(1);
+
+            if (secondmax / max < _tolerance) // if one value of measure is much bigger then the others, then the correxponding number is declared sample without drawing 
             {
-                if (measure[i] < 0)
-                    throw new ArgumentException("Probabilities should be positive");
-                if (sample < intervals[i])
+                result = measure.MaximumIndex();
+            }
+            else // do the drawing
+            {
+                Vector<double> intervals = Vector<double>.Build.Dense(measure.ToArray());
+                //measure.CopyTo(intervals);
+                for (int i = 1; i < intervals.Count; i++)
                 {
-                    result = i;
-                    break;
+                    intervals[i] += intervals[i - 1];
+                }
+
+                Random random = new SystemRandomSource(RandomSeed.Robust());
+                double sample = random.NextDouble();
+
+                for (int i = 0; i < intervals.Count; i++)
+                {
+                    if (measure[i] < 0)
+                        throw new ArgumentException("Probabilities should be positive");
+                    if (sample < intervals[i])
+                    {
+                        result = i;
+                        break;
+                    }
                 }
             }
             return result;

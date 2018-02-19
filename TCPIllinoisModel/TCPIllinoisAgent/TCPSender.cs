@@ -10,7 +10,7 @@ namespace TCPAgent
     public abstract class TCPSender
     {
         protected double W_0 = 1;                     // min windiw size
-        public double W_1 = 10;                    // slow start -> congestion avoidance threshold
+        public double W_1 = 100;                    // slow start -> congestion avoidance threshold. Initial value is high for efficeint bandwidth probing
         protected double W_max = 10000;              // maximum window size (bottleneck threshhold)
         public double W;                          // ccurrent window size
         public int SaveEvery;
