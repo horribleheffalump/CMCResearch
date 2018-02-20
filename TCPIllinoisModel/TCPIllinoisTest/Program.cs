@@ -17,7 +17,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 100.0;
+            double T = 200.0;
             int saveEvery = 100;
 
 
@@ -73,13 +73,14 @@ namespace TCPIllinoisTest
             for (double t = t0; t <= T; t += h)
             {
                 (int loss, int timeout, double? rtt, double? df, double? dt) = channel.Step(sender.W);
-                sender.Step(h, loss, timeout, rtt.Value);
-                //double rtt = sender.estimateRTT(h, channel.JOS.ContObservations.dx);
-                // to estimate RTT we use continuous observations with the same discretization step as defined for all the system. 
-                // but for continuous filters we use thinned continuous observations
-                //double u = sender.step(h, channel.JOS.CPObservations[0].dN, channel.JOS.CPObservations[1].dN, rtt);
-                //channel.CalculateCriterions(u, rtt);
-                //channel.JOS.Step(u);
+                if (rtt.HasValue)
+                {
+                    sender.Step(h, loss, timeout, rtt.Value);
+                }
+                {
+                    double rttEstimate = dt.Value / df.Value * sender.W;
+                    sender.Step(h, loss, timeout, rttEstimate);
+                }
 
                 if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
                 {

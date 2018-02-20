@@ -36,11 +36,11 @@ namespace SystemJointObs
             SimultaneousJumpsIntencities = _I;
             Filters = new Dictionary<string, BaseFilter>();
             Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, _I, C_i(0, _c, _I), C_i(1, _c, _I), _R, _G, () => State.X, _saveEvery));
-            //Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, _I, _saveEvery));
-            ////Filters.Add("DiscreteIndependent", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery));
-            ////Filters.Add("DiscreteMeasureChange", new FilterDiscreteMeasureChange(_N, _t0, _T, _h, _A, _c, _saveEvery));
-            //Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs));
-            //Filters.Add("DiscreteContinuousGaussian", new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs));
+            Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, _I, _saveEvery));
+            //Filters.Add("DiscreteIndependent", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery));
+            //Filters.Add("DiscreteMeasureChange", new FilterDiscreteMeasureChange(_N, _t0, _T, _h, _A, _c, _saveEvery));
+            Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs));
+            Filters.Add("DiscreteContinuousGaussian", new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs));
         }
 
         public Func<double, double, double> C_i(int i, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I) // so that we use the proper i

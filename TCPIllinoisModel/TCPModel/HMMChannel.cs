@@ -28,10 +28,10 @@ namespace Channel
         public double s;       // coefficient of rtt linear growth with cwnd
         public double sigma;   // coefficient of rtt jitter
 
-        public Vector<double> D;
-        public Vector<double> K;
-        public Vector<double> Phi;
-        public Vector<double> Psi;
+        //public Vector<double> D;
+        //public Vector<double> K;
+        //public Vector<double> Phi;
+        //public Vector<double> Psi;
         //public Vector<double> P;
         //public Vector<double> Q;
 
@@ -40,9 +40,9 @@ namespace Channel
         public Dictionary<String, Criterion> Criterions;
         public Dictionary<String, Func<double>> TerminalCriterions;
 
-        private double df = 0.0; // number of acks since last moment we've updated rtt
-        private double dt = 0.0; // time spent to get at least f_step acks
-        int f_step = 10; // akk discretization step
+        //private double df = 0.0; // number of acks since last moment we've updated rtt
+        //private double dt = 0.0; // time spent to get at least f_step acks
+        //int f_step = 10; // akk discretization step
 
 
         public double bandwidth; // channel bandwidth Mbps
@@ -78,8 +78,8 @@ namespace Channel
             noise = new Normal(0.0, 1.0);
 
             // TODO : delete these vectors after observations refactoring
-            D = Extensions.Vector(0.001, 0.005, 0.01, 0.01); // mean queueing time because of the other senders transmission
-            K = Extensions.Vector(0.0005, 0.002, 0.005, 0.005); // mean queueing time because of senders own transmission
+            //D = Extensions.Vector(0.001, 0.005, 0.01, 0.01); // mean queueing time because of the other senders transmission
+            //K = Extensions.Vector(0.0005, 0.002, 0.005, 0.005); // mean queueing time because of senders own transmission
 
 
             //RTT0 = delta_p + D[0];
@@ -100,9 +100,6 @@ namespace Channel
             s = MTU / bandwidth_bps; //0.1 * delta_p / buffersize;
             sigma = Math.Sqrt(s) / 10.0;
 
-            Phi = D * 0.25; // Variance of queueing time because of the other senders transmission
-            Psi = K * 0.25; // Variance deviation of queueing time because of senders own transmission
-
             
             //P = Extensions.Vector(0.00015, 0.001, 0.005, 0.005);
             //P = Extensions.Vector(0.0005, 0.0025, 0.005, 0.05);
@@ -117,44 +114,44 @@ namespace Channel
             //Q = Vector(0.0, 0.0, 0.0, 0.0);
 
             //ContinuousObservationsDiscretizationStep = _h;
-            ContinuousObservationsDiscretizationStep = 1e-2;
+            ContinuousObservationsDiscretizationStep = _h;
 
             Criterions = new Dictionary<string, Criterion>();
 
-            //Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
-            //{
-            //    double rtt = U[1];
-            //    if (rtt > 0)
-            //    {
-            //        double Bps = U[0] * MTU / rtt; // instant bytes per second
-            //        double Mbps = Bps * 8 / 1e6; // instant Mbps
-            //        return Mbps;
+            Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                double rtt = U[1];
+                if (rtt > 0)
+                {
+                    double Bps = U[0] * MTU / rtt; // instant bytes per second
+                    double Mbps = Bps * 8 / 1e6; // instant Mbps
+                    return Mbps;
 
-            //    }
-            //    else
-            //        return 0.0;
-            //}, _saveEvery));
-            //Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, U, Obs) =>
-            //{
-            //    return Math.Abs(X[0][0] - 1.0) < 1e-5 ? 1.0 : 0.0;
-            //}, _saveEvery));
-            //Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, U, Obs) =>
-            //{
-            //    return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
-            //}, _saveEvery));
-            //Criterions.Add("TimeInBadState", new Criterion(_h, (t, X, U, Obs) =>
-            //{
-            //    return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
-            //}, _saveEvery));
+                }
+                else
+                    return 0.0;
+            }, _saveEvery));
+            Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                return Math.Abs(X[0][0] - 1.0) < 1e-5 ? 1.0 : 0.0;
+            }, _saveEvery));
+            Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
+            }, _saveEvery));
+            Criterions.Add("TimeInBadState", new Criterion(_h, (t, X, U, Obs) =>
+            {
+                return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
+            }, _saveEvery));
 
             TerminalCriterions = new Dictionary<string, Func<double>>();
 
-            //TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
-            //TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
-            //TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
-            //TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J);
-            //TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J);
-            //TerminalCriterions.Add("TotalTimeInBadState", () => Criterions["TimeInBadState"].J);
+            TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
+            TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
+            TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
+            TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J);
+            TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J);
+            TerminalCriterions.Add("TotalTimeInBadState", () => Criterions["TimeInBadState"].J);
 
             if (doSimulateSimultaneousJumps)
             {
@@ -180,27 +177,27 @@ namespace Channel
                 JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep);
             }
 
-            dt = 0;
-            df = 0;
+            //dt = 0;
+            //df = 0;
         }
 
         public override (int loss, int timeout, double? rtt, double? ack_received_count, double? ack_received_time) Step(double u)
         {
-            dt += h;
-            df += JOS.ContObservations.dx;
+            // if we measure RTT explicitly, we have to calculate current RTT and return it
+            //currentRTT = RTT(u)[JOS.State.X];
 
-            // raw rtt obtained from received acks. We calculate dt - a time spent to get df acks, where df has a minimum of f_step, then calculate rawrtt = df / dt. 
-            //if (df > f_step)
-            //{
-            //    currentRTT = dt / df;
-            //    dt = 0;
-            //    df = 0;
-            //}
-            currentRTT = RTT(u)[JOS.State.X];
+            // if we do not measure RTT explicitly, then we have to return ack_received_count and ack_received_time. 
+            // For example if we have recieved JOS.ContObservations.dx during period h, then ack_received_time = JOS.ContObservations.dx and ack_received_time = h
+
             JOS.Step(u);
 
-            //CalculateCriterions(u, currentRTT);
-            return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT, null, null); // TODO! FOR RTT OBSERVED
+            // uncomment to calculate performance criterions
+            CalculateCriterions(u, currentRTT);
+
+            // if we have explicit RTT observations
+            //return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT, null, null); 
+            // if we just have acknowledgement counting process (or its approximation) and use it to estimate RTT
+            return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, null, JOS.ContObservations.dx, h); 
         }
 
         public Vector<double> RTT(double u) // real unobservable rtt 
@@ -260,7 +257,7 @@ namespace Channel
         {
             //double Wmax = 200.0;
             double lambda0 = 1e-5;
-            double C = 0.01 * 10.0;
+            double C = 0.001;
 
             double lambda14 = 0; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
             double lambda41 = 0.03;
@@ -317,8 +314,8 @@ namespace Channel
         public Vector<double> LossIntensity(double t, double u)
         {
 
-            double Pmin = 0.0; //0.00005; // probability of one of unacknowledged packets to be lost on time interval equal to RTT
-            double Pmax = 0.0; // 0.0005;
+            double Pmin = 0.000005; // probability of one of unacknowledged packets to be lost on time interval equal to RTT
+            double Pmax = 0.00001;
             double Delta = 5;
 
             var P = Extensions.Vector(
@@ -340,7 +337,7 @@ namespace Channel
 
         public Vector<double> TimeoutIntensity(double t, double u)
         {
-            var Q = Extensions.Vector(0.00001, 0.00001, 0.00001, 0.001)
+            var Q = Extensions.Vector(0.000001, 0.000001, 0.000001, 0.0001)
             //+
             //Extensions.Vector(
             //            u < U2 ? 0 : 1e10,
@@ -350,37 +347,35 @@ namespace Channel
             //)
             ;
 
-            Q = Q * 0.01;
-
             return u * Extensions.Diag(Q) * RTT(u).PointwisePower(-1);
             //return Extensions.Diag(Q) * R(t, u);
             //return LossIntensity(t, u) / 3.0;
         }
 
+        private double q(double u) // buffer occupied
+        {
+            return Math.Max(0.0, u - Ubdp);
+        }
+
         public Vector<double> R(double t, double u)
         {
-            return Extensions.Vector(
-                u * 1.0 / (delta_p + D[0] + u * K[0]),
-                u * 1.0 / (delta_p + D[1] + u * K[1]),
-                u * 1.0 / (delta_p + D[2] + u * K[2]),
-                u * 1.0 / (delta_p + D[3] + u * K[3])
+            return
+                Extensions.Vector(
+                            u * 1.0 / (delta_p + mV0 + q(u) * s),
+                            u * 1.0 / (delta_p + mV0 + q(u) * s),
+                            u * 1.0 / (delta_p + mV0 + buffersize * s),
+                            u * 1.0 / (delta_p_bad + mV0_bad)
                 );
         }
         public Vector<double> G(double t, double u)
         {
-            //return Extensions.Vector(
-            //    1.0 / Math.Sqrt(D[0] + u * K[0]),
-            //    1.0 / Math.Sqrt(D[1] + u * K[1]),
-            //    1.0 / Math.Sqrt(D[2] + u * K[2]),
-            //    1.0 / Math.Sqrt(D[3] + u * K[3])
-            //    );
+            //var Rt = R(t, u);
             return Extensions.Vector(
-                Math.Sqrt(Phi[0] + u * Psi[0]) / Math.Pow(delta_p + D[0] + u * K[0], 1.5),
-                Math.Sqrt(Phi[1] + u * Psi[1]) / Math.Pow(delta_p + D[1] + u * K[1], 1.5),
-                Math.Sqrt(Phi[2] + u * Psi[2]) / Math.Pow(delta_p + D[2] + u * K[2], 1.5),
-                Math.Sqrt(Phi[3] + u * Psi[3]) / Math.Pow(delta_p + D[3] + u * K[3], 1.5)
-                );
-
+               Math.Sqrt(u) * (Math.Sqrt(stdV0 * stdV0 + q(u) * sigma * sigma) / Math.Pow(delta_p + mV0 + q(u) * s, 1.5)),
+               Math.Sqrt(u) * (Math.Sqrt(stdV0 * stdV0 + q(u) * sigma * sigma) / Math.Pow(delta_p + mV0 + q(u) * s, 1.5)),
+               Math.Sqrt(u) * (Math.Sqrt(stdV0 * stdV0 + buffersize * sigma * sigma) / Math.Pow(delta_p + mV0 + buffersize * s, 1.5)),
+               Math.Sqrt(u) * (stdV0_bad / Math.Pow(delta_p_bad + mV0_bad, 1.5))
+            );
         }
 
 

@@ -75,15 +75,16 @@ namespace CMC.Filters
             {
                 pi = pi + x_part + y_part;
                 if (dz.HasValue)
-                {
-                    //pi = pi + x_part + y_part + z_part;
-                    //pi = pi + x_part + y_part;
-                    for (int j = 0; j < pi.Count; j++)
+                    if (dz.Value > 0)
                     {
-                        pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
+                        //pi = pi + x_part + y_part + z_part;
+                        //pi = pi + x_part + y_part;
+                        for (int j = 0; j < pi.Count; j++)
+                        {
+                            pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
+                        }
+                        pi = pi.Normalize(1.0);
                     }
-                    pi = pi.Normalize(1.0);
-                }
             }
             else
             {

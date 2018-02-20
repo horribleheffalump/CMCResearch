@@ -27,7 +27,7 @@ ax1.plot(t, rtt, '-', color = 'yellow', alpha = 0.4, linewidth = 3.0, label = "r
 
 
 ax2 = ax1.twinx()
-ax2.plot(t, u, '-', color = 'green', alpha = 0.4, linewidth = 3.0, label = "u")
+#ax2.plot(t, u, '-', color = 'green', alpha = 0.4, linewidth = 3.0, label = "u")
 ax2.plot(t, throughput, '-', color = 'red', alpha = 0.4, linewidth = 3.0, label = "throughput")
 
 #ax1.plot(t, I0[:,1], '-', color = 'green', alpha = 0.6, linewidth = 2.0, label = "sigma: 1-3")
