@@ -59,7 +59,7 @@ namespace Channel
 
         private Normal noise;
 
-        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = false, bool _evaluatePerformance = false) : base()
+        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _calculateFilters = false, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = false, bool _evaluatePerformance = false) : base()
         {
             h = _h;
 
@@ -174,12 +174,12 @@ namespace Channel
                 TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 3)));
                 TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 2)));
 
-                JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep);
+                JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep, _calculateFilters);
 
             }
             else
             {
-                JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep);
+                JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep, _calculateFilters);
             }
 
             //dt = 0;
@@ -188,7 +188,11 @@ namespace Channel
 
         public override (int loss, int timeout, double rtt) Step(double u)
         {
-            // if we measure RTT explicitly, we have to calculate current RTT and return it
+            // RTTSimulationMode.Explicit  : the RTT i measured explicitly
+            // RTTSimulationMode.AsRenewal : the RTT is simulated as time between full window acknowledgements (reception of all packets sent during the last RTT period)
+            //                               In this case ack counting is a renewal process and RTT = time interval / counts * cwnd
+
+
             switch (rttSimulationMode)
             {
                 case RTTSimulationMode.Explicit: currentRTT = RTT(u)[JOS.State.X]; break;
@@ -196,8 +200,6 @@ namespace Channel
             }
 
 
-            // if we do not measure RTT explicitly, then we have to return ack_received_count and ack_received_time. 
-            // For example if we have recieved JOS.ContObservations.dx during period h, then ack_received_time = JOS.ContObservations.dx and ack_received_time = h
 
             JOS.Step(u);
 
@@ -347,6 +349,9 @@ namespace Channel
             double Pmax = 0.00001;
             double Delta = 5;
 
+            // loss probability during h is p = intensity * h
+            double p_guaranteed = 1.0; // probability of loss during RTT
+
             var P = Extensions.Vector(
                             Pmin,
                             Pmin + (u > U1 ? (Pmax - Pmin) / (U2 - U1) * (u - U1) : 0.0),
@@ -355,10 +360,10 @@ namespace Channel
                 )
                 +
                 Extensions.Vector(
-                            u < U2 + Delta ? Pmin / (U2 - u) : 1e10,
-                            u < U2 + Delta ? Pmin / (U2 - u) : 1e10,
-                            u < U2 + Delta ? Pmin / (U2 - u) : 1e10,
-                            u < U2 + Delta ? Pmin / (U2 - u) : 1e10
+                            u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed,
+                            u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed,
+                            u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed,
+                            u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed
                 );
             return u * Extensions.Diag(P) * RTT(u).PointwisePower(-1);
         }

@@ -45,7 +45,7 @@ namespace TCPIllinoisTest
             //string controlpath_nr = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\simple_newreno_control.txt");
             //sender_nr.SaveTrajectory(controlpath_nr);
 
-            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery);
+            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true);
             TCPSender sender;
 
             string protocol = "ILLINOIS";
