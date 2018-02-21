@@ -17,7 +17,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 200.0;
+            double T = 50.0;
             int saveEvery = 100;
 
 
@@ -72,15 +72,8 @@ namespace TCPIllinoisTest
             sender.W = 1300;
             for (double t = t0; t <= T; t += h)
             {
-                (int loss, int timeout, double? rtt, double? df, double? dt) = channel.Step(sender.W);
-                if (rtt.HasValue)
-                {
-                    sender.Step(h, loss, timeout, rtt.Value);
-                }
-                {
-                    double rttEstimate = dt.Value / df.Value * sender.W;
-                    sender.Step(h, loss, timeout, rttEstimate);
-                }
+                (int loss, int timeout, double rtt) = channel.Step(sender.W);
+                sender.Step(h, loss, timeout, rtt);
 
                 if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
                 {

@@ -28,7 +28,7 @@ namespace Channel
         /// ack_received_count - number of acks received during ack_received_time period
         /// ack_received_time - period of time for ack accounting (may not depend on h - discretization step)
         /// </returns>
-        public abstract (int loss, int timeout, double? rtt, double? ack_received_count, double? ack_received_time) Step(double u);
+        public abstract (int loss, int timeout, double rtt) Step(double u);
 
         public abstract void SaveAll(string folderName);
     }

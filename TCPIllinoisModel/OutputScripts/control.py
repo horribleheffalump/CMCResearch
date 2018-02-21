@@ -7,7 +7,7 @@ from Points import *
 
 #subfolder = ''
 subfolder = 'ILLINOIS/'
-interval = [0,200]
+interval = [0,50]
 #bounds = [0,100]
 
 

@@ -55,16 +55,18 @@ namespace Channel
         private double U2; // AQL upper bound
 
         private double currentRTT;
+        private RTTSimulationMode rttSimulationMode;
 
         private Normal noise;
 
-        public HMMChannel(double _t0, double _T, double _h, int _saveEvery) : base()
+        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = false, bool _evaluatePerformance = false) : base()
         {
             h = _h;
 
             N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
-            doSimulateSimultaneousJumps = false; // simulating the simultaneous jumps of the Markov chain and the observable counting processes
+            doSimulateSimultaneousJumps = _simultaneousJumps; // simulating the simultaneous jumps of the Markov chain and the observable counting processes
             Others = 1; // number of other users of the channel (affects the simultaneous jumps intensity)
+            rttSimulationMode = _RTTSimulationMode;
 
             // RTT = delta_p + D X_t + w_t K X_t
             delta_p = 0.1;
@@ -116,42 +118,45 @@ namespace Channel
             //ContinuousObservationsDiscretizationStep = _h;
             ContinuousObservationsDiscretizationStep = _h;
 
-            Criterions = new Dictionary<string, Criterion>();
-
-            Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
+            if (_evaluatePerformance)
             {
-                double rtt = U[1];
-                if (rtt > 0)
+                Criterions = new Dictionary<string, Criterion>();
+
+                Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
                 {
-                    double Bps = U[0] * MTU / rtt; // instant bytes per second
+                    double rtt = U[1];
+                    if (rtt > 0)
+                    {
+                        double Bps = U[0] * MTU / rtt; // instant bytes per second
                     double Mbps = Bps * 8 / 1e6; // instant Mbps
                     return Mbps;
 
-                }
-                else
-                    return 0.0;
-            }, _saveEvery));
-            Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, U, Obs) =>
-            {
-                return Math.Abs(X[0][0] - 1.0) < 1e-5 ? 1.0 : 0.0;
-            }, _saveEvery));
-            Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, U, Obs) =>
-            {
-                return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
-            }, _saveEvery));
-            Criterions.Add("TimeInBadState", new Criterion(_h, (t, X, U, Obs) =>
-            {
-                return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
-            }, _saveEvery));
+                    }
+                    else
+                        return 0.0;
+                }, _saveEvery));
+                Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, U, Obs) =>
+                {
+                    return Math.Abs(X[0][0] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                }, _saveEvery));
+                Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, U, Obs) =>
+                {
+                    return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                }, _saveEvery));
+                Criterions.Add("TimeInBadState", new Criterion(_h, (t, X, U, Obs) =>
+                {
+                    return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                }, _saveEvery));
 
-            TerminalCriterions = new Dictionary<string, Func<double>>();
+                TerminalCriterions = new Dictionary<string, Func<double>>();
 
-            TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
-            TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
-            TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
-            TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J);
-            TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J);
-            TerminalCriterions.Add("TotalTimeInBadState", () => Criterions["TimeInBadState"].J);
+                TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
+                TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
+                TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
+                TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J);
+                TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J);
+                TerminalCriterions.Add("TotalTimeInBadState", () => Criterions["TimeInBadState"].J);
+            }
 
             if (doSimulateSimultaneousJumps)
             {
@@ -181,10 +186,15 @@ namespace Channel
             //df = 0;
         }
 
-        public override (int loss, int timeout, double? rtt, double? ack_received_count, double? ack_received_time) Step(double u)
+        public override (int loss, int timeout, double rtt) Step(double u)
         {
             // if we measure RTT explicitly, we have to calculate current RTT and return it
-            //currentRTT = RTT(u)[JOS.State.X];
+            switch (rttSimulationMode)
+            {
+                case RTTSimulationMode.Explicit: currentRTT = RTT(u)[JOS.State.X]; break;
+                case RTTSimulationMode.AsRenewal: if (JOS.ContObservations.dx > 0) currentRTT = h / JOS.ContObservations.dx * u; break;
+            }
+
 
             // if we do not measure RTT explicitly, then we have to return ack_received_count and ack_received_time. 
             // For example if we have recieved JOS.ContObservations.dx during period h, then ack_received_time = JOS.ContObservations.dx and ack_received_time = h
@@ -192,16 +202,18 @@ namespace Channel
             JOS.Step(u);
 
             // uncomment to calculate performance criterions
-            CalculateCriterions(u, currentRTT);
+            if (Criterions != null)
+                CalculateCriterions(u, currentRTT);
 
             // if we have explicit RTT observations
             //return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT, null, null); 
             // if we just have acknowledgement counting process (or its approximation) and use it to estimate RTT
-            return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, null, JOS.ContObservations.dx, h); 
+            return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT); 
         }
 
-        public Vector<double> RTT(double u) // real unobservable rtt 
+        public Vector<double> RTT(double u) 
         {
+            // real unobservable rtt 
             double V0 = noise.Sample() * stdV0 + mV0;
             double V0bad = noise.Sample() * stdV0_bad + mV0_bad;
             double V1 = noise.Sample();
@@ -214,30 +226,37 @@ namespace Channel
                             delta_p + V0 + buffersize * s      + Math.Sqrt(buffersize) * sigma * V1,
                             delta_p_bad + V0bad
                 );
-
         }
 
         public void CalculateCriterions(double u, double rtt)
         {
-            foreach (var crit in Criterions)
+            if (Criterions != null)
             {
-                crit.Value.Step(JOS.State.t, new Vector<double>[] { JOS.State.Xvec }, new double[] { u, rtt }, JOS.CPObservations.Select(x => x.dN).ToArray());
+                foreach (var crit in Criterions)
+                {
+                    crit.Value.Step(JOS.State.t, new Vector<double>[] { JOS.State.Xvec }, new double[] { u, rtt }, JOS.CPObservations.Select(x => x.dN).ToArray());
+                }
             }
         }
 
         public void SaveCriterions(string CritFileNameTemplate)
         {
-            foreach (var crit in Criterions)
+            if (Criterions != null)
             {
-                crit.Value.SaveTrajectory(CritFileNameTemplate.Replace("{name}", crit.Key));
-            }
-
-            foreach (var crit in TerminalCriterions)
-                using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(CritFileNameTemplate.Replace("{name}", crit.Key)))
+                foreach (var crit in Criterions)
                 {
-                    outputfile.WriteLine(crit.Value().ToString());
-                    outputfile.Close();
+                    crit.Value.SaveTrajectory(CritFileNameTemplate.Replace("{name}", crit.Key));
                 }
+            }
+            if (TerminalCriterions != null)
+            {
+                foreach (var crit in TerminalCriterions)
+                    using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(CritFileNameTemplate.Replace("{name}", crit.Key)))
+                    {
+                        outputfile.WriteLine(crit.Value().ToString());
+                        outputfile.Close();
+                    }
+            }
         }
 
         public override void SaveAll(string folderName)
@@ -259,15 +278,21 @@ namespace Channel
             double lambda0 = 1e-5;
             double C = 0.001;
 
+
+            // if the transition intensity islambda, then probability of transit during a time interval of length deltaT is equal to p = lambda * deltaT
+            // for p to be close to one during RTT0, lambda should be equal to 1/RTT0
+
+            double lambda_guaranteed = 1.0 / RTT0;
+
             double lambda14 = 0; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
             double lambda41 = 0.03;
             double lambda24 = 0; /// DO NOT FORGET TO CHANGE IT BACK TO0.01;
             double lambda42 = 0.005;
-            double lambda12 = lambda0 + (w > Ubdp ? 1e10 : C / Math.Max(Ubdp - w, C));
+            double lambda12 = lambda0 + (w > Ubdp ? lambda_guaranteed : C / Math.Max(Ubdp - w, C));
             //double lambda12 = 0.01 + 0.001 * w;
             double lambda21 = lambda0 + C * Math.Max(Ubdp - w, 0);
             //double lambda21 = Math.Max(0.01, 0.03 - 0.002 * w);
-            double lambda23 = lambda0 + (w > U2 ? 1e10 : C / Math.Max(U2 - w, C));
+            double lambda23 = lambda0 + (w > U2 ? lambda_guaranteed : C / Math.Max(U2 - w, C));
             //double lambda23 = 0.01 + 0.001 * w;
             double lambda32 = lambda0 + C * Math.Max(U2 - w, 0);
             //double lambda32 = Math.Max(0.01, 0.04 - 0.003 * w); ;
@@ -313,6 +338,10 @@ namespace Channel
 
         public Vector<double> LossIntensity(double t, double u)
         {
+            // TODO: Loss and timeout inensities depend on explicitly simulated RTT, even if the simulation mode is set to "Renewal". 
+            // The problem is that we have to return a vector of intensities for all the states, but we can only estimate it for the
+            // culrrent state if we simulate RTT as time between renewals (ACKs receptions).
+            // This does not make a big difference, but looks scruffy :(
 
             double Pmin = 0.000005; // probability of one of unacknowledged packets to be lost on time interval equal to RTT
             double Pmax = 0.00001;
@@ -381,4 +410,5 @@ namespace Channel
 
 
     }
+    public enum RTTSimulationMode { Explicit, AsRenewal }
 }
