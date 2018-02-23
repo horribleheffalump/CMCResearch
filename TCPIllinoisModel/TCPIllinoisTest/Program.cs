@@ -7,6 +7,8 @@ using System.Text;
 using MathNet.Numerics.Distributions;
 using Channel;
 using TCPAgent;
+using MathNet.Numerics.LinearAlgebra;
+using CMC;
 
 namespace TCPIllinoisTest
 {
@@ -17,13 +19,12 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 50.0;
+             double T = 200.0;
             int saveEvery = 100;
-
 
             //TCPChannel channel_i = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
             //TCPChannel channel_nr = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
-            //TCPSender sender_i = new IllinoisSender(0.1, saveEvery);
+            //TCPSender sender_i =llinoisSender(0.1, saveEvery);
             //TCPSender sender_nr = new NewRenoSender(0.1, saveEvery);
 
             //for (double t = t0; t <= T; t += h)

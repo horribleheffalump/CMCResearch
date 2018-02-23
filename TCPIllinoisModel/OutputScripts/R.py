@@ -80,11 +80,11 @@ levelone = np.ones(n)*R.max().max()
 
 
 ax1 = plt.subplot(111)
-ax1.plot(t_RG, R[:,0], '-', color = 'blue', alpha = 0.2, linewidth = 3.0)
-ax1.plot(t_RG, R[:,1], '-', color = 'blue', alpha = 0.4, linewidth = 3.0)
-ax1.plot(t_RG, R[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
-ax1.plot(t_RG, R[:,3], '-', color = 'blue', alpha = 0.8, linewidth = 3.0)
-ax1.plot(t_RG, Rreal, '-', color = 'red', alpha = 1, linewidth = 1.0)
+ax1.plot(t_RG, R[:,0], '-', color = 'red', alpha = 0.2, linewidth = 3.0)
+ax1.plot(t_RG, R[:,1], '-', color = 'green', alpha = 0.4, linewidth = 3.0)
+#ax1.plot(t_RG, R[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
+#ax1.plot(t_RG, R[:,3], '-', color = 'black', alpha = 0.8, linewidth = 3.0)
+#ax1.plot(t_RG, Rreal, '-', color = 'red', alpha = 1, linewidth = 1.0)
 
 #ax1.plot(t_RG, G[:,0], '-', color = 'green', alpha = 0.2, linewidth = 2.0)
 #ax1.plot(t_RG, G[:,1], '-', color = 'green', alpha = 0.4, linewidth = 2.0)
