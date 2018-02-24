@@ -10,7 +10,7 @@ from Points import *
 
 
 subfolder = 'ILLINOIS/'
-interval = [0,200]
+interval = [0,500]
 
 
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
@@ -89,13 +89,13 @@ ax0.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color=
 for i in range(0, 4):
     #plots[i].set_xlim(0,max(X[:,0]))
     plots[i].set_xlim(interval[0], interval[1])
-    plots[i].plot(t_d, p_d[:,i], color = 'red', linewidth = 5.0)
+    plots[i].plot(t_d, p_d[:,i], color = 'red', linewidth = 1.0)
     #plots[i].plot(t_di, p_di[:,i], color = 'yellow')
     
     plots[i].plot(t_dc, p_dc[:,i], color = 'cyan')
     #plots[i].plot(t_dmc, p_dmc[:,i], color = 'magenta')
     
-    plots[i].plot(t_dcg, p_dcg[:,i], color = 'blue', linewidth = 3.0)
+    plots[i].plot(t_dcg, p_dcg[:,i], color = 'blue', linewidth = 1.0)
 
 #ax4.set_xlim(0,max(X[:,0]))
 ax4.set_xlim(interval[0], interval[1])

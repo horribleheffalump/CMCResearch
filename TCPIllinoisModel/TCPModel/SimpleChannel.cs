@@ -65,7 +65,7 @@ namespace Channel
 
         public override void SaveAll(string folderName)
         {
-            // TODO
+            // TODO: save all for SimpleChannel
         }
     }
 }

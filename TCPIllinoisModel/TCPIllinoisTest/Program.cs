@@ -19,7 +19,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-             double T = 200.0;
+             double T = 500.0;
             int saveEvery = 100;
 
             //TCPChannel channel_i = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
@@ -46,7 +46,7 @@ namespace TCPIllinoisTest
             //string controlpath_nr = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\simple_newreno_control.txt");
             //sender_nr.SaveTrajectory(controlpath_nr);
 
-            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true);
+            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, true);
             TCPSender sender;
 
             string protocol = "ILLINOIS";
@@ -62,11 +62,11 @@ namespace TCPIllinoisTest
             }
             catch { }
 
-
+            double exponential_smooth = 0.99999;
             if (protocol == "ILLINOIS")
-                sender = new IllinoisSender(channel.RTT0, saveEvery);
+                sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery);
             else if (protocol == "NEWRENO")
-                sender = new NewRenoSender(channel.RTT0, saveEvery);
+                sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery);
             else
                 sender = null;
 

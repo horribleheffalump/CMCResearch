@@ -8,7 +8,7 @@ from Points import *
 #subfolder = ''
 subfolder = 'ILLINOIS/'
 interval = [0,500]
-#bounds = [0,100]
+#bounds = [0,0.11]
 
 
 filename = u"../out/" + subfolder + "control.txt"
@@ -67,6 +67,7 @@ ax2.plot(t, rtt, '-', color = 'red')
 #ax1.set_ylim(bounds[0],bounds[1])
 ax1.set_xlim(interval[0],interval[1])
 ax2.set_xlim(interval[0],interval[1])
+ax2.set_ylim(0.1,0.12)
 plt.show()
 
 #plt.plot(t, rtt, '--', color = 'red')

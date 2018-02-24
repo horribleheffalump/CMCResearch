@@ -15,6 +15,8 @@ namespace TCPAgent
         public double W;                          // ccurrent window size
         public int SaveEvery;
         private int saveCounter = 0;
+        protected double gamma; // exponential smoothing parameter
+
 
         public List<Control> controls;
 
@@ -22,7 +24,7 @@ namespace TCPAgent
         public double rtt;      // rtt smoothed (if required)
         protected double t = 0.0; // current time
 
-        public TCPSender(double _rawrtt, int _saveEvery = 0)
+        public TCPSender(double _rawrtt, double _gamma = 0.0, int _saveEvery = 0)
         {
             //h = _h;
             rawrtt = _rawrtt;
@@ -38,6 +40,12 @@ namespace TCPAgent
         public int SSIndicator
         {
             get { return W < W_1 ? 1 : 0; }
+        }
+
+        public double estimateRTT(double rawrtt) //parameters: time increment, acks received increment. Returns exponential smooth estimate of RTT
+        {
+            rtt = (1 - gamma) * rawrtt + (gamma) * rtt; // exponential smoothing
+            return rtt;
         }
 
         public abstract double Step(double h, int dh, int dl, double rtt); //parameters: time increment, loss increment, timeout increment, RTT; returns: current control (window size)

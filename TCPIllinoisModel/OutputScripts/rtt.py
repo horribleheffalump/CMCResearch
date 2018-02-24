@@ -13,7 +13,7 @@ filename = u"../out/ILLINOIS/control.txt"
 data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4,5,6,7,8,9,10,11,12), 
                    dtype=float, 
                    names = ["t", "u", "ss", "thresh", "m", "rtt", "alpha",  "d", "d_1", "d_m", "T_min", "T_max", "kappa_1"])
-data = data[data.t < 60]
+#data = data[data.t < 60]
 
 #print(data.head())
 #.set_index('t', inplace=True)
@@ -42,7 +42,7 @@ f = plt.figure(num=None, figsize=(10, 6), dpi=150, facecolor='w', edgecolor='k')
 
 
 ax1 = plt.subplot(111)
-#ax1.set_ylim(0,0.2)
+#ax1.set_ylim(0,0.15)
 #ax1.set_xlim(0,40)
 #plt.show()
 

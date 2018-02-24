@@ -16,13 +16,16 @@ namespace TCPAgent
         double beta_ca = 0.5;           // denominator in congestion avoidance
 
 
-        public NewRenoSender(double _rawrtt, int _saveEvery = 0) : base(_rawrtt, _saveEvery) // parameters: start point for RTT estimation
+        public NewRenoSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         { }
 
         public override double Step(double h, int dh, int dl, double rawrtt) //parameters: time increment, loss increment, timeout increment, RTT; returns: current control (window size)
         {
-            this.rawrtt = rtt;
-            this.rtt = rawrtt;
+            //this.rawrtt = rtt;
+            //this.rtt = rawrtt;
+            this.rawrtt = estimateRTT(rawrtt);
+            this.rtt = estimateRTT(rawrtt);
+
 
             t += h;
 

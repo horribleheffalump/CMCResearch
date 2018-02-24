@@ -18,12 +18,12 @@ namespace Channel
         public bool doSimulateSimultaneousJumps;
 
         public double delta_p; // delta_p - signal propagation time
-        public double mV0;     // mean of propagation time additive noise
-        public double stdV0;   // standard deviation of propagation time additive noise
+        public Vector<double> mV0;     // mean of propagation time additive noise
+        public Vector<double> stdV0;   // standard deviation of propagation time additive noise
 
-        public double delta_p_bad = 0.02;
-        public double mV0_bad = 0.001;
-        public double stdV0_bad = 0.001;
+        //public double delta_p_bad = 0.02;
+        //public double mV0_bad = 0.001;
+        //public double stdV0_bad = 0.001;
 
         public double s;       // coefficient of rtt linear growth with cwnd
         public double sigma;   // coefficient of rtt jitter
@@ -59,7 +59,7 @@ namespace Channel
 
         private Normal noise;
 
-        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _calculateFilters = false, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = false, bool _evaluatePerformance = false) : base()
+        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _evaluatePerformance = false, bool _calculateFilters = false, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = false) : base()
         {
             h = _h;
 
@@ -68,23 +68,11 @@ namespace Channel
             Others = 1; // number of other users of the channel (affects the simultaneous jumps intensity)
             rttSimulationMode = _RTTSimulationMode;
 
-            // RTT = delta_p + D X_t + w_t K X_t
             delta_p = 0.1;
-            mV0 = 0; // delta_p * 0.001;
-            stdV0 = delta_p * 0.01;
-
-            delta_p_bad = delta_p * 1.1;
-            mV0_bad = 0;
-            stdV0_bad = delta_p * 0.02;
+            mV0 = Extensions.Vector(0, 0, 0, delta_p * 0.03);
+            stdV0 = delta_p * Extensions.Vector(0.005, 0.015, 0.015, 0.02);
 
             noise = new Normal(0.0, 1.0);
-
-            // TODO : delete these vectors after observations refactoring
-            //D = Extensions.Vector(0.001, 0.005, 0.01, 0.01); // mean queueing time because of the other senders transmission
-            //K = Extensions.Vector(0.0005, 0.002, 0.005, 0.005); // mean queueing time because of senders own transmission
-
-
-            //RTT0 = delta_p + D[0];
 
             bandwidth = 100; // Mbps
             buffersize = 100; // packets
@@ -102,18 +90,6 @@ namespace Channel
             s = MTU / bandwidth_bps; //0.1 * delta_p / buffersize;
             sigma = Math.Sqrt(s) / 10.0;
 
-            
-            //P = Extensions.Vector(0.00015, 0.001, 0.005, 0.005);
-            //P = Extensions.Vector(0.0005, 0.0025, 0.005, 0.05);
-            //P = P * 0.1;
-            //P = P * 3;
-            //P = Vector(0.0, 0.0, 0.0, 0.0);
-            //timeout intensity nu_t = R_t diag(Q)
-            //Q = P * 0.2;
-            //Q = Extensions.Vector(0.0001, 0.0005, 0.0015, 0.01);
-            //Q = Q * 0.03;
-            //Q = Q * 1;
-            //Q = Vector(0.0, 0.0, 0.0, 0.0);
 
             //ContinuousObservationsDiscretizationStep = _h;
             ContinuousObservationsDiscretizationStep = _h;
@@ -128,8 +104,8 @@ namespace Channel
                     if (rtt > 0)
                     {
                         double Bps = U[0] * MTU / rtt; // instant bytes per second
-                    double Mbps = Bps * 8 / 1e6; // instant Mbps
-                    return Mbps;
+                        double Mbps = Bps * 8 / 1e6; // instant Mbps
+                        return Mbps;
 
                     }
                     else
@@ -210,23 +186,22 @@ namespace Channel
             // if we have explicit RTT observations
             //return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT, null, null); 
             // if we just have acknowledgement counting process (or its approximation) and use it to estimate RTT
-            return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT); 
+            return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT);
         }
 
-        public Vector<double> RTT(double u) 
+        public Vector<double> RTT(double u)
         {
             // real unobservable rtt 
-            double V0 = noise.Sample() * stdV0 + mV0;
-            double V0bad = noise.Sample() * stdV0_bad + mV0_bad;
+            Vector<double> V0 = noise.Sample() * stdV0 + mV0;
             double V1 = noise.Sample();
             double buffer_occupied = Math.Max(0.0, u - Ubdp);
 
             return
                 Extensions.Vector(
-                            delta_p + V0 + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
-                            delta_p + V0 + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
-                            delta_p + V0 + buffersize * s      + Math.Sqrt(buffersize) * sigma * V1,
-                            delta_p_bad + V0bad
+                            delta_p + V0[0] + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
+                            delta_p + V0[1] + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
+                            delta_p + V0[2] + buffersize * s + Math.Sqrt(buffersize) * sigma * V1,
+                            delta_p + V0[3]
                 );
         }
 
@@ -277,7 +252,7 @@ namespace Channel
         public Matrix<double> TransitionMatrix(double t, double w)
         {
             //double Wmax = 200.0;
-            double lambda0 = 1e-5;
+            double lambda0 = 0.01;
             double C = 0.001;
 
 
@@ -286,9 +261,9 @@ namespace Channel
 
             double lambda_guaranteed = 1.0 / RTT0;
 
-            double lambda14 = 0; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
+            double lambda14 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
             double lambda41 = 0.03;
-            double lambda24 = 0; /// DO NOT FORGET TO CHANGE IT BACK TO0.01;
+            double lambda24 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO0.01;
             double lambda42 = 0.005;
             double lambda12 = lambda0 + (w > Ubdp ? lambda_guaranteed : C / Math.Max(Ubdp - w, C));
             //double lambda12 = 0.01 + 0.001 * w;
@@ -395,20 +370,20 @@ namespace Channel
         {
             return
                 Extensions.Vector(
-                            u * 1.0 / (delta_p + mV0 + q(u) * s),
-                            u * 1.0 / (delta_p + mV0 + q(u) * s),
-                            u * 1.0 / (delta_p + mV0 + buffersize * s),
-                            u * 1.0 / (delta_p_bad + mV0_bad)
+                            u * 1.0 / (delta_p + mV0[0] + q(u) * s),
+                            u * 1.0 / (delta_p + mV0[1] + q(u) * s),
+                            u * 1.0 / (delta_p + mV0[2] + buffersize * s),
+                            u * 1.0 / (delta_p + mV0[3])
                 );
         }
         public Vector<double> G(double t, double u)
         {
             //var Rt = R(t, u);
             return Extensions.Vector(
-               Math.Sqrt(u) * (Math.Sqrt(stdV0 * stdV0 + q(u) * sigma * sigma) / Math.Pow(delta_p + mV0 + q(u) * s, 1.5)),
-               Math.Sqrt(u) * (Math.Sqrt(stdV0 * stdV0 + q(u) * sigma * sigma) / Math.Pow(delta_p + mV0 + q(u) * s, 1.5)),
-               Math.Sqrt(u) * (Math.Sqrt(stdV0 * stdV0 + buffersize * sigma * sigma) / Math.Pow(delta_p + mV0 + buffersize * s, 1.5)),
-               Math.Sqrt(u) * (stdV0_bad / Math.Pow(delta_p_bad + mV0_bad, 1.5))
+               Math.Sqrt(u) * (Math.Sqrt(stdV0[0] * stdV0[0] + q(u) * sigma * sigma) / Math.Pow(delta_p + mV0[0] + q(u) * s, 1.5)),
+               Math.Sqrt(u) * (Math.Sqrt(stdV0[1] * stdV0[1] + q(u) * sigma * sigma) / Math.Pow(delta_p + mV0[1] + q(u) * s, 1.5)),
+               Math.Sqrt(u) * (Math.Sqrt(stdV0[2] * stdV0[2] + buffersize * sigma * sigma) / Math.Pow(delta_p + mV0[2] + buffersize * s, 1.5)),
+               Math.Sqrt(u) * (stdV0[3] / Math.Pow(delta_p + mV0[3], 1.5))
             );
         }
 
