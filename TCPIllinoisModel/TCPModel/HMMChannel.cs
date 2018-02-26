@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CMC;
 using SystemJointObs;
 using MathNet.Numerics.Distributions;
+using System.Globalization;
 
 namespace Channel
 {
@@ -216,8 +217,13 @@ namespace Channel
             }
         }
 
-        public void SaveCriterions(string CritFileNameTemplate)
+        public void SaveCriterions(string CritFileNameTemplate, string TerminalCritFileNameTemplate = null)
         {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+
+            if (string.IsNullOrEmpty(TerminalCritFileNameTemplate))
+                TerminalCritFileNameTemplate = CritFileNameTemplate;
             if (Criterions != null)
             {
                 foreach (var crit in Criterions)
@@ -228,9 +234,9 @@ namespace Channel
             if (TerminalCriterions != null)
             {
                 foreach (var crit in TerminalCriterions)
-                    using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(CritFileNameTemplate.Replace("{name}", crit.Key)))
+                    using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(TerminalCritFileNameTemplate.Replace("{name}", crit.Key)))
                     {
-                        outputfile.WriteLine(crit.Value().ToString());
+                        outputfile.WriteLine(crit.Value().ToString(provider));
                         outputfile.Close();
                     }
             }
@@ -245,7 +251,8 @@ namespace Channel
             JOS.SaveAll(statepath, cpobspath, contobspath, filterpath);
 
             string criterionpath = folderName + "\\crit_{name}.txt";
-            SaveCriterions(criterionpath);
+            string terminalcriterionpath = folderName + "\\crit_T_{name}.txt";
+            SaveCriterions(criterionpath, terminalcriterionpath);
 
         }
 
