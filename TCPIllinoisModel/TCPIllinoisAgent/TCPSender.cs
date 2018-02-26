@@ -30,6 +30,8 @@ namespace TCPAgent
             rawrtt = _rawrtt;
             rtt = rawrtt;
 
+            gamma = _gamma;
+
             W = W_0;
             SaveEvery = _saveEvery;
 

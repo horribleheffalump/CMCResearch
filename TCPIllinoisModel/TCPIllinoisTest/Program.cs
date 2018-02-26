@@ -9,6 +9,7 @@ using Channel;
 using TCPAgent;
 using MathNet.Numerics.LinearAlgebra;
 using CMC;
+using PythonInteract;
 
 namespace TCPIllinoisTest
 {
@@ -49,7 +50,7 @@ namespace TCPIllinoisTest
             TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, true);
             TCPSender sender;
 
-            string protocol = "ILLINOIS";
+            string protocol = "NEWRENO";
             try
             {
                 protocol = args[0];
@@ -95,6 +96,7 @@ namespace TCPIllinoisTest
 
             string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\control.txt");
             sender.SaveTrajectory(controlpath);
+
 
         }
     }

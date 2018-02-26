@@ -59,6 +59,10 @@
       <Project>{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}</Project>
       <Name>SystemJointObs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Misc\PythonInteract\PythonInteract.csproj">
+      <Project>{697bafd7-3a44-47b3-a1d3-ac20147427a3}</Project>
+      <Name>PythonInteract</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TCPIllinoisAgent\TCPAgent.csproj">
       <Project>{9c98482a-f20d-492d-b596-3593117088a0}</Project>
       <Name>TCPAgent</Name>

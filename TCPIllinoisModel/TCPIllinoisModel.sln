@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPIllinoisTest", "TCPIllinoisTest\TCPIllinoisTest.csproj", "{7BA96D6D-8334-42FE-97BF-2E4B56749DA7}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPModel", "TCPModel\TCPModel.csproj", "{CFA48E32-422F-4F9C-99BD-CE455C4ECFB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemJointObs", "..\CMCTools\SystemJointObs\SystemJointObs.csproj", "{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PythonInteract", "..\Misc\PythonInteract\PythonInteract.csproj", "{697BAFD7-3A44-47B3-A1D3-AC20147427A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{647A91CC-EC3B-4A5A-941B-E2D1F3F9B84F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{697BAFD7-3A44-47B3-A1D3-AC20147427A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{697BAFD7-3A44-47B3-A1D3-AC20147427A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{697BAFD7-3A44-47B3-A1D3-AC20147427A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{697BAFD7-3A44-47B3-A1D3-AC20147427A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

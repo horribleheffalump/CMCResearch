@@ -253,7 +253,7 @@ namespace Channel
         {
             //double Wmax = 200.0;
             double lambda0 = 0.01;
-            double C = 0.001;
+            double C = 0.0005;
 
 
             // if the transition intensity islambda, then probability of transit during a time interval of length deltaT is equal to p = lambda * deltaT
