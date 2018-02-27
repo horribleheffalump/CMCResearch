@@ -8,8 +8,9 @@ protocols = sys.argv[2:]
 
 outfilename = 'performance.txt'
 pattern = 'crit_T_*.txt'
-print(folder)
-print(protocols)
+#print(sys.argv)
+#print(folder)
+#print(protocols)
 
 dataframes_protocols = []
 for protocolname in protocols:

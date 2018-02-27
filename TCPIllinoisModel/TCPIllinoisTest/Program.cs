@@ -10,6 +10,7 @@ using TCPAgent;
 using MathNet.Numerics.LinearAlgebra;
 using CMC;
 using PythonInteract;
+using CMC.Filters;
 
 namespace TCPIllinoisTest
 {
@@ -20,7 +21,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-             double T = 500.0;
+            double T = 500.0;
             int saveEvery = 100;
 
             //TCPChannel channel_i = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
@@ -47,8 +48,6 @@ namespace TCPIllinoisTest
             //string controlpath_nr = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\simple_newreno_control.txt");
             //sender_nr.SaveTrajectory(controlpath_nr);
 
-            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, true);
-            TCPSender sender;
 
             string protocol = "NEWRENO";
             try
@@ -56,18 +55,22 @@ namespace TCPIllinoisTest
                 protocol = args[0];
                 try
                 {
-
                     double t_args = double.Parse(args[1]); T = t_args;
                 }
                 catch { }
             }
             catch { }
 
+            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, true);
+            TCPSender sender;
+
             double exponential_smooth = 0.99999;
             if (protocol == "ILLINOIS")
                 sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery);
             else if (protocol == "NEWRENO")
                 sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery);
+            else if (protocol == "STATEBASED")
+                sender = new StateBasedTCPSender(channel.RTT0, exponential_smooth, saveEvery);
             else
                 sender = null;
 
@@ -75,7 +78,12 @@ namespace TCPIllinoisTest
             for (double t = t0; t <= T; t += h)
             {
                 (int loss, int timeout, double rtt) = channel.Step(sender.W);
-                sender.Step(h, loss, timeout, rtt);
+                if (protocol == "STATEBASED")
+                {
+                    (sender as StateBasedTCPSender).Step(h, loss, timeout, rtt, (channel as HMMChannel).JOS.Filters["DiscreteContinuousGaussian"].pi);
+                }
+                else
+                    sender.Step(h, loss, timeout, rtt);
 
                 if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
                 {
@@ -97,7 +105,10 @@ namespace TCPIllinoisTest
             string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\control.txt");
             sender.SaveTrajectory(controlpath);
 
-
+            Python.RunScript(
+                                Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\OutputScripts\\", "performance.py"),
+                                new string[] { Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\"), "ILLINOIS", "NEWRENO", "STATEBASED" }
+                            );
         }
     }
 }

@@ -6,7 +6,7 @@ import pylab
 from Points import *
 
 #subfolder = ''
-subfolder = 'ILLINOIS/'
+subfolder = 'STATEBASED/'
 interval = [0,500]
 #bounds = [0,0.11]
 

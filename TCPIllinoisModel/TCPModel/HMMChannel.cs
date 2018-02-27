@@ -120,19 +120,25 @@ namespace Channel
                 {
                     return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
                 }, _saveEvery));
-                Criterions.Add("TimeInBadState", new Criterion(_h, (t, X, U, Obs) =>
+                Criterions.Add("TimeInBadWireState", new Criterion(_h, (t, X, U, Obs) =>
                 {
                     return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                }, _saveEvery));
+                Criterions.Add("TimeInBadWirelessState", new Criterion(_h, (t, X, U, Obs) =>
+                {
+                    return Math.Abs(X[0][3] - 1.0) < 1e-5 ? 1.0 : 0.0;
                 }, _saveEvery));
 
                 TerminalCriterions = new Dictionary<string, Func<double>>();
 
                 TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
                 TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
+                TerminalCriterions.Add("TotalTime", () => JOS.State.T);
                 TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
-                TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J);
-                TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J);
-                TerminalCriterions.Add("TotalTimeInBadState", () => Criterions["TimeInBadState"].J);
+                TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J / JOS.State.T);
+                TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J / JOS.State.T);
+                TerminalCriterions.Add("TotalTimeInBadWireState", () => Criterions["TimeInBadWireState"].J / JOS.State.T);
+                TerminalCriterions.Add("TotalTimeInBadWirelessState", () => Criterions["TimeInBadWirelessState"].J / JOS.State.T);
             }
 
             if (doSimulateSimultaneousJumps)
