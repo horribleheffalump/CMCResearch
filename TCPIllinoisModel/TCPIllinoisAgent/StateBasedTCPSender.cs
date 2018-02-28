@@ -33,8 +33,8 @@ namespace TCPAgent
         public StateBasedTCPSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         {
             //h = _h;
-            alphas = Extensions.Vector(alpha_max, alpha_max, alpha_min, alpha_min);
-            betas = Extensions.Vector(beta_min, beta_min, beta_max, beta_max);
+            alphas = Extensions.Vector(alpha_max, alpha_min, alpha_min, alpha_min);
+            betas = Extensions.Vector(beta_min, beta_min, beta_min, beta_max);
 
             gamma = 0.99999;
             T_min = double.NaN;

@@ -21,7 +21,7 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-1;
             double t0 = 0.0;
-            double T = 500.0;
+            double T = 200.0;
             int saveEvery = 100;
 
             //TCPChannel channel_i = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
@@ -49,7 +49,7 @@ namespace TCPIllinoisTest
             //sender_nr.SaveTrajectory(controlpath_nr);
 
 
-            string protocol = "NEWRENO";
+            string protocol = "CUBIC";
             try
             {
                 protocol = args[0];
@@ -61,20 +61,22 @@ namespace TCPIllinoisTest
             }
             catch { }
 
-            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, true);
+            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, false, false);
             TCPSender sender;
 
             double exponential_smooth = 0.99999;
-            if (protocol == "ILLINOIS")
-                sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery);
-            else if (protocol == "NEWRENO")
-                sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery);
-            else if (protocol == "STATEBASED")
-                sender = new StateBasedTCPSender(channel.RTT0, exponential_smooth, saveEvery);
-            else
-                sender = null;
+            switch (protocol)
+            {
+                case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                case "STATEBASED": sender = new StateBasedTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                case "CUBIC": sender = new CUBICTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                default: sender = null; break;
+
+            }
 
             sender.W = 1300;
+            //sender.W = 10;
             for (double t = t0; t <= T; t += h)
             {
                 (int loss, int timeout, double rtt) = channel.Step(sender.W);
@@ -105,10 +107,10 @@ namespace TCPIllinoisTest
             string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\control.txt");
             sender.SaveTrajectory(controlpath);
 
-            Python.RunScript(
-                                Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\OutputScripts\\", "performance.py"),
-                                new string[] { Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\"), "ILLINOIS", "NEWRENO", "STATEBASED" }
-                            );
+            //Python.RunScript(
+            //                    Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\OutputScripts\\", "performance.py"),
+            //                    new string[] { Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\"), "ILLINOIS", "NEWRENO", "STATEBASED" }
+            //                );
         }
     }
 }

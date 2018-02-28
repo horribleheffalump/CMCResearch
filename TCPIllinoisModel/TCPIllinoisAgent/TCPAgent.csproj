@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CUBICSender.cs" />
     <Compile Include="StateBasedTCPSender.cs" />
     <Compile Include="TCPSender.cs" />
     <Compile Include="NewRenoSender.cs" />

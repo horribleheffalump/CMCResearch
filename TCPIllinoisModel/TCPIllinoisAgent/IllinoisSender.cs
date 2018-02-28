@@ -21,7 +21,7 @@ namespace TCPAgent
         public IllinoisSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         {
             //h = _h;
-            gamma = 0.99999;
+            //gamma = 0.99999;
             T_min = double.NaN;
             T_max = double.NaN;
         }

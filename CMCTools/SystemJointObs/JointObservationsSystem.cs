@@ -29,9 +29,9 @@ namespace SystemJointObs
             if (_calculateFilters)
             {
                 Filters = new Dictionary<string, BaseFilter>();
-                Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, null, C_i(0, _c), C_i(1, _c), _R, _G, () => State.X, _SaveEvery));
-                Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _SaveEvery));
-                Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery, _hObs));
+                //Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, null, C_i(0, _c), C_i(1, _c), _R, _G, () => State.X, _SaveEvery));
+                //Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _SaveEvery));
+                //Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery, _hObs));
                 Filters.Add("DiscreteContinuousGaussian", new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, null, _R, _G, _SaveEvery, _hObs));
             }
         }
