@@ -69,14 +69,17 @@ namespace TCPAgent
 
         public void SaveTrajectory(string path) //, int every)
         {
-            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
+            if (controls.Count > 0)
             {
-                //foreach (Estimate e in estimates.Where((x, i) => i % every == 0).OrderBy(s => s.t))
-                foreach (Control e in controls.OrderBy(s => s.t))
+                using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
                 {
-                    outputfile.WriteLine(e.ToString());
+                    //foreach (Estimate e in estimates.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                    foreach (Control e in controls.OrderBy(s => s.t))
+                    {
+                        outputfile.WriteLine(e.ToString());
+                    }
+                    outputfile.Close();
                 }
-                outputfile.Close();
             }
         }
 

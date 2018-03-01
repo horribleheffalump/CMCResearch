@@ -20,7 +20,8 @@ for protocolname in protocols:
     #print(crits)
     dataframes_crits = []
     for crit in crits:
-        cdf = pd.read_csv(crit, header=None, dtype=float, names = [protocolname], )
+        #print(crit)
+        cdf = pd.read_csv(crit, header=None, dtype=float, names = [protocolname], engine='python') ## TODO: problem with unicode strings
         cdf['Crit'] = crit.replace(fullpattern.replace('*.txt',''),'').replace('.txt','')
         dataframes_crits.append(cdf)
     dfp = pd.concat(dataframes_crits,ignore_index = True)

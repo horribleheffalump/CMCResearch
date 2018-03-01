@@ -22,7 +22,7 @@ namespace SystemJointObs
 
         public List<SimultaneousJumpsIntencity>[] SimultaneousJumpsIntencities;
 
-        public JointObservationsSystemSimultaniousJumps(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _saveEvery = 0, double _hObs = 0, bool _calculateFilters = false) :
+        public JointObservationsSystemSimultaniousJumps(int _N, double _t0, double _T, int _X0, double _h, Func<double, double, Matrix<double>> _A, Func<double, double, Vector<double>>[] _c, List<SimultaneousJumpsIntencity>[] _I, Func<double, double, Vector<double>> _R, Func<double, double, Vector<double>> _G, int _saveEvery = 0, double _hObs = 0, FilterType[] _filters = null) :
             base(_N, _t0, _T, _X0, _h, _A, _c, _R, _G, _saveEvery, _hObs)
         {
             if (_c.Length != _I.Length)
@@ -34,15 +34,22 @@ namespace SystemJointObs
                 CPObservations[i] = new ControllableCountingProcess(_t0, _T, 0, _h, C_i(i, _c, _I), _saveEvery > 0);
             }
             SimultaneousJumpsIntencities = _I;
-            if (_calculateFilters)
+
+            if (_filters != null)
             {
-                Filters = new Dictionary<string, BaseFilter>();
-                //Filters.Add("Dummy", new DummyFilter(_N, _t0, _T, _h, _A, _c, _I, C_i(0, _c, _I), C_i(1, _c, _I), _R, _G, () => State.X, _saveEvery));
-                //Filters.Add("Discrete", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, _I, _saveEvery));
-                ////Filters.Add("DiscreteIndependent", new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery));
-                ////Filters.Add("DiscreteMeasureChange", new FilterDiscreteMeasureChange(_N, _t0, _T, _h, _A, _c, _saveEvery));
-                //Filters.Add("DiscreteContinuous", new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs));
-                Filters.Add("DiscreteContinuousGaussian", new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs));
+                Filters = new Dictionary<FilterType, BaseFilter>();
+                foreach (FilterType f in _filters)
+                {
+                    switch (f)
+                    {
+                        case FilterType.Dummy: Filters.Add(f, new DummyFilter(_N, _t0, _T, _h, _A, _c, _I, C_i(0, _c, _I), C_i(1, _c, _I), _R, _G, () => State.X, _saveEvery)); break;
+                        case FilterType.Discrete: Filters.Add(f, new FilterDiscrete(_N, _t0, _T, _h, _A, _c, _I, _saveEvery)); break;
+                        case FilterType.DiscreteIndependent: Filters.Add(f, new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery)); break;
+                        case FilterType.DiscreteMeasureChange: Filters.Add(f, new FilterDiscreteMeasureChange(_N, _t0, _T, _h, _A, _c, _saveEvery)); break;
+                        case FilterType.DiscreteContinuous: Filters.Add(f, new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs)); break;
+                        case FilterType.DiscreteContinuousGaussian: Filters.Add(f, new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, _I, _R, _G, _saveEvery, _hObs)); break;
+                    }
+                }
             }
         }
 

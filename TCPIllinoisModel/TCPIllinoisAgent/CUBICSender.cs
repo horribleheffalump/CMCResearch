@@ -11,7 +11,7 @@ namespace TCPAgent
         double beta_cubic = 0.7;
         double C = 0.4; // C is a constant fixed to determine the aggressiveness of growth in high BDP networks, with higher C values (for example C = 4.0), CIBIC is more aggressive
         double beta_aimd = 0.5;
-        double alpha_aimd = 1.0;
+        //double alpha_aimd = 1.0;
         double t_sincelastloss;
         double W_atpreviousloss;
         double W_atlastloss;

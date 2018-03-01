@@ -11,6 +11,7 @@ using MathNet.Numerics.LinearAlgebra;
 using CMC;
 using PythonInteract;
 using CMC.Filters;
+using SystemJointObs;
 
 namespace TCPIllinoisTest
 {
@@ -19,10 +20,10 @@ namespace TCPIllinoisTest
         static void Main(string[] args)
         {
             double h = 1e-4;
-            double h_write = 1e-1;
+            double h_write = 1e-0;
             double t0 = 0.0;
             double T = 200.0;
-            int saveEvery = 100;
+            int saveEvery = 0;
 
             //TCPChannel channel_i = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
             //TCPChannel channel_nr = new SimpleChannel(h, 0.1, 100, 1000, 100); // simple channel RTT = 100ms, Bandwidth = 100Mbps, Packet size = 1000bytes, buffer size = 100
@@ -61,56 +62,61 @@ namespace TCPIllinoisTest
             }
             catch { }
 
-            TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, false, false);
-            TCPSender sender;
-
-            double exponential_smooth = 0.99999;
-            switch (protocol)
+            if (protocol == "stats")
             {
-                case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                case "STATEBASED": sender = new StateBasedTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                case "CUBIC": sender = new CUBICTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                default: sender = null; break;
-
+                string response = Python.RunScript(
+                                    Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\OutputScripts\\", "performance.py"),
+                                    new string[] { Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\"), "ILLINOIS", "NEWRENO", "STATEBASED", "CUBIC" }
+                                );
+                Console.WriteLine(response);
             }
-
-            sender.W = 1300;
-            //sender.W = 10;
-            for (double t = t0; t <= T; t += h)
+            else
             {
-                (int loss, int timeout, double rtt) = channel.Step(sender.W);
+
+                FilterType[] filters = null;
                 if (protocol == "STATEBASED")
-                {
-                    (sender as StateBasedTCPSender).Step(h, loss, timeout, rtt, (channel as HMMChannel).JOS.Filters["DiscreteContinuousGaussian"].pi);
-                }
-                else
-                    sender.Step(h, loss, timeout, rtt);
+                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian };
 
-                if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
+                TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, filters);
+                TCPSender sender;
+
+                double exponential_smooth = 0.99999;
+                switch (protocol)
                 {
-                    Console.WriteLine(t);
+                    case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                    case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                    case "STATEBASED": sender = new StateBasedTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                    case "CUBIC": sender = new CUBICTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                    default: sender = null; break;
+
                 }
+
+                sender.W = 1300;
+                //sender.W = 10;
+                for (double t = t0; t <= T; t += h)
+                {
+                    (int loss, int timeout, double rtt) = channel.Step(sender.W);
+                    if (protocol == "STATEBASED")
+                    {
+                        (sender as StateBasedTCPSender).Step(h, loss, timeout, rtt, (channel as HMMChannel).JOS.Filters[FilterType.DiscreteContinuousGaussian].pi);
+                    }
+                    else
+                        sender.Step(h, loss, timeout, rtt);
+
+                    if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
+                    {
+                        Console.WriteLine(t);
+                    }
+                }
+
+
+                string folderName = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol);
+                channel.SaveAll(folderName);
+
+                string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\control.txt");
+                sender.SaveTrajectory(controlpath);
             }
 
-
-            string folderName = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol);
-            channel.SaveAll(folderName);
-            //string statepath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\channel_state.txt");
-            //string cpobspath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\CP_obs_{num}.txt");
-            //string contobspath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\cont_obs.txt");
-            //string filterpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\filter_{name}.txt");
-            //channel.JOS.SaveAll(statepath, cpobspath, contobspath, filterpath);
-            //string criterionpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\crit_{name}.txt");
-            //channel.SaveCriterions(criterionpath);
-
-            string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\control.txt");
-            sender.SaveTrajectory(controlpath);
-
-            //Python.RunScript(
-            //                    Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\OutputScripts\\", "performance.py"),
-            //                    new string[] { Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\"), "ILLINOIS", "NEWRENO", "STATEBASED" }
-            //                );
         }
     }
 }

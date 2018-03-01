@@ -10,9 +10,9 @@ namespace PythonInteract
 {
     public static class Python
     {
-        public static string RunScript(string scriptPath, string[] args, string pythonPath = @"C:\Program Files\Anaconda3\python.exe")
+        public static string RunScript(string scriptPath, string[] args, string pythonPath = @"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Anaconda3_64\python.exe")
         {
-            string output = string.Empty;
+            StringBuilder output = new StringBuilder();
             try
             {
                 ProcessStartInfo pythonProcessStartInfo = new ProcessStartInfo(pythonPath)
@@ -29,16 +29,22 @@ namespace PythonInteract
                 pythonProcess.Start();
 
                 StreamReader outputStreamReader = pythonProcess.StandardOutput;
-                output = outputStreamReader.ReadLine();
+
+                string output_line = outputStreamReader.ReadLine();
+                while (!string.IsNullOrEmpty(output_line))
+                {
+                    output.AppendLine(output_line);
+                    output_line = outputStreamReader.ReadLine();
+                }
 
                 pythonProcess.WaitForExit();
                 pythonProcess.Close();
             }
             catch (Exception e)
             {
-                output = e.Message;
+                output.AppendLine(e.Message);
             }
-            return output;
+            return output.ToString();
         }
     }
 }

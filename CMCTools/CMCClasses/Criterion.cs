@@ -51,14 +51,17 @@ namespace CMC
 
         public void SaveTrajectory(string path, int every = 0) // left 'every' param for compatibility with multipleBSModel (// TODO: eliminate it!!!)
         {
-            using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
+            if (valueFunctionSamples.Count > 0)
             {
-                //foreach (Sample sample in valueFunctionSamples.Where((x, i) => i % every == 0).OrderBy(s => s.t))
-                foreach (Sample sample in valueFunctionSamples.OrderBy(s => s.t))
+                using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(path))
                 {
-                    outputfile.WriteLine(sample.ToString());
+                    //foreach (Sample sample in valueFunctionSamples.Where((x, i) => i % every == 0).OrderBy(s => s.t))
+                    foreach (Sample sample in valueFunctionSamples.OrderBy(s => s.t))
+                    {
+                        outputfile.WriteLine(sample.ToString());
+                    }
+                    outputfile.Close();
                 }
-                outputfile.Close();
             }
         }
 
