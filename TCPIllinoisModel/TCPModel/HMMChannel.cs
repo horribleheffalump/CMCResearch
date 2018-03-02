@@ -60,7 +60,7 @@ namespace Channel
 
         private Normal noise;
 
-        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _evaluatePerformance = false, FilterType[] filters = null, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = false) : base()
+        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _evaluatePerformance = false, FilterType[] filters = null, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = true) : base()
         {
             h = _h;
 
@@ -104,8 +104,8 @@ namespace Channel
                     double rtt = U[1];
                     if (rtt > 0)
                     {
-                        double Bps = U[0] * MTU / rtt; // instant bytes per second
-                        double Mbps = Bps * 8 / 1e6; // instant Mbps
+                        double Bps = Math.Min(U[0], Ubdp) * MTU / rtt; // instant bytes per second
+                        double Mbps = Bps * 8.0 / 1000.0 / 1000.0; // instant Mbps
                         return Mbps;
 
                     }
@@ -278,6 +278,9 @@ namespace Channel
             double lambda41 = 0.03;
             double lambda24 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO0.01;
             double lambda42 = 0.005;
+            double lambda34 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
+            double lambda43 = 0.005;
+
             double lambda12 = lambda0 + (w > Ubdp ? lambda_guaranteed : C / Math.Max(Ubdp - w, C));
             //double lambda12 = 0.01 + 0.001 * w;
             double lambda21 = lambda0 + C * Math.Max(Ubdp - w, 0);
@@ -288,8 +291,8 @@ namespace Channel
             //double lambda32 = Math.Max(0.01, 0.04 - 0.003 * w); ;
             Matrix<double> Lambda = Matrix<double>.Build.DenseOfArray(new[,]{{-(lambda12 + lambda14), lambda12, 0, lambda14 },
                                                                              { lambda21, -(lambda21 + lambda23 + lambda24 ), lambda23, lambda24 },
-                                                                             { 0, lambda32, -lambda32, 0 },
-                                                                             { lambda41, lambda42, 0, -(lambda41 + lambda42) }});
+                                                                             { 0, lambda32, -(lambda32 + lambda34), lambda34 },
+                                                                             { lambda41, lambda42, lambda43, -(lambda41 + lambda42 + lambda43) }});
             //Matrix<double> Lambda = Matrix<double>.Build.DenseOfDiagonalArray(new[]{0.0, 0.0, 0.0, 0.0});
             if (!Lambda.IsTransitionRateMatrix())
             {

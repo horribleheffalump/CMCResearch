@@ -40,6 +40,12 @@
     <Compile Include="G.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JCSSIpics\control.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JCSSIpics\filter.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="nu.py">
       <SubType>Code</SubType>
     </Compile>
@@ -64,7 +70,7 @@
     <Compile Include="sigma_error.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="simple_control.py">
+    <Compile Include="JCSSIpics\simple_control.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="simultjumprates.py">
@@ -78,6 +84,9 @@
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
     <InterpreterReference Include="Global|PythonCore|3.5-32" />
     <InterpreterReference Include="Global|PythonCore|3.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="JCSSIpics\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace TCPAgent
 {
-    public class StateBasedTCPSender : TCPSender
+    public class StateBasedSender : TCPSender
     {
         double alpha_max = 10;
-        double alpha_min = 0.1;
+        double alpha_min = 0.1; // from Illinois: 0.1 in Basar original paper, 0.3 in Linux kernel implimentation
+        double alpha_cons = 0.3; // conservative value for normal state
         double beta_max = 0.5;
         double beta_min = 0.125;
 
@@ -30,11 +31,11 @@ namespace TCPAgent
 
         //double h; //discretization step
 
-        public StateBasedTCPSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
+        public StateBasedSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         {
             //h = _h;
-            alphas = Extensions.Vector(alpha_max, alpha_min, alpha_min, alpha_min);
-            betas = Extensions.Vector(beta_min, beta_min, beta_min, beta_max);
+            alphas = Extensions.Vector(alpha_max, alpha_cons, alpha_min, alpha_min);
+            betas = Extensions.Vector(beta_max, beta_max, beta_max, beta_max);
 
             gamma = 0.99999;
             T_min = double.NaN;
@@ -84,18 +85,6 @@ namespace TCPAgent
             Save();
 
             return W;
-        }
-
-        // TODO:    Once d > d_1, we do not allow  to increase alpha to alpha_max unless d stays below d_1 for a certain amount of time.
-        //          TCP-Illinois chooses parameter Theta, and lets Theta * RTT be this amount of time.
-        //          Theta = 5 (standard)
-
-        public double d_m   // maximum average queueing delay = T_max-T_min
-        {
-            get
-            {
-                return T_max - T_min;
-            }
         }
     }
 }

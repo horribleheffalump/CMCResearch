@@ -80,10 +80,10 @@ namespace TCPAgent
 
         // coefficients for alpha(d), beta(d)
         double alpha_max = 10;
-        double alpha_min = 0.1;
+        double alpha_min = 0.3; // 0.1 according to Basar original paper, 0.3 - Linux kernel implementation
         double beta_max = 0.5;
         double beta_min = 0.125;
-        double eta_1 = 0.01; // 0.01 according to Basar
+        double eta_1 = 0.01; // 0.01 according to Basar original paper
         double eta_2 = 0.1;
         double eta_3 = 0.8;
 

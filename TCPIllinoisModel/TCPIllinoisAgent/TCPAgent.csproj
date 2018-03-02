@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CUBICSender.cs" />
-    <Compile Include="StateBasedTCPSender.cs" />
+    <Compile Include="StateBasedSender.cs" />
     <Compile Include="TCPSender.cs" />
     <Compile Include="NewRenoSender.cs" />
     <Compile Include="IllinoisSender.cs" />

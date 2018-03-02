@@ -6,8 +6,8 @@ import pylab
 from Points import *
 
 #subfolder = ''
-subfolder = 'NEWRENO/'
-interval = [0,100]
+subfolder = 'STATEBASED/'
+interval = [0,600]
 #bounds = [0,0.11]
 
 

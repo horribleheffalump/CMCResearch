@@ -50,6 +50,8 @@ namespace Channel
         {
             get
             {
+                if (current_buffersize >= buffersize)
+                    Console.WriteLine(current_buffersize);
                 //return u > maxU + buffersize ? 1 : 0;
                 return current_buffersize >= buffersize ? 1 : 0;
             }
