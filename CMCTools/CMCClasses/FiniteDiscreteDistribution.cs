@@ -10,6 +10,8 @@ namespace CMC
     public static class FiniteDiscreteDistribution
     {
         private static double _tolerance = 1E-6;
+        private static Random random = new SystemRandomSource(RandomSeed.Robust());
+
         public static int Sample(Vector<double> measure)
         {
             if (Math.Abs(measure.Sum() - 1.0) > _tolerance)
@@ -18,8 +20,26 @@ namespace CMC
             }
             int result = int.MinValue;
 
-            double max = measure.OrderByDescending(x => x).ElementAt(0);
-            double secondmax = measure.OrderByDescending(x => x).ElementAt(1);
+            double max = double.MinValue;
+            double secondmax = double.MinValue;
+
+            for (int i = 0; i < measure.Count; i++)
+            {
+                if (measure[i] >= secondmax)
+                {
+                    if (measure[i] >= max)
+                    {
+                        secondmax = max;
+                        max = measure[i];
+                    }
+                    else
+                    {
+                        secondmax = measure[i];
+                    }
+                }
+            }
+            //double max = measure.OrderByDescending(x => x).ElementAt(0);
+            //double secondmax = measure.OrderByDescending(x => x).ElementAt(1);
 
             if (secondmax / max < _tolerance) // if one value of measure is much bigger then the others, then the correxponding number is declared sample without drawing 
             {
@@ -34,7 +54,6 @@ namespace CMC
                     intervals[i] += intervals[i - 1];
                 }
 
-                Random random = new SystemRandomSource(RandomSeed.Robust());
                 double sample = random.NextDouble();
 
                 for (int i = 0; i < intervals.Count; i++)

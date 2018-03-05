@@ -39,13 +39,20 @@ namespace CMC.Filters
                 var y_part_coeff = k * c[i](t, u);
                 if (I != null)
                 {
-                    var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
+                    //var IM = Matrix<double>.Build.Dense(N, N, (ii, jj) =>
+                    //{
+                    //    if (ii != jj)
+                    //        return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intensity(t, u) ?? 0.0;
+                    //    else
+                    //        return -I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intensity(t, u)) ?? 0.0;
+                    //});
+
+                    var IM = Matrix<double>.Build.Dense(N, N, 0.0);
+                    foreach (var item in I[i])
                     {
-                        if (ii != jj)
-                            return I[i].FirstOrDefault(elem => elem.From == jj && elem.To == ii)?.Intencity(t, u) ?? 0.0;
-                        else
-                            return -I[i].Where(elem => elem.From == jj)?.Sum(elem => elem.Intencity(t, u)) ?? 0.0;
-                    });
+                        IM[item.To, item.From] += item.Intensity(t, u);
+                        IM[item.From, item.From] -= item.Intensity(t, u);
+                    }
                     y_part_coeff = y_part_coeff + IM * pi;
                 }
                 if (dy[i] > 0)

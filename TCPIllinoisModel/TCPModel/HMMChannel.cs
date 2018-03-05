@@ -55,10 +55,12 @@ namespace Channel
         private double U1; // AQM lower bound
         private double U2; // AQL upper bound
 
+        private Tuple <double, Vector<double>> temp_possibleRTT;
         private double currentRTT;
         private RTTSimulationMode rttSimulationMode;
 
         private Normal noise;
+
 
         public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _evaluatePerformance = false, FilterType[] filters = null, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = true) : base()
         {
@@ -90,8 +92,7 @@ namespace Channel
 
             s = MTU / bandwidth_bps; //0.1 * delta_p / buffersize;
             sigma = Math.Sqrt(s) / 10.0;
-
-
+            
             //ContinuousObservationsDiscretizationStep = _h;
             ContinuousObservationsDiscretizationStep = _h;
 
@@ -178,7 +179,7 @@ namespace Channel
 
             switch (rttSimulationMode)
             {
-                case RTTSimulationMode.Explicit: currentRTT = RTT(u)[JOS.State.X]; break;
+                case RTTSimulationMode.Explicit: currentRTT = PossibleRTT(JOS.State.t, u)[JOS.State.X]; break;
                 case RTTSimulationMode.AsRenewal: if (JOS.ContObservations.dx > 0) currentRTT = h / JOS.ContObservations.dx * u; break;
             }
 
@@ -196,20 +197,31 @@ namespace Channel
             return (JOS.CPObservations[0].dN, JOS.CPObservations[1].dN, currentRTT);
         }
 
-        public Vector<double> RTT(double u)
+        public Vector<double> PossibleRTT(double t, double u)
         {
             // real unobservable rtt 
-            Vector<double> V0 = noise.Sample() * stdV0 + mV0;
-            double V1 = noise.Sample();
-            double buffer_occupied = Math.Max(0.0, u - Ubdp);
 
-            return
-                Extensions.Vector(
-                            delta_p + V0[0] + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
-                            delta_p + V0[1] + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
-                            delta_p + V0[2] + buffersize * s + Math.Sqrt(buffersize) * sigma * V1,
-                            delta_p + V0[3]
-                );
+            if (temp_possibleRTT == null)
+                temp_possibleRTT = new Tuple<double, Vector<double>>(double.NaN, null);
+
+            if (temp_possibleRTT.Item1 == t)
+                return temp_possibleRTT.Item2;
+            else
+            {
+                Vector<double> V0 = noise.Sample() * stdV0 + mV0;
+                double V1 = noise.Sample();
+                double buffer_occupied = Math.Max(0.0, u - Ubdp);
+
+                Vector<double> rtt = Extensions.Vector(
+                                delta_p + V0[0] + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
+                                delta_p + V0[1] + buffer_occupied * s + Math.Sqrt(buffer_occupied) * sigma * V1,
+                                delta_p + V0[2] + buffersize * s + Math.Sqrt(buffersize) * sigma * V1,
+                                delta_p + V0[3]
+                    );
+
+                temp_possibleRTT = new Tuple<double, Vector<double>>(t, rtt);
+                return rtt;
+            }
         }
 
         public void CalculateCriterions(double u, double rtt)
@@ -356,7 +368,7 @@ namespace Channel
                             u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed,
                             u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed
                 );
-            return u * Extensions.Diag(P) * RTT(u).PointwisePower(-1);
+            return u * Extensions.Diag(P) * PossibleRTT(t, u).PointwisePower(-1);
         }
 
 
@@ -372,7 +384,7 @@ namespace Channel
             //)
             ;
 
-            return u * Extensions.Diag(Q) * RTT(u).PointwisePower(-1);
+            return u * Extensions.Diag(Q) * PossibleRTT(t, u).PointwisePower(-1);
             //return Extensions.Diag(Q) * R(t, u);
             //return LossIntensity(t, u) / 3.0;
         }

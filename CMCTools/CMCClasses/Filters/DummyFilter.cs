@@ -45,8 +45,8 @@ namespace CMC.Filters
                     c[0](t,u), 
                     c[1](t,u), 
                     Extensions.Vector(ci0(t,u), ci1(t,u)),
-                    Extensions.Vector(I[0].Select(e => e.Intencity(t, u)).ToArray()),
-                    Extensions.Vector(I[1].Select(e => e.Intencity(t, u)).ToArray()),
+                    Extensions.Vector(I[0].Select(e => e.Intensity(t, u)).ToArray()),
+                    Extensions.Vector(I[1].Select(e => e.Intensity(t, u)).ToArray()),
                     Extensions.Vector(A(t, u)[0, 3], A(t, u)[1, 3], A(t, u)[1, 2]),
                     Extensions.Vector(A(t, u)[3, 0], A(t, u)[3, 1], A(t, u)[2, 1])
                     ).ToArray()

@@ -132,14 +132,14 @@ namespace CMC
     {
         public int From;
         public int To;
-        public Func<double, double, double> Intencity;
+        public Func<double, double, double> Intensity;
 
 
         public SimultaneousJumpsIntencity(int _from, int _to, Func<double, double, double> _intencity)
         {
             From = _from;
             To = _to;
-            Intencity = _intencity;
+            Intensity = _intencity;
         }
     }
 

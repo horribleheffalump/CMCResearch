@@ -7,7 +7,7 @@ from Points import *
 
 #subfolder = ''
 subfolder = 'STATEBASED/'
-interval = [0,600]
+interval = [0,200]
 #bounds = [0,0.11]
 
 

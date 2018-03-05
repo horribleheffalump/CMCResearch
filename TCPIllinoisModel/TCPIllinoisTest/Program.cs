@@ -23,7 +23,7 @@ namespace TCPIllinoisTest
             double h_write = 1e-0;
             double t0 = 0.0;
             double T = 600.0;
-            int saveEvery = 100;
+            int saveEvery = 0;
             double exponential_smooth = 0.99999;
 
             //// simple channel 
@@ -83,6 +83,12 @@ namespace TCPIllinoisTest
                     double t_args = double.Parse(args[1]); T = t_args;
                 }
                 catch { }
+                try
+                {
+                    int saveevery_args = int.Parse(args[2]); saveEvery = saveevery_args;
+                }
+                catch { }
+
             }
             catch { }
 
@@ -98,10 +104,10 @@ namespace TCPIllinoisTest
             {
 
                 FilterType[] filters = null;
-                filters = new FilterType[] { FilterType.Discrete, FilterType.DiscreteContinuousGaussian };
+                //filters = new FilterType[] { FilterType.Discrete, FilterType.DiscreteContinuousGaussian };
 
-                //if (protocol == "STATEBASED")
-                //    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian };
+                if (protocol == "STATEBASED")
+                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian };
 
                 TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, filters);
                 TCPSender sender;

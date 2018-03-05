@@ -58,9 +58,10 @@ namespace SystemJointObs
             Func<double, double, double> SummarizedIntencity = (t, u) =>
             {
                 double result = 0;
-                foreach (SimultaneousJumpsIntencity _i in _I[i].Where(e => e.From == State.X))
+                foreach (SimultaneousJumpsIntencity _i in _I[i])
                 {
-                    result += _i.Intencity(t, u);
+                    if (_i.From == State.X)
+                    result += _i.Intensity(t, u);
                 }
                 return result;
             };
@@ -79,7 +80,7 @@ namespace SystemJointObs
                 {
                     foreach (var sim in SimultaneousJumpsIntencities[i].Where(s => s.From == x_ && s.To == x))
                     {
-                        double p = sim.Intencity(State.t, u) / State.TransitionRateMatrix(State.t, u)[x_, x]; // Bayes theorem: P(A|B) = P(AB)/P(B); A - MC jump, B - CPO jump. P(AB) =  SimultaneousJumpsIntencitiy(x_ -> x) * h, P(B) = TransitionRateMatrix(x_ -> x) * h
+                        double p = sim.Intensity(State.t, u) / State.TransitionRateMatrix(State.t, u)[x_, x]; // Bayes theorem: P(A|B) = P(AB)/P(B); A - MC jump, B - CPO jump. P(AB) =  SimultaneousJumpsIntencitiy(x_ -> x) * h, P(B) = TransitionRateMatrix(x_ -> x) * h
                         int nojump = FiniteDiscreteDistribution.Sample(Vector<double>.Build.DenseOfArray(new[] { p, 1 - p }));
                         if (nojump == 0)
                         {
