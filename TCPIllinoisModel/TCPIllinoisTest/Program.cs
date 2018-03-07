@@ -24,7 +24,8 @@ namespace TCPIllinoisTest
             double t0 = 0.0;
             double T = 600.0;
             int saveEvery = 0;
-            double exponential_smooth = 0.99999;
+            double exponential_smooth = 0.9999;
+            //double exponential_smooth = 0.99;
 
             //// simple channel 
             //exponential_smooth = 0; // rtt is known exactly for simple channel, so there is no need to smooth
@@ -107,7 +108,7 @@ namespace TCPIllinoisTest
                 //filters = new FilterType[] { FilterType.Discrete, FilterType.DiscreteContinuousGaussian };
 
                 if (protocol == "STATEBASED")
-                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian };
+                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian, FilterType.Dummy };
 
                 TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, filters);
                 TCPSender sender;
@@ -123,6 +124,8 @@ namespace TCPIllinoisTest
 
                 }
 
+
+                DateTime start = DateTime.Now;
                 sender.W = 1300;
                 //sender.W = 10;
                 for (double t = t0; t <= T; t += h)
@@ -137,7 +140,11 @@ namespace TCPIllinoisTest
 
                     if (t / h_write - Math.Truncate(t / h_write) < h / h_write)
                     {
-                        Console.WriteLine(t);
+                        if (t > 0)
+                        {
+                            var elapsed = DateTime.Now - start;
+                            Console.WriteLine($"{t.ToString("F3")}\t elapsed: {elapsed}\t estimated finish time: {DateTime.Now + TimeSpan.FromTicks((long)(elapsed.Ticks * (T - t) / (t)))}");
+                        }
                     }
                 }
 

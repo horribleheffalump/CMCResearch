@@ -7,18 +7,18 @@ from Points import *
        
 import pandas as pd
 
-filename = u"../out/ILLINOIS/control.txt"
+filename = u"../out/STATEBASED/control.txt"
 t, u, ss, thresh, m, rtt = np.loadtxt(filename, delimiter = ' ', usecols=(0,1,2,3,4,5), unpack=True, dtype=float)
 
-filename_X = u"../out/ILLINOIS/channel_state.txt"
+filename_X = u"../out/STATEBASED/channel_state.txt"
 t_X, X = np.loadtxt(filename_X, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
-filename_dh = u"../out/ILLINOIS/CP_obs_0.txt"
+filename_dh = u"../out/STATEBASED/CP_obs_0.txt"
 t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
-filename_dl = u"../out/ILLINOIS/CP_obs_1.txt"
+filename_dl = u"../out/STATEBASED/CP_obs_1.txt"
 t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
-filename_co = u"../out/ILLINOIS/cont_obs.txt"
+filename_co = u"../out/STATEBASED/cont_obs.txt"
 t_co, co = np.loadtxt(filename_co, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 
 
@@ -27,8 +27,8 @@ f = plt.figure(num=None, figsize=(20, 6), dpi=150, facecolor='w', edgecolor='k')
 Xpoints = Points(t_X, X)
 Xpoints.multiply()
 
-filename = u"../out/ILLINOIS/filter_Dummy.txt"
-data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 5, 6, 7, 8, 9, 10, 11, 12), dtype=float, names = ["t", "R0", "R1", "R2", "R3", "G0", "G1", "G2", "G3"])
+filename = u"../out/STATEBASED/filter_Dummy.txt"
+data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0, 6, 7, 8, 9, 10, 11, 12, 13), dtype=float, names = ["t", "G0", "G1", "G2", "G3", "R0", "R1", "R2", "R3"])
 t_RG = data.t.as_matrix()
 R = data[["R0", "R1", "R2", "R3"]].as_matrix()
 G = data[["G0", "G1", "G2", "G3"]].as_matrix()
@@ -74,7 +74,7 @@ n = len(Xpoints.x)
 o = np.zeros(n)
 ones = np.ones(n)
 levelzero = np.ones(n)*0.0
-levelone = np.ones(n)*50.0
+levelone = np.ones(n)*10.0
 
 
 
@@ -86,13 +86,14 @@ ax1 = plt.subplot(111)
 #ax1.plot(t_RG, R[:,3], '-', color = 'blue', alpha = 0.8, linewidth = 3.0)
 #ax1.plot(t_RG, Rreal, '-', color = 'red', alpha = 1, linewidth = 1.0)
 
-ax1.plot(t_RG, G[:,0], '-', color = 'red', alpha = 0.2, linewidth = 3.0)
-ax1.plot(t_RG, G[:,1], '-', color = 'green', alpha = 0.4, linewidth = 3.0)
-ax1.plot(t_RG, G[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 3.0)
-ax1.plot(t_RG, G[:,3], '-', color = 'black', alpha = 0.8, linewidth = 3.0)
-ax1.plot(t_RG, Greal, '-', color = 'red', alpha = 1, linewidth = 1.0)
+ax1.plot(t_RG, G[:,0], '-', color = 'red', alpha = 0.2, linewidth = 6.0)
+ax1.plot(t_RG, G[:,1], '-', color = 'green', alpha = 1.0, linewidth = 4.0)
+ax1.plot(t_RG, G[:,2], '-', color = 'blue', alpha = 0.6, linewidth = 2.0)
+ax1.plot(t_RG, G[:,3], '-', color = 'black', alpha = 0.8, linewidth = 1.0)
+#ax1.plot(t_RG, Greal, '-', color = 'red', alpha = 1, linewidth = 1.0)
+
 #print(R)
-#print(G)
+print(G)
 #print(data)
 
 ax1.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==o, color='black', alpha = 0.2, linewidth=0.0);

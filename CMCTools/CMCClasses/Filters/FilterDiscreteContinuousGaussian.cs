@@ -18,9 +18,12 @@ namespace CMC.Filters
         List<SimultaneousJumpsIntencity>[] I; // Intencities of simultaneous MC transitions and CP jumps
         Func<double, double, Vector<double>> R; // Continuous observations drift matrix
         Func<double, double, Vector<double>> G; // Continous observations diffusion matrix
-        double hObs;
+        //double hObs;
 
-        public FilterDiscreteContinuousGaussian(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1, double hObs = 0)
+        Vector<double> integral_R = null;
+        Vector<double> integral_G2 = null;
+
+        public FilterDiscreteContinuousGaussian(int N, double t0, double T, double h, Func<double, double, Matrix<double>> A, Func<double, double, Vector<double>>[] c, List<SimultaneousJumpsIntencity>[] I, Func<double, double, Vector<double>> R, Func<double, double, Vector<double>> G, int SaveEvery = 1)
             : base(N, t0, T, h, A, SaveEvery)
         {
             this.c = c;
@@ -28,20 +31,29 @@ namespace CMC.Filters
             this.R = R;
             this.G = G;
 
-            this.hObs = h;
-            if (hObs > h)
-                this.hObs = hObs;
+
+            //this.hObs = h;
+            //if (hObs > h)
+            //    this.hObs = hObs;
         }
 
 
         public override Vector<double> Step(double u, int[] dy, double? dz)
         {
             t += h;
+
+            var dR = R(t, u) * h;
+            var dG2 = G(t, u).PointwisePower(2.0) * h;
+            if (integral_R == null) integral_R = dR;
+            else integral_R = integral_R + dR;
+            if (integral_G2 == null) integral_G2 = dG2;
+            else integral_G2 = integral_G2 + dG2;
+
             var lambda = A(t, u);
 
             var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
             //var x_part = lambda.TransposeThisAndMultiply(pi) * h;
-            var x_part = (lambda.Transpose() * h).Exponential() * pi; 
+            var x_part = (lambda.Transpose() * h).Exponential() * pi;
             var y_part = Extensions.Zero(N);
             for (int i = 0; i < dy.Length; i++)
             {
@@ -83,16 +95,29 @@ namespace CMC.Filters
             {
                 //pi = pi + x_part + y_part;
                 pi = x_part + y_part;
+                for (int i = 0; i < pi.Count; i++)
+                    if (pi[i] < 0)
+                        pi[i] = 0;
+                pi = pi.Normalize(1.0);
                 if (dz.HasValue)
                     if (dz.Value > 0)
                     {
+
                         //pi = pi + x_part + y_part + z_part;
                         //pi = pi + x_part + y_part;
                         for (int j = 0; j < pi.Count; j++)
                         {
-                            pi[j] = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
+                            //var hObs = h;
+                            //var temp = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
+                            pi[j] = pi[j] * Normal.PDF(integral_R[j], Math.Sqrt(integral_G2[j]), dz.Value);
+                            //if (pi[j] != temp)
+                            //{
+                            //    Console.WriteLine("omg!");
+                            //}
                         }
-                        pi = pi.Normalize(1.0);
+                        //pi = pi.Normalize(1.0);
+                        integral_R = null;
+                        integral_G2 = null;
                     }
             }
             else
@@ -103,7 +128,16 @@ namespace CMC.Filters
             //var y_part = k * mu.Transpose() + 
 
             for (int i = 0; i < pi.Count; i++)
-                if (pi[i] < 0) pi[i] = 0;
+            {
+                if (pi[i] < 0)
+                {
+                    if (Math.Abs(pi[i]) > 0.001)
+                    {
+                        Console.WriteLine("ups");
+                    }
+                    pi[i] = 0;
+                }
+            }
             pi = pi.Normalize(1.0);
             Save();
             return pi;

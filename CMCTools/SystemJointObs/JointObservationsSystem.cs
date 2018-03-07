@@ -38,7 +38,7 @@ namespace SystemJointObs
                         case FilterType.DiscreteIndependent: Filters.Add(f, new FilterDiscrete(_N, _t0, _T, _h, _A, _c, null, _saveEvery)); break;
                         case FilterType.DiscreteMeasureChange: Filters.Add(f, new FilterDiscreteMeasureChange(_N, _t0, _T, _h, _A, _c, _saveEvery)); break;
                         case FilterType.DiscreteContinuous: Filters.Add(f, new FilterDiscreteContinuous(_N, _t0, _T, _h, _A, _c, null, _R, _G, _saveEvery, _hObs)); break;
-                        case FilterType.DiscreteContinuousGaussian: Filters.Add(f, new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, null, _R, _G, _saveEvery, _hObs)); break;
+                        case FilterType.DiscreteContinuousGaussian: Filters.Add(f, new FilterDiscreteContinuousGaussian(_N, _t0, _T, _h, _A, _c, null, _R, _G, _saveEvery)); break;
                 }
             }
             }

@@ -10,7 +10,8 @@ from Points import *
 
 
 subfolder = 'STATEBASED/'
-interval = [0,500]
+#subfolder = 'ILLINOIS/'
+interval = [0,200]
 
 
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')

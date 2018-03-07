@@ -35,9 +35,8 @@ namespace TCPAgent
         {
             //h = _h;
             alphas = Extensions.Vector(alpha_max, alpha_max, alpha_cons, alpha_cons);
-            betas = Extensions.Vector(beta_min, beta_min, beta_max, beta_max);
+            betas = Extensions.Vector(beta_min, beta_min, beta_min, beta_max);
 
-            gamma = 0.99999;
             T_min = double.NaN;
             T_max = double.NaN;
         }

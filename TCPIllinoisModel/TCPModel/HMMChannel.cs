@@ -55,7 +55,7 @@ namespace Channel
         private double U1; // AQM lower bound
         private double U2; // AQL upper bound
 
-        private Tuple <double, Vector<double>> temp_possibleRTT;
+        private Tuple<double, Vector<double>> temp_possibleRTT;
         private double currentRTT;
         private RTTSimulationMode rttSimulationMode;
 
@@ -68,12 +68,12 @@ namespace Channel
 
             N = 4; // states count: e1 - free, e2 - moderate load, e3 - wire congestion, e4 - last mile (wireless) bad signal
             doSimulateSimultaneousJumps = _simultaneousJumps; // simulating the simultaneous jumps of the Markov chain and the observable counting processes
-            Others = 1; // number of other users of the channel (affects the simultaneous jumps intensity)
+            Others = 10; // number of other users of the channel (affects the simultaneous jumps intensity)
             rttSimulationMode = _RTTSimulationMode;
 
             delta_p = 0.1;
-            mV0 = Extensions.Vector(0, 0, 0, delta_p * 0.03);
-            stdV0 = delta_p * Extensions.Vector(0.005, 0.015, 0.015, 0.02);
+            mV0 =   delta_p * Extensions.Vector(0.0, 0.0, 0.0, 0.03);
+            stdV0 = delta_p * Extensions.Vector(0.001, 0.01, 0.02, 0.02);
 
             noise = new Normal(0.0, 1.0);
 
@@ -92,9 +92,9 @@ namespace Channel
 
             s = MTU / bandwidth_bps; //0.1 * delta_p / buffersize;
             sigma = Math.Sqrt(s) / 10.0;
-            
+
+            ContinuousObservationsDiscretizationStep = 1.0;
             //ContinuousObservationsDiscretizationStep = _h;
-            ContinuousObservationsDiscretizationStep = _h;
 
             if (_evaluatePerformance)
             {
@@ -284,7 +284,7 @@ namespace Channel
             // if the transition intensity islambda, then probability of transit during a time interval of length deltaT is equal to p = lambda * deltaT
             // for p to be close to one during RTT0, lambda should be equal to 1/RTT0
 
-            double lambda_guaranteed = 1.0 / RTT0;
+            double lambda_guaranteed = 0.5 / RTT0;
 
             double lambda14 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
             double lambda41 = 0.03;
@@ -347,13 +347,14 @@ namespace Channel
             // The problem is that we have to return a vector of intensities for all the states, but we can only estimate it for the
             // culrrent state if we simulate RTT as time between renewals (ACKs receptions).
             // This does not make a big difference, but looks scruffy :(
+            // SOLUTION: this can be helped by substituting u * PossibleRTT(t, u).PointwisePower(-1) with R(t,u)
 
             double Pmin = 0.000005; // probability of one of unacknowledged packets to be lost on time interval equal to RTT
             double Pmax = 0.00001;
             double Delta = 5;
 
             // loss probability during h is p = intensity * h
-            double p_guaranteed = 1.0; // probability of loss during RTT
+            double p_guaranteed = 0.5; // probability of loss during RTT
 
             var P = Extensions.Vector(
                             Pmin,
@@ -368,7 +369,14 @@ namespace Channel
                             u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed,
                             u < U2 + Delta ? Pmin / (U2 - u) : p_guaranteed
                 );
-            return u * Extensions.Diag(P) * PossibleRTT(t, u).PointwisePower(-1);
+
+            Vector<double> intensity = null;
+            switch (rttSimulationMode)
+            {
+                case RTTSimulationMode.Explicit: intensity = u * Extensions.Diag(P) * PossibleRTT(t, u).PointwisePower(-1); break;
+                case RTTSimulationMode.AsRenewal: intensity = R(t, u) * Extensions.Diag(P); break;
+            }
+            return intensity;
         }
 
 
@@ -384,9 +392,18 @@ namespace Channel
             //)
             ;
 
-            return u * Extensions.Diag(Q) * PossibleRTT(t, u).PointwisePower(-1);
+            //return u * Extensions.Diag(Q) * PossibleRTT(t, u).PointwisePower(-1);
             //return Extensions.Diag(Q) * R(t, u);
             //return LossIntensity(t, u) / 3.0;
+
+            Vector<double> intensity = null;
+            switch (rttSimulationMode)
+            {
+                case RTTSimulationMode.Explicit: intensity = u * Extensions.Diag(Q) * PossibleRTT(t, u).PointwisePower(-1); break;
+                case RTTSimulationMode.AsRenewal: intensity = R(t, u) * Extensions.Diag(Q); break;
+            }
+            return intensity;
+
         }
 
         private double q(double u) // buffer occupied
@@ -413,6 +430,9 @@ namespace Channel
                Math.Sqrt(u) * (Math.Sqrt(stdV0[2] * stdV0[2] + buffersize * sigma * sigma) / Math.Pow(delta_p + mV0[2] + buffersize * s, 1.5)),
                Math.Sqrt(u) * (stdV0[3] / Math.Pow(delta_p + mV0[3], 1.5))
             );
+
+
+
         }
 
 

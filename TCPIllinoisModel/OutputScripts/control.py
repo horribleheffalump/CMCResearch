@@ -5,7 +5,7 @@ matplotlib.rc('text', usetex = True)
 import pylab
 from Points import *
 
-#subfolder = ''
+#subfolder = 'ILLINOIS/'
 subfolder = 'STATEBASED/'
 interval = [0,200]
 #bounds = [0,0.11]
