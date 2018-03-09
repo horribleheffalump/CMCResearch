@@ -11,7 +11,7 @@ from Points import *
 
 subfolder = 'STATEBASED/'
 #subfolder = 'ILLINOIS/'
-interval = [0,200]
+interval = [0,100]
 
 
 f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
@@ -31,10 +31,10 @@ ones = np.ones(n)
 levelzero = np.ones(n)*0.0
 levelone = np.ones(n)*1.0
 
-#filename = u"../out/" + subfolder + "filter_Discrete.txt"
-#data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
-#t_d = data.t.as_matrix()
-#p_d = data[["p0", "p1", "p2", "p3"]].as_matrix()
+filename = u"../out/" + subfolder + "filter_Discrete.txt"
+data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
+t_d = data.t.as_matrix()
+p_d = data[["p0", "p1", "p2", "p3"]].as_matrix()
 
 #filename = u"../out/" + subfolder + "filter_DiscreteContinuous.txt"
 #data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1,2,3,4), dtype=float, names = ["t", "p0", "p1", "p2", "p3"])
@@ -90,7 +90,7 @@ ax0.fill_between(Xpoints.x, levelzero, levelone, where=Xpoints.y==ones*3, color=
 for i in range(0, 4):
     #plots[i].set_xlim(0,max(X[:,0]))
     plots[i].set_xlim(interval[0], interval[1])
-    #plots[i].plot(t_d, p_d[:,i], color = 'red', linewidth = 1.0)
+    plots[i].plot(t_d, p_d[:,i], color = 'red', linewidth = 1.0)
     #plots[i].plot(t_di, p_di[:,i], color = 'yellow')
     
     #plots[i].plot(t_dc, p_dc[:,i], color = 'cyan')

@@ -49,6 +49,8 @@ namespace CMC.Filters
             if (integral_G2 == null) integral_G2 = dG2;
             else integral_G2 = integral_G2 + dG2;
 
+            double[] savearray = null;
+
             var lambda = A(t, u);
 
             var k = Extensions.Diag(pi) - pi.ToColumnMatrix() * pi.ToRowMatrix();
@@ -60,7 +62,7 @@ namespace CMC.Filters
                 Matrix<double> IM;
                 if (I == null)
                 {
-                    IM = Matrix<double>.Build.DenseIdentity(N, N);
+                    IM = Matrix<double>.Build.Dense(N, N, 0.0); //???
                 }
                 else
                 {
@@ -95,26 +97,30 @@ namespace CMC.Filters
             {
                 //pi = pi + x_part + y_part;
                 pi = x_part + y_part;
-                for (int i = 0; i < pi.Count; i++)
-                    if (pi[i] < 0)
-                        pi[i] = 0;
+                pi = pi.PointwiseMaximum(0.0);
                 pi = pi.Normalize(1.0);
                 if (dz.HasValue)
                     if (dz.Value > 0)
                     {
+                        var pdf = Vector<double>.Build.Dense(pi.Count, (j) => Normal.PDF(integral_R[j], Math.Sqrt(integral_G2[j]), dz.Value));
+                        if (pdf.Sum() > 0.0) // we take into account only the meaningful observations. If the observations are such that they do not help to distinguish the states, they are skipped.
+                            pi = pi.PointwiseMultiply(pdf);
+                        //else
+                        //    Console.WriteLine("alles nicht!");
+
+                        savearray = Extensions.Stack(Extensions.Vector(dz.Value), integral_R, integral_G2, pdf).ToArray();
 
                         //pi = pi + x_part + y_part + z_part;
                         //pi = pi + x_part + y_part;
-                        for (int j = 0; j < pi.Count; j++)
-                        {
-                            //var hObs = h;
-                            //var temp = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
-                            pi[j] = pi[j] * Normal.PDF(integral_R[j], Math.Sqrt(integral_G2[j]), dz.Value);
-                            //if (pi[j] != temp)
-                            //{
-                            //    Console.WriteLine("omg!");
-                            //}
-                        }
+                        //for (int j = 0; j < pi.Count; j++)
+                        //{
+                        //var hObs = h;
+                        //var temp = pi[j] * Normal.PDF(R(t, u)[j] * hObs, G(t, u)[j] * Math.Sqrt(hObs), dz.Value);
+                        //if (pi[j] != temp)
+                        //{
+                        //    Console.WriteLine("omg!");
+                        //}
+                        //}
                         //pi = pi.Normalize(1.0);
                         integral_R = null;
                         integral_G2 = null;
@@ -126,20 +132,14 @@ namespace CMC.Filters
             }
 
             //var y_part = k * mu.Transpose() + 
-
-            for (int i = 0; i < pi.Count; i++)
-            {
-                if (pi[i] < 0)
-                {
-                    if (Math.Abs(pi[i]) > 0.001)
-                    {
-                        Console.WriteLine("ups");
-                    }
-                    pi[i] = 0;
-                }
-            }
+            pi = pi.PointwiseMaximum(0.0);
             pi = pi.Normalize(1.0);
-            Save();
+            if (pi.Sum() == 0.0)
+                Console.WriteLine("alles!");
+            if (dz.HasValue)
+                DoSave(savearray);
+            else
+                Save();
             return pi;
         }
     }

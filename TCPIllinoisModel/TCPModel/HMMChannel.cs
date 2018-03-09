@@ -72,8 +72,8 @@ namespace Channel
             rttSimulationMode = _RTTSimulationMode;
 
             delta_p = 0.1;
-            mV0 =   delta_p * Extensions.Vector(0.0, 0.0, 0.0, 0.03);
-            stdV0 = delta_p * Extensions.Vector(0.001, 0.01, 0.02, 0.02);
+            mV0 = delta_p * Extensions.Vector(0.0, 0.0, 0.0, 0.03);
+            stdV0 = delta_p * Extensions.Vector(0.003, 0.01, 0.02, 0.02);
 
             noise = new Normal(0.0, 1.0);
 
@@ -93,19 +93,24 @@ namespace Channel
             s = MTU / bandwidth_bps; //0.1 * delta_p / buffersize;
             sigma = Math.Sqrt(s) / 10.0;
 
-            ContinuousObservationsDiscretizationStep = 1.0;
+            ContinuousObservationsDiscretizationStep = 0.5;
             //ContinuousObservationsDiscretizationStep = _h;
 
             if (_evaluatePerformance)
             {
                 Criterions = new Dictionary<string, Criterion>();
 
-                Criterions.Add("Throughput", new Criterion(_h, (t, X, U, Obs) =>
+                Criterions.Add("FilterErrorStd", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
-                    double rtt = U[1];
+                    return (X - pi).L2Norm();
+                }, _saveEvery));
+
+                Criterions.Add("Throughput", new Criterion(_h, (t, X, pi, u, Obs, p) =>
+                {
+                    double rtt = p[0];
                     if (rtt > 0)
                     {
-                        double Bps = Math.Min(U[0], Ubdp) * MTU / rtt; // instant bytes per second
+                        double Bps = Math.Min(u, Ubdp) * MTU / rtt; // instant bytes per second
                         double Mbps = Bps * 8.0 / 1000.0 / 1000.0; // instant Mbps
                         return Mbps;
 
@@ -113,21 +118,21 @@ namespace Channel
                     else
                         return 0.0;
                 }, _saveEvery));
-                Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, U, Obs) =>
+                Criterions.Add("TimeInGoodState", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
-                    return Math.Abs(X[0][0] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                    return Math.Abs(X[0] - 1.0) < 1e-5 ? 1.0 : 0.0;
                 }, _saveEvery));
-                Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, U, Obs) =>
+                Criterions.Add("TimeInNormState", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
-                    return Math.Abs(X[0][1] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                    return Math.Abs(X[1] - 1.0) < 1e-5 ? 1.0 : 0.0;
                 }, _saveEvery));
-                Criterions.Add("TimeInBadWireState", new Criterion(_h, (t, X, U, Obs) =>
+                Criterions.Add("TimeInBadWireState", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
-                    return Math.Abs(X[0][2] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                    return Math.Abs(X[2] - 1.0) < 1e-5 ? 1.0 : 0.0;
                 }, _saveEvery));
-                Criterions.Add("TimeInBadWirelessState", new Criterion(_h, (t, X, U, Obs) =>
+                Criterions.Add("TimeInBadWirelessState", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
-                    return Math.Abs(X[0][3] - 1.0) < 1e-5 ? 1.0 : 0.0;
+                    return Math.Abs(X[3] - 1.0) < 1e-5 ? 1.0 : 0.0;
                 }, _saveEvery));
 
                 TerminalCriterions = new Dictionary<string, Func<double>>();
@@ -135,6 +140,7 @@ namespace Channel
                 TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
                 TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
                 TerminalCriterions.Add("TotalTime", () => JOS.State.T);
+                TerminalCriterions.Add("MeanFilterErrorStd", () => Criterions["FilterErrorStd"].J / JOS.State.T);
                 TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
                 TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J / JOS.State.T);
                 TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J / JOS.State.T);
@@ -230,7 +236,12 @@ namespace Channel
             {
                 foreach (var crit in Criterions)
                 {
-                    crit.Value.Step(JOS.State.t, new Vector<double>[] { JOS.State.Xvec }, new double[] { u, rtt }, JOS.CPObservations.Select(x => x.dN).ToArray());
+                    // TODO: make it for all possible filters
+                    var estimate = Vector<double>.Build.Dense(N, 0.0);
+                    if (JOS.Filters != null)
+                        if (JOS.Filters.ContainsKey(FilterType.DiscreteContinuousGaussian))
+                            estimate = JOS.Filters[FilterType.DiscreteContinuousGaussian].pi;
+                    crit.Value.Step(JOS.State.t, JOS.State.Xvec, estimate, u, JOS.CPObservations.Select(x => (double)x.dN).ToArray(), new double[] { rtt });
                 }
             }
         }

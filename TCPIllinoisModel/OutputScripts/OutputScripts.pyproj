@@ -40,6 +40,9 @@
     <Compile Include="G.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="gaussianfilter.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JCSSIpics\control.py">
       <SubType>Code</SubType>
     </Compile>

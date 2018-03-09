@@ -64,7 +64,7 @@ namespace CMC
 
             if (deltah >= hObs)
             {
-                deltah = 0;
+                deltah = 0.0;
                 dx_thin = x - x_thin;
                 x_thin = x;
             }

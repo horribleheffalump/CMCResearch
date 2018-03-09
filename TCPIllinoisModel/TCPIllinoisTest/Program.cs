@@ -108,9 +108,9 @@ namespace TCPIllinoisTest
                 //filters = new FilterType[] { FilterType.Discrete, FilterType.DiscreteContinuousGaussian };
 
                 if (protocol == "STATEBASED")
-                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian, FilterType.Dummy };
+                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian}; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
 
-                TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, filters);
+                TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, true);
                 TCPSender sender;
 
 

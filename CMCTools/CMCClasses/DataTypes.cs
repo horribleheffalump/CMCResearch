@@ -108,21 +108,20 @@ namespace CMC
         public double t;
         public double val;
         public double sumU;
-        public double[] U;
+        public double[] p;
 
-        public Sample(double t, double val, double[] U)
+        public Sample(double t, double val, double[] p)
         {
             this.t = t;
             this.val = val;
-            this.U = U;
-            sumU = U.Sum();
+            this.p = p;
         }
 
         public override string ToString()
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1} {2} {3}", t, val, sumU, string.Join(" ", U.Select(e => e.ToString(provider))));
+            string result = string.Format(provider, "{0} {1} {2}", t, val, string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 

@@ -81,6 +81,16 @@ namespace CMC.Filters
         }
 
         /// <summary>
+        /// Saves estimates to list ignoring the thinning settngs
+        /// </summary>
+        /// <param name="p"></param>
+        public void DoSave(params double[] p)
+        {
+            var estimate = new Estimate(t, pi, p);
+            estimates.Add(estimate);
+        }
+
+        /// <summary>
         /// Save estimate trajectory to file
         /// </summary>
         /// <param name="path">file path</param>
