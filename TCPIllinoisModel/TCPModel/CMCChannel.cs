@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace Channel
 {
-    public class HMMChannel : TCPChannel
+    public class CMCChannel : TCPChannel
     {
         int N;
         int Others;
@@ -38,6 +38,7 @@ namespace Channel
 
 
         public JointObservationsSystem JOS;
+        public Dictionary<FilterType, Criterion> FilterCriterions;
         public Dictionary<String, Criterion> Criterions;
         public Dictionary<String, Func<double>> TerminalCriterions;
 
@@ -62,7 +63,7 @@ namespace Channel
         private Normal noise;
 
 
-        public HMMChannel(double _t0, double _T, double _h, int _saveEvery, bool _evaluatePerformance = false, FilterType[] filters = null, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = true) : base()
+        public CMCChannel(double _t0, double _T, double _h, int _saveEvery, bool _evaluatePerformance = false, FilterType[] filters = null, RTTSimulationMode _RTTSimulationMode = RTTSimulationMode.AsRenewal, bool _simultaneousJumps = true) : base()
         {
             h = _h;
 
@@ -96,14 +97,44 @@ namespace Channel
             ContinuousObservationsDiscretizationStep = 0.5;
             //ContinuousObservationsDiscretizationStep = _h;
 
+            if (doSimulateSimultaneousJumps)
+            {
+                // the following simultaneous jumps are simulated:
+                //     Loss may occure at the same time as the Markov chain jumps e1->e4, e2->e4 of e2->e3. 
+                //     The intencity of the simultaneous jump and loss is equal to 1 / ( 6.0 * Others) * min (lambda_ij, mu)
+                List<SimultaneousJumpsIntencity> LossSimultaneousIntencity = new List<SimultaneousJumpsIntencity>();
+                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 0, 3)));
+                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 1, 3)));
+                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 1, 2)));
+                //     Timeout may occure at the same time as the Markov chain jumps e1->e4, e2->e4 of e2->e3. 
+                //     The intencity of the simultaneous jump and timeout is equal to 1/(6*Others) min (lambda_ij, nu)
+                List<SimultaneousJumpsIntencity> TimeoutSimultaneousIntencity = new List<SimultaneousJumpsIntencity>();
+                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 0, 3)));
+                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 3)));
+                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 2)));
+
+                JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep, filters);
+
+            }
+            else
+            {
+                JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep, filters);
+            }
+
+            //dt = 0;
+            //df = 0;
+
             if (_evaluatePerformance)
             {
+                FilterCriterions = new Dictionary<FilterType, Criterion>();
                 Criterions = new Dictionary<string, Criterion>();
 
-                Criterions.Add("FilterErrorStd", new Criterion(_h, (t, X, pi, u, Obs, p) =>
-                {
-                    return (X - pi).L2Norm();
-                }, _saveEvery));
+                if (JOS.Filters != null)
+                    foreach (var f in JOS.Filters)
+                        FilterCriterions.Add(f.Key, new Criterion(_h, (t, X, pi, u, Obs, p) =>
+                        {
+                            return (X - pi).L2Norm();
+                        }, _saveEvery));
 
                 Criterions.Add("Throughput", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
@@ -137,43 +168,23 @@ namespace Channel
 
                 TerminalCriterions = new Dictionary<string, Func<double>>();
 
+                foreach (var c in FilterCriterions)
+                    TerminalCriterions.Add($"Mean_{c.Key.ToString()}", () => c.Value.J / JOS.State.T);
+
+                foreach (var c in Criterions)
+                    TerminalCriterions.Add($"Mean_{c.Key}", () => c.Value.J / JOS.State.T);
+
+
                 TerminalCriterions.Add("Loss", () => JOS.CPObservations[0].N);
                 TerminalCriterions.Add("Timeout", () => JOS.CPObservations[1].N);
                 TerminalCriterions.Add("TotalTime", () => JOS.State.T);
-                TerminalCriterions.Add("MeanFilterErrorStd", () => Criterions["FilterErrorStd"].J / JOS.State.T);
-                TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
-                TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J / JOS.State.T);
-                TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J / JOS.State.T);
-                TerminalCriterions.Add("TotalTimeInBadWireState", () => Criterions["TimeInBadWireState"].J / JOS.State.T);
-                TerminalCriterions.Add("TotalTimeInBadWirelessState", () => Criterions["TimeInBadWirelessState"].J / JOS.State.T);
+                //TerminalCriterions.Add("AverageThroughput", () => Criterions["Throughput"].J / JOS.State.T);
+                //TerminalCriterions.Add("TotalTimeInGoodState", () => Criterions["TimeInGoodState"].J / JOS.State.T);
+                //TerminalCriterions.Add("TotalTimeInNormState", () => Criterions["TimeInNormState"].J / JOS.State.T);
+                //TerminalCriterions.Add("TotalTimeInBadWireState", () => Criterions["TimeInBadWireState"].J / JOS.State.T);
+                //TerminalCriterions.Add("TotalTimeInBadWirelessState", () => Criterions["TimeInBadWirelessState"].J / JOS.State.T);
             }
 
-            if (doSimulateSimultaneousJumps)
-            {
-                // the following simultaneous jumps are simulated:
-                //     Loss may occure at the same time as the Markov chain jumps e1->e4, e2->e4 of e2->e3. 
-                //     The intencity of the simultaneous jump and loss is equal to 1 / ( 6.0 * Others) * min (lambda_ij, mu)
-                List<SimultaneousJumpsIntencity> LossSimultaneousIntencity = new List<SimultaneousJumpsIntencity>();
-                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 0, 3)));
-                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 1, 3)));
-                LossSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndLossIntensity(t, u, 1, 2)));
-                //     Timeout may occure at the same time as the Markov chain jumps e1->e4, e2->e4 of e2->e3. 
-                //     The intencity of the simultaneous jump and timeout is equal to 1/(6*Others) min (lambda_ij, nu)
-                List<SimultaneousJumpsIntencity> TimeoutSimultaneousIntencity = new List<SimultaneousJumpsIntencity>();
-                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(0, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 0, 3)));
-                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 3, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 3)));
-                TimeoutSimultaneousIntencity.Add(new SimultaneousJumpsIntencity(1, 2, (t, u) => SimultaneousJumpAndTimeoutIntensity(t, u, 1, 2)));
-
-                JOS = new JointObservationsSystemSimultaniousJumps(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, new List<SimultaneousJumpsIntencity>[] { LossSimultaneousIntencity, TimeoutSimultaneousIntencity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep, filters);
-
-            }
-            else
-            {
-                JOS = new JointObservationsSystem(N, _t0, _T, 0, _h, TransitionMatrix, new Func<double, double, Vector<double>>[] { LossIntensity, TimeoutIntensity }, R, G, _saveEvery, ContinuousObservationsDiscretizationStep, filters);
-            }
-
-            //dt = 0;
-            //df = 0;
         }
 
         public override (int loss, int timeout, double rtt) Step(double u)
@@ -232,17 +243,25 @@ namespace Channel
 
         public void CalculateCriterions(double u, double rtt)
         {
-            if (Criterions != null)
+            if (FilterCriterions != null && JOS.Filters != null)
             {
-                foreach (var crit in Criterions)
+                foreach (var fc in FilterCriterions)
                 {
-                    // TODO: make it for all possible filters
                     var estimate = Vector<double>.Build.Dense(N, 0.0);
-                    if (JOS.Filters != null)
-                        if (JOS.Filters.ContainsKey(FilterType.DiscreteContinuousGaussian))
-                            estimate = JOS.Filters[FilterType.DiscreteContinuousGaussian].pi;
-                    crit.Value.Step(JOS.State.t, JOS.State.Xvec, estimate, u, JOS.CPObservations.Select(x => (double)x.dN).ToArray(), new double[] { rtt });
+                    if (JOS.Filters.ContainsKey(fc.Key))
+                    {
+                        estimate = JOS.Filters[fc.Key].pi;
+                    }
+                    fc.Value.Step(JOS.State.t, JOS.State.Xvec, estimate, u, JOS.CPObservations.Select(x => (double)x.dN).ToArray(), new double[] { rtt });
                 }
+            }
+
+
+
+            foreach (var crit in Criterions)
+            {
+                var estimate = Vector<double>.Build.Dense(N, 0.0);
+                crit.Value.Step(JOS.State.t, JOS.State.Xvec, estimate, u, JOS.CPObservations.Select(x => (double)x.dN).ToArray(), new double[] { rtt });
             }
         }
 
