@@ -41,6 +41,7 @@ namespace CMC.Filters
         public override Vector<double> Step(double u, int[] dy, double? dz)
         {
             t += h;
+            var old_pi = pi;
 
             var dR = R(t, u) * h;
             var dG2 = G(t, u).PointwisePower(2.0) * h;
@@ -103,7 +104,7 @@ namespace CMC.Filters
                     if (dz.Value > 0)
                     {
                         var pdf = Vector<double>.Build.Dense(pi.Count, (j) => Normal.PDF(integral_R[j], Math.Sqrt(integral_G2[j]), dz.Value));
-                        if (pdf.Sum() > 0.0) // we take into account only the meaningful observations. If the observations are such that they do not help to distinguish the states, they are skipped.
+                        if (pdf.Sum() > 1e-6) // we take into account only the meaningful observations. If the observations are such that they do not help to distinguish the states, they are skipped.
                             pi = pi.PointwiseMultiply(pdf);
                         //else
                         //    Console.WriteLine("alles nicht!");
@@ -133,11 +134,17 @@ namespace CMC.Filters
 
             //var y_part = k * mu.Transpose() + 
             pi = pi.PointwiseMaximum(0.0);
+            //if (pi.Sum() < 1e-6)
+            //    Console.WriteLine("alles!");
             pi = pi.Normalize(1.0);
-            if (pi.Sum() == 0.0)
-                Console.WriteLine("alles!");
+
+            for (int i = 0; i < pi.Count; i++) // if something went wrong, take previous value;
+                if (double.IsNaN(pi[i]) || double.IsInfinity(pi[i]))
+                    pi = old_pi;
+                    //Console.WriteLine("alles!");
+
             if (dz.HasValue)
-                DoSave(savearray);
+                ForceSave(savearray);
             else
                 Save();
             return pi;
