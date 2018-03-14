@@ -321,7 +321,7 @@ namespace Channel
             double lambda24 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO0.01;
             double lambda42 = 0.005;
             double lambda34 = 0.01; /// DO NOT FORGET TO CHANGE IT BACK TO 0.01;
-            double lambda43 = 0.005;
+            double lambda43 = 0.0; // after wifi restored, we more likely transit to one of the good channel states, since our flow was low while wifi was bad
 
             double lambda12 = lambda0 + (w > Ubdp ? lambda_guaranteed : C / Math.Max(Ubdp - w, C));
             //double lambda12 = 0.01 + 0.001 * w;
