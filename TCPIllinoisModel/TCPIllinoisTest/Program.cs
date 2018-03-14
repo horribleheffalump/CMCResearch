@@ -110,7 +110,7 @@ namespace TCPIllinoisTest
                 if (protocol == "STATEBASED")
                     filters = new FilterType[] { FilterType.DiscreteContinuousGaussian}; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
 
-                TCPChannel channel = new HMMChannel(t0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, true);
+                TCPChannel channel = new CMCChannel(t0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, true);
                 TCPSender sender;
 
 
@@ -133,7 +133,7 @@ namespace TCPIllinoisTest
                     (int loss, int timeout, double rtt) = channel.Step(sender.W);
                     if (protocol == "STATEBASED")
                     {
-                        (sender as StateBasedSender).Step(h, loss, timeout, rtt, (channel as HMMChannel).JOS.Filters[FilterType.DiscreteContinuousGaussian].pi);
+                        (sender as StateBasedSender).Step(h, loss, timeout, rtt, (channel as CMCChannel).JOS.Filters[FilterType.DiscreteContinuousGaussian].pi);
                     }
                     else
                         sender.Step(h, loss, timeout, rtt);
