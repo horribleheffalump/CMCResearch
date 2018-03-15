@@ -22,8 +22,8 @@ namespace TCPIllinoisTest
             double h = 1e-4;
             double h_write = 1e-0;
             double t0 = 0.0;
-            double T = 600.0;
-            int saveEvery = 0;
+            double T = 200.0;
+            int saveEvery = 100;
             double exponential_smooth = 0.9999;
             //double exponential_smooth = 0.99;
 
@@ -105,10 +105,11 @@ namespace TCPIllinoisTest
             {
 
                 FilterType[] filters = null;
-                //filters = new FilterType[] { FilterType.Discrete, FilterType.DiscreteContinuousGaussian };
+ 
+                filters = new FilterType[] { FilterType.DiscreteContinuousGaussian, FilterType.Discrete };
 
-                if (protocol == "STATEBASED")
-                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian}; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
+                //if (protocol == "STATEBASED")
+                //    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian }; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
 
                 TCPChannel channel = new CMCChannel(t0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, true);
                 TCPSender sender;
