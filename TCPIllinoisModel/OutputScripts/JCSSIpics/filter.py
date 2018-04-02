@@ -10,13 +10,13 @@ rc('text.latex',unicode=True)
 rc('text.latex',preamble=r'\usepackage[T2A]{fontenc}')
 rc('text.latex',preamble=r'\usepackage[utf8]{inputenc}')
 rc('text.latex',preamble=r'\usepackage[russian]{babel}')
-import pylab
+
 import pandas as pd
 
 from Points import * 
 
 
-subfolder = 'STATEBASED/'
+subfolder = 'NEWRENO/'
 interval = [0,200]
 
 
@@ -52,7 +52,11 @@ p_dcg = data[["p0", "p1", "p2", "p3"]].as_matrix()
 filename_dh = u"../out/" + subfolder + "CP_obs_0.txt"
 t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 filename_dl = u"../out/" + subfolder + "CP_obs_1.txt"
-t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
+try:
+    t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
+except:
+    t_dl = [] 
+    dl = []
 
 dhpoints = Points(t_dh, dh)
 dhpoints.toones()

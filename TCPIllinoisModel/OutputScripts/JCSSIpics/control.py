@@ -13,7 +13,7 @@ import pylab
 from Points import *
 
 #subfolder = ''
-subfolder = 'STATEBASED/'
+subfolder = 'NEWRENO/'
 interval = [0,200]
 #bounds = [0,0.11]
 
@@ -27,7 +27,11 @@ t_X, X = np.loadtxt(filename_X, delimiter = ' ', usecols=(0,1), unpack=True, dty
 filename_dh = u"../out/" + subfolder + "CP_obs_0.txt"
 t_dh, dh = np.loadtxt(filename_dh, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
 filename_dl = u"../out/" + subfolder + "CP_obs_1.txt"
-t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
+try:
+    t_dl, dl = np.loadtxt(filename_dl, delimiter = ' ', usecols=(0,1), unpack=True, dtype=float)
+except:
+    t_dl = [] 
+    dl = []
 
 f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
 #plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)

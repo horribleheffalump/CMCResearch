@@ -33,7 +33,7 @@ namespace CMC
             Intensity = _Intensity;
             SaveHistory = _SaveHistory;
             //if (SaveHistory)
-            Jumps.Add(new Jump(t0, N0));
+            //Jumps.Add(new Jump(t0, N0));
         }
 
         public int Step(double u)
