@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>db162a6c-f3e0-42c2-a00e-478e6664d4c6</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>control.py</StartupFile>
+    <StartupFile>JCSSIpics\simple_control.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -43,10 +43,19 @@
     <Compile Include="gaussianfilter.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JCSSIpics\arrowed_spines.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JCSSIpics\control.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JCSSIpics\filter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JCSSIpics\subplot.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="latex_test.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="nu.py">
