@@ -13,7 +13,7 @@ import pylab
 from Points import *
 
 #subfolder = ''
-subfolder = 'NEWRENO/'
+subfolder = 'STATEBASED/'
 interval = [0,200]
 #bounds = [0,0.11]
 
@@ -118,12 +118,12 @@ yticks = [0, 1250, 1350]
 ylabels = ['0','$B$', "$B+W''$"]
 ax1.set_yticks(yticks);
 ax1.set_yticklabels(ylabels);
-ax1.set_ylabel('окно перегрузки, \# пакетов')
+#ax1.set_ylabel('окно перегрузки, \# пакетов')
 ax1.yaxis.set_label_coords(-0.06,0.45)
 
 yticks2 = [0.1, np.round(rttmax * 100)/100]
 ax2.set_yticks(yticks2);
-ax2.text(205, rttmin + diff*0.73, 'Время кругового обращения, с', rotation= -90)
+#ax2.text(205, rttmin + diff*0.73, 'Время кругового обращения, с', rotation= -90)
 
 
 ax3.set_xlim([0,200])
@@ -131,7 +131,7 @@ xticks = [0, 100, 200]
 xlabels = ['0', '', '200']
 ax3.set_xticks(xticks);
 ax3.set_xticklabels(xlabels);
-ax3.set_xlabel('время, с')
+#ax3.set_xlabel('время, с')
 ax3.xaxis.set_label_coords(0.5,-0.4)
 
 
