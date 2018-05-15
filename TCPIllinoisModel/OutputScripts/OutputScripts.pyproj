@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>db162a6c-f3e0-42c2-a00e-478e6664d4c6</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>JCSSIpics\simple_control.py</StartupFile>
+    <StartupFile>JCSSIpics\control.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
