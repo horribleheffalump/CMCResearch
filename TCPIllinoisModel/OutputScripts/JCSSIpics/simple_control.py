@@ -55,17 +55,17 @@ levelone = np.ones(data.t.size)*data.u_sb.max()
 
 #plt.plot(data.t, data.u_i, '-', color = 'blue', label = 'illinois')
 
-ax1.plot(data.t, data.u_sb, '-', color = 'black') #, label = 'statebased')
-ax1.fill_between(data.t, levelzero, levelone, where=data.u_sb<1250, color='black', alpha = 0.1, linewidth=0.0);
-ax1.fill_between(data.t, levelzero, levelone, where=(data.u_sb>=1250)*(data.u_sb<1330), color='black', alpha = 0.2, linewidth=0.0);
-ax1.fill_between(data.t, levelzero, levelone, where=(data.u_sb>1330), color='black', alpha = 0.4, linewidth=0.0);
-ax3.plot(t_dh_sb, dh_sb, '.', color = 'black')
+#ax1.plot(data.t, data.u_sb, '-', color = 'black') #, label = 'statebased')
+#ax1.fill_between(data.t, levelzero, levelone, where=data.u_sb<1250, color='black', alpha = 0.1, linewidth=0.0);
+#ax1.fill_between(data.t, levelzero, levelone, where=(data.u_sb>=1250)*(data.u_sb<1330), color='black', alpha = 0.2, linewidth=0.0);
+#ax1.fill_between(data.t, levelzero, levelone, where=(data.u_sb>1330), color='black', alpha = 0.4, linewidth=0.0);
+#ax3.plot(t_dh_sb, dh_sb, '.', color = 'black')
 
-#ax1.plot(data.t, data.u_nr, '-', color = 'black') #, label = 'newreno')
-#ax1.fill_between(data.t, levelzero, levelone, where=data.u_nr<1250, color='black', alpha = 0.1, linewidth=0.0);
-#ax1.fill_between(data.t, levelzero, levelone, where=(data.u_nr>=1250)*(data.u_nr<1330), color='black', alpha = 0.2, linewidth=0.0);
-#ax1.fill_between(data.t, levelzero, levelone, where=(data.u_nr>1330), color='black', alpha = 0.4, linewidth=0.0);
-#ax3.plot(t_dh_nr, dh_nr, '.', color = 'black')
+ax1.plot(data.t, data.u_nr, '-', color = 'black') #, label = 'newreno')
+ax1.fill_between(data.t, levelzero, levelone, where=data.u_nr<1250, color='black', alpha = 0.1, linewidth=0.0);
+ax1.fill_between(data.t, levelzero, levelone, where=(data.u_nr>=1250)*(data.u_nr<1330), color='black', alpha = 0.2, linewidth=0.0);
+ax1.fill_between(data.t, levelzero, levelone, where=(data.u_nr>1330), color='black', alpha = 0.4, linewidth=0.0);
+ax3.plot(t_dh_nr, dh_nr, '.', color = 'black')
 
 
 #ax2 = ax1.twinx()
@@ -114,14 +114,14 @@ box_x2 = 0.6
 box_y1 = 0
 box_y2 = 150
 
-#subax = add_subplot_axes(ax1, [0.05, 0.5, .1, .4])
-#subax.plot(data.t, data.u_nr, '-', color = 'black')
-#subax.set_xlim([0,0.5]);
-#subax.set_ylim([0,150]);
-#subax.set_xticks([0,0.5])
-#subax.set_yticks([])
+subax = add_subplot_axes(ax1, [0.05, 0.5, .1, .4])
+subax.plot(data.t, data.u_nr, '-', color = 'black')
+subax.set_xlim([0,0.5]);
+subax.set_ylim([0,150]);
+subax.set_xticks([0,0.5])
+subax.set_yticks([])
 
-arrowed_spines(f, ax3, ax1)
+arrowed_spines(f, [ax1, ax3])
 
 
 plt.show()

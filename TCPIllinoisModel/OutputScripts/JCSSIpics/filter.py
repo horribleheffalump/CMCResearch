@@ -14,17 +14,17 @@ rc('text.latex',preamble=r'\usepackage[russian]{babel}')
 import pandas as pd
 
 from Points import * 
+from arrowed_spines import *
 
-
-subfolder = 'STATEBASED/'
-interval = [0,200]
-
+subfolder = 'NEWRENO/'
+#subfolder = 'STATEBASED/'
+interval = [0,205]
 
 #f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
 f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
 #plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 gs = gridspec.GridSpec(5, 1, height_ratios=[10, 10, 10, 10, 2])     
-gs.update(left=0.1, bottom=0.04, right=0.95, top=0.99, wspace=0.02, hspace=0.0)
+gs.update(left=0.1, bottom=0.08, right=0.94, top=0.95, wspace=0.02, hspace=0.0)
 
 filename = u"../out/" + subfolder + "channel_state.txt"
 data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "X"])
@@ -106,12 +106,14 @@ for i in range(0, 4):
 for i in range(0, 3):
     plots[i].spines['top'].set_visible(False)
 
-#ax4.set_xlim(0,max(X[:,0]))
-ax4.set_xlim(interval[0], interval[1])
+ax0.text(-9.0, 1.1, '$\hat{X}_t^i$')
 
-ax4.plot(dhpoints.x, dhpoints.y*2, '.', color = 'black')
-ax4.plot(dlpoints.x, dlpoints.y, 'x', color = 'black')
-ax4.set_ylim(0.5,2.5)
+#ax4.set_xlim(0,max(X[:,0]))
+ax4.set_xlim(interval)
+
+ax4.plot(dhpoints.x, dhpoints.y*1.5, '.', color = 'black')
+ax4.plot(dlpoints.x, dlpoints.y*0.7, 'x', color = 'black')
+ax4.set_ylim(0.0,2.0)
 ax4.axes.yaxis.set_visible(False)
 ax4.spines['top'].set_visible(False)
 
@@ -121,7 +123,7 @@ ax4.set_xticks(xticks);
 ax4.set_xticklabels(xlabels);
 ax4.set_xlabel('время, с')
 ax4.xaxis.set_label_coords(0.5,-0.4)
-
+ax4.text(208, -2.0, '$t$')
 ax4.text(-15, 28, 'Оценки фильтрации', rotation= 90)
 
 
@@ -139,5 +141,9 @@ ax4.text(-15, 28, 'Оценки фильтрации', rotation= 90)
 #plt.setp(ax3.get_xticklabels(), visible=False)
 
 ##plt.savefig(u"../Output/ForIFAC.final/filter_" + str(n) + ".pdf")
+
+
+arrowed_spines(f, [ax0, ax1, ax2, ax3, ax4])
+
 plt.show()
 

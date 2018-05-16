@@ -14,8 +14,8 @@ from Points import *
 from arrowed_spines import *
 
 #subfolder = ''
-#subfolder = 'NEWRENO/'
-subfolder = 'STATEBASED/'
+subfolder = 'NEWRENO/'
+#subfolder = 'STATEBASED/'
 interval = [0,205]
 bounds = [0,1450]
 
@@ -173,10 +173,10 @@ ax1.text(209, 1450.0, '$r_t$')
 
 
 
-arrowed_spines(f, ax3, ax1)
-ax2.arrow(205, rttmin, 0.,  diff * 1450.0 / 1350.0, fc='k', ec='k', lw = 1.0, 
-            head_width=3.84, head_length=48.35 / 1450.0 * np.array([0.1, diff]).min() , overhang = 0, 
-            length_includes_head= False, clip_on = False)
+arrowed_spines(f, [ax1, ax3], [ax2])
+#ax2.arrow(205, rttmin, 0.,  diff * 1450.0 / 1350.0, fc='k', ec='k', lw = 1.0, 
+#            head_width=3.84, head_length=48.35 / 1450.0 * np.array([0.1, diff]).min() , overhang = 0, 
+#            length_includes_head= False, clip_on = False)
 
 plt.show()
 
