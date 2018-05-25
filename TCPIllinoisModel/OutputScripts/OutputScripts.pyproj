@@ -43,6 +43,9 @@
     <Compile Include="gaussianfilter.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JCSSIpics\AIMD.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JCSSIpics\arrowed_spines.py">
       <SubType>Code</SubType>
     </Compile>
@@ -50,6 +53,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JCSSIpics\filter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JCSSIpics\RED.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JCSSIpics\subplot.py">

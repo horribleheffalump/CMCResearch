@@ -16,15 +16,17 @@ import pandas as pd
 from Points import * 
 from arrowed_spines import *
 
-subfolder = 'NEWRENO/'
-#subfolder = 'STATEBASED/'
+#subfolder = 'NEWRENO/'
+subfolder = 'STATEBASED/'
 interval = [0,205]
 
 #f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
-f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
+#f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(5,4), dpi=200, facecolor='w', edgecolor='k')
 #plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 gs = gridspec.GridSpec(5, 1, height_ratios=[10, 10, 10, 10, 2])     
-gs.update(left=0.1, bottom=0.08, right=0.94, top=0.95, wspace=0.02, hspace=0.0)
+gs.update(left=0.13, bottom=0.08, right=0.92, top=0.95, wspace=0.0, hspace=0.0)
+#gs.update(left=0.1, bottom=0.08, right=0.94, top=0.95, wspace=0.02, hspace=0.0)
 
 filename = u"../out/" + subfolder + "channel_state.txt"
 data = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "X"])
@@ -106,7 +108,7 @@ for i in range(0, 4):
 for i in range(0, 3):
     plots[i].spines['top'].set_visible(False)
 
-ax0.text(-9.0, 1.1, '$\hat{X}_t^i$')
+ax0.text(-12.0, 1.1, '$\hat{X}_t^i$')
 
 #ax4.set_xlim(0,max(X[:,0]))
 ax4.set_xlim(interval)
@@ -123,8 +125,8 @@ ax4.set_xticks(xticks);
 ax4.set_xticklabels(xlabels);
 ax4.set_xlabel('время, с')
 ax4.xaxis.set_label_coords(0.5,-0.4)
-ax4.text(208, -2.0, '$t$')
-ax4.text(-15, 28, 'Оценки фильтрации', rotation= 90)
+ax4.text(208, -2.4, '$t$')
+ax4.text(-23, 28, 'Оценки фильтрации', rotation= 90)
 
 
 #ax4.set_axis_off()

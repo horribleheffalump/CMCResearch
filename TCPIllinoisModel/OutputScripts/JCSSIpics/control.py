@@ -14,8 +14,8 @@ from Points import *
 from arrowed_spines import *
 
 #subfolder = ''
-subfolder = 'NEWRENO/'
-#subfolder = 'STATEBASED/'
+#subfolder = 'NEWRENO/'
+subfolder = 'STATEBASED/'
 interval = [0,205]
 bounds = [0,1450]
 
@@ -35,11 +35,13 @@ except:
     t_dl = [] 
     dl = []
 
-f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
+#f = plt.figure(num=None, figsize=(7,5), dpi=150, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(5,4), dpi=200, facecolor='w', edgecolor='k')
 #plt.subplots_adjust(left=0.06, bottom=0.07, right=0.95, top=0.95, wspace=0.1)
 gs = gridspec.GridSpec(2, 1, height_ratios=[20, 1])     
 #gs.update(left=0.1, bottom=0.04, right=0.95, top=0.99, wspace=0.0, hspace=0.0)
-gs.update(left=0.1, bottom=0.08, right=0.94, top=0.95, wspace=0.0, hspace=0.0)
+#gs.update(left=0.1, bottom=0.08, right=0.94, top=0.95, wspace=0.0, hspace=0.0)
+gs.update(left=0.13, bottom=0.08, right=0.92, top=0.95, wspace=0.0, hspace=0.0)
 
 ax1 = plt.subplot(gs[0])
 #ax2 = plt.subplot(gs[1])
@@ -151,7 +153,7 @@ ax3.set_yticks([]);
 ax3.set_xticklabels(xlabels);
 ax3.set_xlabel('время, с')
 ax3.xaxis.set_label_coords(0.5,-0.4)
-ax3.text(208, -2.0, '$t$')
+ax3.text(208, -2.4, '$t$')
 
 yticks = [0, 1250, 1350]
 ylabels = ['0','$B$', "$B+W''$"]
@@ -161,7 +163,7 @@ ax1.set_yticks(yticks);
 ax1.set_yticklabels(ylabels);
 ax1.set_ylabel('окно перегрузки, \# пакетов')
 ax1.yaxis.set_label_coords(-0.02, 0.45)
-ax1.text(-8.0, 1450.0, '$U_t$')
+ax1.text(-10.0, 1450.0, '$U_t$')
 
 ax2.set_xticks([]);
 yticks2 = [0.1, np.round(rttmax * 100)/100]
