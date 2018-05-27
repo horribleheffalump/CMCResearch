@@ -25,7 +25,7 @@ dh = np.array([1.0, 1.0])
 t_dl = np.array([160.0])
 dl = np.array([1.0])
 
-f = plt.figure(num=None, figsize=(5,4), dpi=200, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(6,4), dpi=200, facecolor='w', edgecolor='k')
 gs = gridspec.GridSpec(2, 1, height_ratios=[20, 1])     
 gs.update(left=0.13, bottom=0.08, right=0.92, top=0.95, wspace=0.0, hspace=0.0)
 
@@ -112,7 +112,7 @@ ax1.set_yticks(yticks);
 ax1.set_yticklabels(ylabels);
 ax1.set_ylabel('окно перегрузки, \# пакетов')
 ax1.yaxis.set_label_coords(-0.02, 0.50)
-ax1.text(-10.0, 1450.0, '$U_t$')
+ax1.text(-9.0, 1450.0, '$U_t$')
 
 ax1.fill_between(x, levelzero, levelone, where=vals==o, color='black', alpha = 0.1, linewidth=0.0);
 ax1.fill_between(x, levelzero, levelone, where=vals==ones, color='black', alpha = 0.2, linewidth=0.0);
@@ -121,25 +121,44 @@ ax1.fill_between(x, levelzero, levelone, where=vals==ones*3, color='black', alph
 
 ax1.text(25, 80, '$U_t = \\underline{W} 2^t$')
 ax1.text(30, 250, '$\\mathrm{tg}(\\alpha) = \\overline{RTT}^{-1}$')
-ax1.text(114, 400, '$U_t = \\frac{1}{2} U_{t-}$')
+#ax1.text(114, 400, '$U_t = \\frac{1}{2} U_{t-}$')
+ax1.text(120, 400, '$U_t = \\frac{1}{2} U_{t-}$')
 
-ax1.text(1, 1405, 'Slow', fontsize=7)
-ax1.text(1, 1365, 'start', fontsize=7)
+#ax1.text(1, 1405, 'Slow', fontsize=7)
+#ax1.text(1, 1365, 'start', fontsize=7)
 
-ax1.text(21, 1405, 'Congestion', fontsize=7)
-ax1.text(21, 1365, 'avoidance', fontsize=7)
+#ax1.text(21, 1405, 'Congestion', fontsize=7)
+#ax1.text(21, 1365, 'avoidance', fontsize=7)
 
-ax1.text(96, 1505, 'Congestion', fontsize=7)
-ax1.text(96, 1465, 'fact', fontsize=7)
+#ax1.text(96, 1505, 'Congestion', fontsize=7)
+#ax1.text(96, 1465, 'fact', fontsize=7)
 
-ax1.text(106, 1405, 'Congestion', fontsize=7)
-ax1.text(106, 1365, 'avoidance', fontsize=7)
+#ax1.text(106, 1405, 'Congestion', fontsize=7)
+#ax1.text(106, 1365, 'avoidance', fontsize=7)
 
-ax1.text(161, 1405, 'Slow', fontsize=7)
-ax1.text(161, 1365, 'start', fontsize=7)
+#ax1.text(161, 1405, 'Slow', fontsize=7)
+#ax1.text(161, 1365, 'start', fontsize=7)
 
-ax1.text(181, 1405, 'Congestion', fontsize=7)
-ax1.text(181, 1365, 'avoidance', fontsize=7)
+#ax1.text(181, 1405, 'Congestion', fontsize=7)
+#ax1.text(181, 1365, 'avoidance', fontsize=7)
+
+ax1.text(5.5, 1405, 'Slow', fontsize=7)
+ax1.text(5.25, 1365, 'start', fontsize=7)
+
+ax1.text(45, 1405, 'Congestion', fontsize=7)
+ax1.text(46.5, 1365, 'avoidance', fontsize=7)
+
+ax1.text(90, 1505, 'Congestion', fontsize=7)
+ax1.text(96.75, 1465, 'fact', fontsize=7)
+
+ax1.text(121, 1405, 'Congestion', fontsize=7)
+ax1.text(122.5, 1365, 'avoidance', fontsize=7)
+
+ax1.text(165.5, 1405, 'Slow', fontsize=7)
+ax1.text(165.25, 1365, 'start', fontsize=7)
+
+#ax1.text(181.5, 1405, 'Congestion', fontsize=7)
+#ax1.text(183, 1365, 'avoidance', fontsize=7)
 
 arrowed_spines(f, [ax1, ax3])
 ax1.grid(linestyle=":", color='black')

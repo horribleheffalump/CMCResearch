@@ -17,9 +17,9 @@ from Points import *
 from arrowed_spines import *
 
 
-f = plt.figure(num=None, figsize=(5,4), dpi=200, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(6,4), dpi=200, facecolor='w', edgecolor='k')
 gs = gridspec.GridSpec(3, 1, height_ratios=[10, 10, 10])     
-gs.update(left=0.18, bottom=0.08, right=0.92, top=0.95, wspace=0.0, hspace=0.0)
+gs.update(left=0.16, bottom=0.08, right=0.92, top=0.95, wspace=0.0, hspace=0.3)
 
 ax0 = plt.subplot(gs[0])
 ax1 = plt.subplot(gs[1])
@@ -63,10 +63,12 @@ ax0.plot(x1, y1, '-', color = 'black', linewidth = 1.0)
 ax1.plot(x2, y2, '-', color = 'black', linewidth = 1.0)
 ax2.plot(x2, y2, '-', color = 'black', linewidth = 1.0)
 
-ax0.text(-13, 50, '$P_l(u)$', rotation = '30')
-ax1.text(-25, 70, '$\\mathbf{E}\\{RTT\\}(u)$', rotation = '30')
-ax2.text(-25, 70, '$\\mathbf{D}\\{RTT\\}(u)$', rotation = '30')
+ax0.text(-11, 120, '$P_l(u)$')#, rotation = '90')
+ax1.text(-22, 125, '$\\mathbf{E}\\{RTT\\}(u)$')#, rotation = '90')
+ax2.text(-22, 125, '$\\mathbf{D}\\{RTT\\}(u)$')#, rotation = '90')
 
+ax0.text(120, -20, '$u$')
+ax1.text(120, -20, '$u$')
 ax2.text(120, -20, '$u$')
 
 xf = [10, 30, 30, 90, 90, 110]
@@ -93,7 +95,9 @@ for ax in plots:
 plt.setp(ax2.get_xticklabels(), visible=True)
 
 
-arrowed_spines(f, [ax0, ax1, ax2])
+arrowed_spines(f, [ax0])
+arrowed_spines(f, [ax1])
+arrowed_spines(f, [ax2])
 
 plt.show()
 
