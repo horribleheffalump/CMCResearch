@@ -64,8 +64,8 @@ ax1.plot(x2, y2, '-', color = 'black', linewidth = 1.0)
 ax2.plot(x2, y2, '-', color = 'black', linewidth = 1.0)
 
 ax0.text(-11, 120, '$P_l(u)$')#, rotation = '90')
-ax1.text(-22, 125, '$\\mathbf{E}\\{RTT\\}(u)$')#, rotation = '90')
-ax2.text(-22, 125, '$\\mathbf{D}\\{RTT\\}(u)$')#, rotation = '90')
+ax1.text(-22, 125, '$\\mathbf{E}\\{\\mathrm{RTT}\\}(u)$')#, rotation = '90')
+ax2.text(-22, 125, '$\\mathbf{D}\\{\\mathrm{RTT}\\}(u)$')#, rotation = '90')
 
 ax0.text(120, -20, '$u$')
 ax1.text(120, -20, '$u$')

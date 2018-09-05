@@ -14,8 +14,8 @@ from Points import *
 from arrowed_spines import *
 
 #subfolder = ''
-#subfolder = 'NEWRENO/'
-subfolder = 'STATEBASED/'
+subfolder = 'NEWRENO/'
+#subfolder = 'STATEBASED/'
 interval = [0,205]
 bounds = [0,1450]
 
@@ -151,7 +151,7 @@ xlabels = ['0', '', '200']
 ax3.set_xticks(xticks);
 ax3.set_yticks([]);
 ax3.set_xticklabels(xlabels);
-ax3.set_xlabel('время, с')
+ax3.set_xlabel('Время, с')
 ax3.xaxis.set_label_coords(0.5,-0.4)
 ax3.text(208, -2.4, '$t$')
 
@@ -161,7 +161,7 @@ ylabels = ['0','$B$', "$B+W''$"]
 ax1.set_xticks([]);
 ax1.set_yticks(yticks);
 ax1.set_yticklabels(ylabels);
-ax1.set_ylabel('окно перегрузки, \# пакетов')
+ax1.set_ylabel('Окно перегрузки, число пакетов')
 ax1.yaxis.set_label_coords(-0.02, 0.45)
 ax1.text(-10.0, 1450.0, '$U_t$')
 

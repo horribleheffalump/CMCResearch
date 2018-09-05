@@ -16,8 +16,8 @@ import pandas as pd
 from Points import * 
 from arrowed_spines import *
 
-#subfolder = 'NEWRENO/'
-subfolder = 'STATEBASED/'
+subfolder = 'NEWRENO/'
+#subfolder = 'STATEBASED/'
 interval = [0,205]
 
 #f = plt.figure(num=None, figsize=(10, 10), dpi=150, facecolor='w', edgecolor='k')
@@ -98,7 +98,7 @@ for i in range(0, 4):
     plots[i].plot(t_dcg, p_dcg[:,i], '-', color = 'black', linewidth = 1)
     plots[i].set_xticks([])
     plots[i].set_yticks([0,1])
-    plots[i].set_ylabel('$\hat{X}_t^' + str(i+1) +'$')
+    #plots[i].set_ylabel('$\hat{X}_t^' + str(i+1) +'$')
     plots[i].yaxis.set_label_coords(-0.015,0.5)
     #plots[i].set_axis_off()
     #plots[i].axes.xaxis.set_visible(False)
@@ -123,10 +123,10 @@ xticks = [0, 100, 200]
 xlabels = ['0', '', '200']
 ax4.set_xticks(xticks);
 ax4.set_xticklabels(xlabels);
-ax4.set_xlabel('время, с')
+ax4.set_xlabel('Время, с')
 ax4.xaxis.set_label_coords(0.5,-0.4)
 ax4.text(208, -2.4, '$t$')
-ax4.text(-23, 28, 'Оценки фильтрации', rotation= 90)
+ax4.text(-23, 34, 'Оценки фильтрации $\\hat{X}_t^1, \\hat{X}_t^2, \\hat{X}_t^3, \\hat{X}_t^4$', rotation= 90)
 
 
 #ax4.set_axis_off()
