@@ -51,7 +51,7 @@ namespace CMC
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
             string piString = pi.ToRowMatrix().ToMatrixString(null, provider).Trim().Replace("  "," ");
-            string result = string.Format(provider, "{0} {1} {2}", t, piString, string.Join(" ", p.Select(e => e.ToString(provider))));
+            string result = string.Format(provider, "{0} {1} {2}", t, piString, p == null ? "" : string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 
@@ -74,7 +74,7 @@ namespace CMC
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1} {2}", t, x, string.Join(" ", p.Select(e => e.ToString(provider))));
+            string result = string.Format(provider, "{0} {1} {2}", t, x, p == null ? "" : string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 
@@ -97,7 +97,7 @@ namespace CMC
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1} {2}", t, u, string.Join(" ", p.Select(e => e.ToString(provider))));
+            string result = string.Format(provider, "{0} {1} {2}", t, u, p == null ? "" : string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 
@@ -121,7 +121,7 @@ namespace CMC
         {
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
-            string result = string.Format(provider, "{0} {1} {2}", t, val, string.Join(" ", p.Select(e => e.ToString(provider))));
+            string result = string.Format(provider, "{0} {1} {2}", t, val, p == null ? "" : string.Join(" ", p.Select(e => e.ToString(provider))));
             return result;
         }
 

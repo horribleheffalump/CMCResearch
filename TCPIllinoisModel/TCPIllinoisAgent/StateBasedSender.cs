@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace TCPAgent
 {
     public class StateBasedSender : TCPSender
@@ -40,6 +41,21 @@ namespace TCPAgent
             T_min = double.NaN;
             T_max = double.NaN;
         }
+        public StateBasedSender(double _rawrtt, double _gamma, double alpha_min, double alpha_max, double beta_min, double beta_max, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
+        {
+            //h = _h;
+            this.alpha_max = alpha_max;
+            this.alpha_min = alpha_min;
+            this.beta_max = beta_max;
+            this.beta_min = beta_min;
+
+            alphas = Extensions.Vector(alpha_max, alpha_min, alpha_min, alpha_min);
+            betas = Extensions.Vector(beta_min, beta_min, beta_min, beta_max);
+
+            T_min = double.NaN;
+            T_max = double.NaN;
+        }
+        
 
         public double Step(double h, int dh, int dl, double rawrtt, Vector<double> p)
         {

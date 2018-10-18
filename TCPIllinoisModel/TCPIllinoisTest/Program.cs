@@ -12,6 +12,7 @@ using CMC;
 using PythonInteract;
 using CMC.Filters;
 using SystemJointObs;
+using MathNet.Numerics.Distributions;
 
 namespace TCPIllinoisTest
 {
@@ -105,21 +106,36 @@ namespace TCPIllinoisTest
             {
 
                 FilterType[] filters = null;
+                //filters = new FilterType[] { FilterType.DiscreteContinuousGaussian, FilterType.Discrete };
+
+                if (protocol == "STATEBASED" || protocol == "STATEBASED_RAND")
+                    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian }; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
  
-                filters = new FilterType[] { FilterType.DiscreteContinuousGaussian, FilterType.Discrete };
-
-                //if (protocol == "STATEBASED")
-                //    filters = new FilterType[] { FilterType.DiscreteContinuousGaussian }; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
-
-                TCPChannel channel = new CMCChannel(t0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, true);
+                TCPChannel channel = new CMCChannel(0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, false); // set last param to false for no simult jumps
                 TCPSender sender;
 
+
+                //double alpha_max = Math.Abs(new Normal(10.0, 1.0).Sample());
+                //double alpha_min = Math.Abs(new Normal(0.1, 0.1).Sample());
+                //double beta_max = Math.Abs(new Normal(0.5, 0.1).Sample());
+                //double beta_min = Math.Abs(new Normal(0.125, 0.1).Sample());
+
+                //double alpha_max = new ContinuousUniform(0.0, 10.0).Sample();
+                //double alpha_min = new ContinuousUniform(0.0, alpha_max).Sample();
+                //double beta_max = new ContinuousUniform(0.0, 1.0).Sample();
+                //double beta_min = new ContinuousUniform(0.0, beta_max).Sample();
+
+                double alpha_max = new ContinuousUniform(10.0, 20.0).Sample();
+                double alpha_min = new ContinuousUniform(0.0, 0.5).Sample();
+                double beta_max = new ContinuousUniform(0.0, 0.5).Sample();
+                double beta_min = new ContinuousUniform(0.0, 0.2).Sample();
 
                 switch (protocol)
                 {
                     case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery); break;
                     case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery); break;
                     case "STATEBASED": sender = new StateBasedSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                    case "STATEBASED_RAND": sender = new StateBasedSender(channel.RTT0, exponential_smooth, alpha_min, alpha_max, beta_min, beta_max, saveEvery); break;
                     case "CUBIC": sender = new CUBICTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
                     default: sender = null; break;
 
@@ -132,7 +148,7 @@ namespace TCPIllinoisTest
                 for (double t = t0; t <= T; t += h)
                 {
                     (int loss, int timeout, double rtt) = channel.Step(sender.W);
-                    if (protocol == "STATEBASED")
+                    if (protocol == "STATEBASED" || protocol == "STATEBASED_RAND")
                     {
                         (sender as StateBasedSender).Step(h, loss, timeout, rtt, (channel as CMCChannel).JOS.Filters[FilterType.DiscreteContinuousGaussian].pi);
                     }
@@ -149,11 +165,18 @@ namespace TCPIllinoisTest
                     }
                 }
 
-
                 string folderName = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol);
-                channel.SaveAll(folderName);
+                if (protocol == "STATEBASED_RAND")
+                {
+                    folderName = folderName + $"_{alpha_min}_{alpha_max}_{beta_min}_{beta_max}";
+                }
+                if (!Directory.Exists(folderName))
+                {
+                    Directory.CreateDirectory(folderName);
+                }
+                string controlpath = Path.Combine(Environment.CurrentDirectory, folderName + "\\control.txt");
 
-                string controlpath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol + "\\control.txt");
+                channel.SaveAll(folderName);
                 sender.SaveTrajectory(controlpath);
             }
 

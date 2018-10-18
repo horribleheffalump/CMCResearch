@@ -252,3 +252,5 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+/TCPIllinoisModel/out_for_JCSS
+/TCPIllinoisModel/out_gaussian
