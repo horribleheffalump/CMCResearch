@@ -254,3 +254,4 @@ paket-files/
 *.sln.iml
 /TCPIllinoisModel/out_for_JCSS
 /TCPIllinoisModel/out_gaussian
+/TCPIllinoisModel/out_uniform

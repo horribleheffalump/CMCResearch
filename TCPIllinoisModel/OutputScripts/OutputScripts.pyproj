@@ -67,7 +67,7 @@
     <Compile Include="nu.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="performance.py">
+    <Compile Include="VSPU\performance_vspu.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Points.py">
@@ -97,6 +97,7 @@
     <Compile Include="test.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="performance.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda36-64" />
@@ -105,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="JCSSIpics\" />
+    <Folder Include="VSPU\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

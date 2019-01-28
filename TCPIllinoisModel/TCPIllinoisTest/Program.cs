@@ -13,18 +13,55 @@ using PythonInteract;
 using CMC.Filters;
 using SystemJointObs;
 using MathNet.Numerics.Distributions;
+using CommandLine;
 
 namespace TCPIllinoisTest
 {
     class Program
     {
+        public class Options
+        {
+            [Option('p', "protocol", Required = true, HelpText = "Protocol name, one of ILLINOIS, NEWRENO, STATEBASED, STATEBASED_RAND, CUBIC")]
+            public string Protocol { get; set; }
+
+            [Option('T', "upper-bound", Required = true, HelpText = "The upper bound of the observation interval")]
+            public double T { get; set; }
+
+            [Option("save-every", Required = false, Default = 100, HelpText = "How often the sample path should be saved")]
+            public int saveEvery { get; set; }
+
+            [Option("amax", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the upper bound of additive increase parameter")]
+            public double amax { get; set; }
+
+            [Option("amin", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the lower bound of additive increase parameter")]
+            public double amin { get; set; }
+
+            [Option("alim", Required = false, HelpText = "For STATEBASED_RAND protocol defines the distance from the average for the randomly generated bounds of additive increase parameter")]
+            public double alim { get; set; }
+
+            [Option("bmax", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the upper bound of multiplicative decrease parameter")]
+            public double bmax { get; set; }
+
+            [Option("bmin", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the lower bound of multiplicative decrease  parameter")]
+            public double bmin { get; set; }
+
+            [Option("blim", Required = false, HelpText = "For STATEBASED_RAND protocol defines the distance from the average for the randomly generated bounds of multiplicative decrease parameter")]
+            public double blim { get; set; }
+
+
+
+        }
+
         static void Main(string[] args)
+        {
+            CommandLine.Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(opts => Run(opts, args));
+        }
+        static void Run(Options o, string[] args)
         {
             double h = 1e-4;
             double h_write = 1e-0;
             double t0 = 0.0;
-            double T = 200.0;
-            int saveEvery = 100;
+
             double exponential_smooth = 0.9999;
             //double exponential_smooth = 0.99;
 
@@ -76,25 +113,8 @@ namespace TCPIllinoisTest
             //sender_sb.SaveTrajectory(controlpath_sb);
 
 
-            string protocol = "CUBIC";
-            try
-            {
-                protocol = args[0];
-                try
-                {
-                    double t_args = double.Parse(args[1]); T = t_args;
-                }
-                catch { }
-                try
-                {
-                    int saveevery_args = int.Parse(args[2]); saveEvery = saveevery_args;
-                }
-                catch { }
 
-            }
-            catch { }
-
-            if (protocol == "stats")
+            if (o.Protocol == "stats")
             {
                 string response = Python.RunScript(
                                     Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\OutputScripts\\", "performance.py"),
@@ -108,10 +128,10 @@ namespace TCPIllinoisTest
                 FilterType[] filters = null;
                 //filters = new FilterType[] { FilterType.DiscreteContinuousGaussian, FilterType.Discrete };
 
-                if (protocol == "STATEBASED" || protocol == "STATEBASED_RAND")
+                if (o.Protocol == "STATEBASED" || o.Protocol == "STATEBASED_RAND")
                     filters = new FilterType[] { FilterType.DiscreteContinuousGaussian }; // , FilterType.DiscreteIndependent, FilterType.Discrete, FilterType.Dummy 
- 
-                TCPChannel channel = new CMCChannel(0, T, h, saveEvery, true, filters, RTTSimulationMode.AsRenewal, false); // set last param to false for no simult jumps
+
+                TCPChannel channel = new CMCChannel(0, o.T, h, o.saveEvery, true, filters, RTTSimulationMode.AsRenewal, false); // set last param to false for no simult jumps
                 TCPSender sender;
 
 
@@ -125,18 +145,23 @@ namespace TCPIllinoisTest
                 //double beta_max = new ContinuousUniform(0.0, 1.0).Sample();
                 //double beta_min = new ContinuousUniform(0.0, beta_max).Sample();
 
-                double alpha_max = new ContinuousUniform(10.0, 20.0).Sample();
-                double alpha_min = new ContinuousUniform(0.0, 0.5).Sample();
-                double beta_max = new ContinuousUniform(0.0, 0.5).Sample();
-                double beta_min = new ContinuousUniform(0.0, 0.2).Sample();
+                double alpha_max = new ContinuousUniform(o.amax - o.alim, o.amax + o.alim).Sample();
+                double alpha_min = new ContinuousUniform(o.amin - o.alim, o.amin + o.alim).Sample();
+                double beta_max = new ContinuousUniform(o.bmax - o.blim, o.bmax + o.blim).Sample();
+                double beta_min = new ContinuousUniform(o.bmin - o.blim, o.bmin + o.blim).Sample();
 
-                switch (protocol)
+                if (alpha_max < 0) alpha_max = o.amax;
+                if (alpha_min < 0) alpha_min = o.amin;
+                if (beta_max < 0) beta_max = o.bmax;
+                if (beta_min < 0) beta_min = o.bmin;
+
+                switch (o.Protocol)
                 {
-                    case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                    case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                    case "STATEBASED": sender = new StateBasedSender(channel.RTT0, exponential_smooth, saveEvery); break;
-                    case "STATEBASED_RAND": sender = new StateBasedSender(channel.RTT0, exponential_smooth, alpha_min, alpha_max, beta_min, beta_max, saveEvery); break;
-                    case "CUBIC": sender = new CUBICTCPSender(channel.RTT0, exponential_smooth, saveEvery); break;
+                    case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
+                    case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
+                    case "STATEBASED": sender = new StateBasedSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
+                    case "STATEBASED_RAND": sender = new StateBasedSender(channel.RTT0, exponential_smooth, alpha_min, alpha_max, beta_min, beta_max, o.saveEvery); break;
+                    case "CUBIC": sender = new CUBICTCPSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
                     default: sender = null; break;
 
                 }
@@ -145,10 +170,10 @@ namespace TCPIllinoisTest
                 DateTime start = DateTime.Now;
                 sender.W = 1300;
                 //sender.W = 10;
-                for (double t = t0; t <= T; t += h)
+                for (double t = t0; t <= o.T; t += h)
                 {
                     (int loss, int timeout, double rtt) = channel.Step(sender.W);
-                    if (protocol == "STATEBASED" || protocol == "STATEBASED_RAND")
+                    if (o.Protocol == "STATEBASED" || o.Protocol == "STATEBASED_RAND")
                     {
                         (sender as StateBasedSender).Step(h, loss, timeout, rtt, (channel as CMCChannel).JOS.Filters[FilterType.DiscreteContinuousGaussian].pi);
                     }
@@ -160,13 +185,13 @@ namespace TCPIllinoisTest
                         if (t > 0)
                         {
                             var elapsed = DateTime.Now - start;
-                            Console.WriteLine($"{t.ToString("F3")}\t elapsed: {elapsed}\t estimated finish time: {DateTime.Now + TimeSpan.FromTicks((long)(elapsed.Ticks * (T - t) / (t)))}");
+                            Console.WriteLine($"{t.ToString("F3")}\t elapsed: {elapsed}\t estimated finish time: {DateTime.Now + TimeSpan.FromTicks((long)(elapsed.Ticks * (o.T - t) / (t)))}");
                         }
                     }
                 }
 
-                string folderName = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + protocol);
-                if (protocol == "STATEBASED_RAND")
+                string folderName = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + o.Protocol);
+                if (o.Protocol == "STATEBASED_RAND")
                 {
                     folderName = folderName + $"_{alpha_min}_{alpha_max}_{beta_min}_{beta_max}";
                 }

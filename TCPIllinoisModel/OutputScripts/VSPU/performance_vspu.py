@@ -3,7 +3,6 @@ import sys
 import glob
 import os
 import matplotlib.pyplot as plt
-import numpy as np
 
 from matplotlib import rc
 rc('font',**{'family':'serif'})
@@ -12,33 +11,6 @@ rc('text.latex',unicode=True)
 rc('text.latex',preamble=r'\usepackage[T2A]{fontenc}')
 rc('text.latex',preamble=r'\usepackage[utf8]{inputenc}')
 rc('text.latex',preamble=r'\usepackage[russian]{babel}')
-
-
-def is_pareto_efficient(costs, return_mask = True):
-    """
-    Find the pareto-efficient points
-    :param costs: An (n_points, n_costs) array
-    :param return_mask: True to return a mask
-    :return: An array of indices of pareto-efficient points.
-        If return_mask is True, this will be an (n_points, ) boolean array
-        Otherwise it will be a (n_efficient_points, ) integer array of indices.
-    """
-    is_efficient = np.arange(costs.shape[0])
-    n_points = costs.shape[0]
-    next_point_index = 0  # Next index in the is_efficient array to search for
-    while next_point_index<len(costs):
-        nondominated_point_mask = np.any(costs<costs[next_point_index], axis=1)
-        nondominated_point_mask[next_point_index] = True
-        is_efficient = is_efficient[nondominated_point_mask]  # Remove dominated points
-        costs = costs[nondominated_point_mask]
-        next_point_index = np.sum(nondominated_point_mask[:next_point_index])+1
-    if return_mask:
-        is_efficient_mask = np.zeros(n_points, dtype = bool)
-        is_efficient_mask[is_efficient] = True
-        return is_efficient_mask
-    else:
-        return is_efficient
-
 
 #from matplotlib import gridspec
 
@@ -125,13 +97,6 @@ X = df.loc['Mean_Throughput']
 Y = df.loc['Loss'] / df.loc['TotalTime']
 note = df.loc['alpha_min'].map("{:.2f}".format) + ',' + df.loc['alpha_max'].map("{:.2f}".format) + ';' + df.loc['beta_min'].map("{:.2f}".format) + ',' + df.loc['beta_max'].map("{:.2f}".format)
 
-XY = np.transpose(np.vstack([-X.values,Y.values]))
-fr = is_pareto_efficient(XY)
-m = X>60
-fr = fr & m
-
-
-
 #print(note)
 
 
@@ -142,8 +107,6 @@ ax = f.add_subplot(111)
 ax.scatter(X,Y, c='black', s=1, label='TCP NewReno модифицированный')
 ax.scatter(X['ILLINOIS'],Y['ILLINOIS'],c='red', label='TCP Illinois')
 ax.scatter(X['NEWRENO'],Y['NEWRENO'],c='green', label='TCP NewReno')
-
-ax.scatter(X[fr],Y[fr], c='orange', s=3, label='TCP NewReno модифицированный')
 
 ax.set_xlim(20,80)
 ax.set_ylim(0,4)
