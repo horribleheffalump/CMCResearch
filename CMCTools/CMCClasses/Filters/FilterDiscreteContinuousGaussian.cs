@@ -143,9 +143,9 @@ namespace CMC.Filters
                     pi = old_pi;
                     //Console.WriteLine("alles!");
 
-            if (dz.HasValue)
-                ForceSave(savearray);
-            else
+            //if (dz.HasValue)
+            //    ForceSave(savearray);
+            //else
                 Save();
             return pi;
         }

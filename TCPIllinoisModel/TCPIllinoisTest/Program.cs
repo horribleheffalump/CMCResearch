@@ -27,7 +27,13 @@ namespace TCPIllinoisTest
             [Option('T', "upper-bound", Required = true, HelpText = "The upper bound of the observation interval")]
             public double T { get; set; }
 
-            [Option("save-every", Required = false, Default = 100, HelpText = "How often the sample path should be saved")]
+            [Option('h', "step", Required = false, Default =1e-3, HelpText = "Discretization step")]
+            public double h { get; set; }
+
+            [Option("inform-period", Required = false, Default= 1e0, HelpText = "Write to console period")]
+            public double h_write { get; set; }
+
+            [Option("save-every", Required = false, Default = 1000, HelpText = "How often the sample path should be saved")]
             public int saveEvery { get; set; }
 
             [Option("amax", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the upper bound of additive increase parameter")]
@@ -48,6 +54,11 @@ namespace TCPIllinoisTest
             [Option("blim", Required = false, HelpText = "For STATEBASED_RAND protocol defines the distance from the average for the randomly generated bounds of multiplicative decrease parameter")]
             public double blim { get; set; }
 
+            [Option('o', "output-folder", Required = false, HelpText = "Folder to store the results")]
+            public string OutputFolder { get; set; }
+
+            [Option('f', "output-file", Required = false, HelpText = "File to store the main results. If set, it is the only output.")]
+            public string OutputFile { get; set; }
 
 
         }
@@ -58,8 +69,11 @@ namespace TCPIllinoisTest
         }
         static void Run(Options o, string[] args)
         {
-            double h = 1e-4;
-            double h_write = 1e-0;
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+
+            double h = o.h;
+            double h_write = o.h_write;
             double t0 = 0.0;
 
             double exponential_smooth = 0.9999;
@@ -185,24 +199,32 @@ namespace TCPIllinoisTest
                         if (t > 0)
                         {
                             var elapsed = DateTime.Now - start;
-                            Console.WriteLine($"{t.ToString("F3")}\t elapsed: {elapsed}\t estimated finish time: {DateTime.Now + TimeSpan.FromTicks((long)(elapsed.Ticks * (o.T - t) / (t)))}");
+                            Console.WriteLine($"{t.ToString("F3")}\t elapsed: {elapsed}\t estimated finish time: {DateTime.Now + TimeSpan.FromTicks((long)(elapsed.Ticks * (o.T - t) / t))}");
                         }
                     }
                 }
 
-                string folderName = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\out\\" + o.Protocol);
+                string folderName = Path.Combine(Environment.CurrentDirectory, o.OutputFolder + "\\" + o.Protocol);
                 if (o.Protocol == "STATEBASED_RAND")
                 {
                     folderName = folderName + $"_{alpha_min}_{alpha_max}_{beta_min}_{beta_max}";
                 }
+                folderName = folderName + $"_{Guid.NewGuid()}";
                 if (!Directory.Exists(folderName))
                 {
                     Directory.CreateDirectory(folderName);
                 }
                 string controlpath = Path.Combine(Environment.CurrentDirectory, folderName + "\\control.txt");
 
-                channel.SaveAll(folderName);
-                sender.SaveTrajectory(controlpath);
+                if (string.IsNullOrEmpty(o.OutputFile))
+                {
+                    channel.SaveAll(folderName);
+                    sender.SaveTrajectory(controlpath);
+                }
+                else
+                {
+                    channel.SaveMain(o.OutputFile, new string[] { "protocol", "alpha_min", "alpha_max", "beta_min", "beta_max" }, new string[] { o.Protocol, alpha_min.ToString(provider), alpha_max.ToString(provider), beta_min.ToString(provider), beta_max.ToString(provider) });
+                }
             }
 
         }

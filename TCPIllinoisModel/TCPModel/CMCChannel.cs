@@ -8,6 +8,7 @@ using CMC;
 using SystemJointObs;
 using MathNet.Numerics.Distributions;
 using System.Globalization;
+using System.IO;
 
 namespace Channel
 {
@@ -129,12 +130,12 @@ namespace Channel
                 FilterCriterions = new Dictionary<FilterType, Criterion>();
                 Criterions = new Dictionary<string, Criterion>();
 
-                if (JOS.Filters != null)
-                    foreach (var f in JOS.Filters)
-                        FilterCriterions.Add(f.Key, new Criterion(_h, (t, X, pi, u, Obs, p) =>
-                        {
-                            return (X - pi).L2Norm();
-                        }, _saveEvery));
+                //if (JOS.Filters != null)
+                //    foreach (var f in JOS.Filters)
+                //        FilterCriterions.Add(f.Key, new Criterion(_h, (t, X, pi, u, Obs, p) =>
+                //        {
+                //            return (X - pi).L2Norm();
+                //        }, _saveEvery));
 
                 Criterions.Add("Throughput", new Criterion(_h, (t, X, pi, u, Obs, p) =>
                 {
@@ -301,6 +302,34 @@ namespace Channel
             string criterionpath = folderName + "\\crit_{name}.txt";
             string terminalcriterionpath = folderName + "\\crit_T_{name}.txt";
             SaveCriterions(criterionpath, terminalcriterionpath);
+
+        }
+
+        public override void SaveMain(string fileName, string[] addHead, string[] addVals)
+        {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+
+            if (TerminalCriterions != null)
+            {
+                bool needhead = !File.Exists(fileName);
+                using (System.IO.StreamWriter outputfile = new System.IO.StreamWriter(fileName, true))
+                {
+                    if (needhead)
+                    {
+                        outputfile.Write(string.Join(" ", TerminalCriterions.Select(c => c.Key)));
+                        outputfile.Write(" ");
+                        outputfile.Write(string.Join(" ", addHead));
+                        outputfile.WriteLine();
+                    }
+
+                    outputfile.Write(string.Join(" ", TerminalCriterions.Select(c => c.Value().ToString(provider))));
+                    outputfile.Write(" ");
+                    outputfile.Write(string.Join(" ", addVals));
+                    outputfile.WriteLine();
+                    outputfile.Close();
+                }
+            }
 
         }
 

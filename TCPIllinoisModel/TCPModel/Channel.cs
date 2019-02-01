@@ -31,5 +31,8 @@ namespace Channel
         public abstract (int loss, int timeout, double rtt) Step(double u);
 
         public abstract void SaveAll(string folderName);
+
+        public abstract void SaveMain(string fileName, string[] addHead, string[] addVals);
+
     }
 }

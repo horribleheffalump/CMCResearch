@@ -69,5 +69,10 @@ namespace Channel
         {
             // TODO: save all for SimpleChannel
         }
+
+        public override void SaveMain(string fileName, string[] addHead, string[] addVals)
+        {
+            // TODO: save for SimpleChannel
+        }
     }
 }
