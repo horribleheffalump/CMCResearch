@@ -95,16 +95,33 @@ def get_df(folders):
 #X2 = df.loc['Mean_Throughput']
 #Y2 = df.loc['Loss'] / df.loc['TotalTime']
 
+file = "D:/projects.git/CMCResearch/TCPIllinoisModel/results.txt"
+df = pd.read_csv(file, header=0, delimiter = " ", dtype=str, engine='python') ## TODO: problem with unicode strings
+
+for c in df.columns:
+    if c == 'protocol':
+        df[[c]] = df[[c]].astype(str)
+    else:
+        df[[c]] = df[[c]].astype(float)
+
+Xnew = df['Mean_Throughput']
+Ynew = df['Loss'] / df['TotalTime']
+
 
 folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_mln"
 df = get_df([folder])
 Xsb = df.loc['Mean_Throughput']
 Ysb = df.loc['Loss'] / df.loc['TotalTime']
 
-folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_100000"
-df = get_df([folder])
-Xsb2 = df.loc['Mean_Throughput']
-Ysb2 = df.loc['Loss'] / df.loc['TotalTime']
+#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_100000"
+#df = get_df([folder])
+#Xsb2 = df.loc['Mean_Throughput']
+#Ysb2 = df.loc['Loss'] / df.loc['TotalTime']
+
+#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_10mln"
+#df = get_df([folder])
+#Xsb3 = df.loc['Mean_Throughput']
+#Ysb3 = df.loc['Loss'] / df.loc['TotalTime']
 
 
 folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_mln"
@@ -112,17 +129,15 @@ df = get_df([folder])
 Xil = df.loc['Mean_Throughput']
 Yil = df.loc['Loss'] / df.loc['TotalTime']
 
-folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_100000"
-df = get_df([folder])
-Xil2 = df.loc['Mean_Throughput']
-Yil2 = df.loc['Loss'] / df.loc['TotalTime']
+#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_100000"
+#df = get_df([folder])
+#Xil2 = df.loc['Mean_Throughput']
+#Yil2 = df.loc['Loss'] / df.loc['TotalTime']
 
-folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_10mln"
-df = get_df([folder])
-Xil3 = df.loc['Mean_Throughput']
-Yil3 = df.loc['Loss'] / df.loc['TotalTime']
-
-#print(note)
+#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_10mln"
+#df = get_df([folder])
+#Xil3 = df.loc['Mean_Throughput']
+#Yil3 = df.loc['Loss'] / df.loc['TotalTime']
 
 
 f = plt.figure(num=None, figsize=(5,3), dpi=200, facecolor='w', edgecolor='k')
@@ -135,17 +150,16 @@ ax = f.add_subplot(111)
 
 #ax.scatter(X[fr],Y[fr], c='orange', s=3, label='Pareto')
 
-ax.scatter(Xsb,Ysb,c='blue', s=1, label = 'Statebased')
-ax.scatter(Xsb2,Ysb2, c='cyan', s=1, label='Statebased 100000')
+#ax.scatter(Xsb2,Ysb2, c='green', s=1, label='Statebased 100000')
+ax.scatter(Xsb,Ysb,c='blue', s=1, label = 'Statebased mln')
+#ax.scatter(Xsb3,Ysb3, c='cyan', s=1, label='Statebased 10mln')
 
+#ax.scatter(Xil2,Yil2, c='orange', s=1, label='Illinois 100000')
 ax.scatter(Xil,Yil, c='red', s=1, label='Illinois mln')
-ax.scatter(Xil2,Yil2, c='orange', s=1, label='Illinois 100000')
-ax.scatter(Xil3,Yil3, c='magenta', s=1, label='Illinois 10mln')
+#ax.scatter(Xil3,Yil3, c='magenta', s=1, label='Illinois 10mln')
 
+ax.scatter(Xnew,Ynew, c='black', s=1, label='Statebased')
 
-
-#ax.set_xlim(20,80)
-#ax.set_ylim(0,4)
 
 plt.xlabel('Пропускная способность соединения')
 plt.ylabel('Потерь в секунду')
