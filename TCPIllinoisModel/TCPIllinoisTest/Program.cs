@@ -14,6 +14,7 @@ using CMC.Filters;
 using SystemJointObs;
 using MathNet.Numerics.Distributions;
 using CommandLine;
+using System.Text.RegularExpressions;
 
 namespace TCPIllinoisTest
 {
@@ -36,23 +37,17 @@ namespace TCPIllinoisTest
             [Option("save-every", Required = false, Default = 1000, HelpText = "How often the sample path should be saved")]
             public int saveEvery { get; set; }
 
-            [Option("amax", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the upper bound of additive increase parameter")]
-            public double amax { get; set; }
+            [Option("amax", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the upper bound of the additive increase parameter, e.g. 10.0, N(10,1), U(9.0, 10.0)")]
+            public string amax { get; set; }
 
-            [Option("amin", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the lower bound of additive increase parameter")]
-            public double amin { get; set; }
+            [Option("amin", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the lower bound of the additive increase parameter, e.g. 0.3, N(0.3,0.1), U(0, .5)")]
+            public string amin { get; set; }
 
-            [Option("alim", Required = false, HelpText = "For STATEBASED_RAND protocol defines the distance from the average for the randomly generated bounds of additive increase parameter")]
-            public double alim { get; set; }
+            [Option("bmax", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the upper bound of the multiplicative decrease parameter, e.g. 0.5, N(0.5,0.1), U(.4, .6)")]
+            public string bmax { get; set; }
 
-            [Option("bmax", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the upper bound of multiplicative decrease parameter")]
-            public double bmax { get; set; }
-
-            [Option("bmin", Required = false, HelpText = "For STATEBASED (STATEBASED_RAND) protocol defines (the average of) the lower bound of multiplicative decrease  parameter")]
-            public double bmin { get; set; }
-
-            [Option("blim", Required = false, HelpText = "For STATEBASED_RAND protocol defines the distance from the average for the randomly generated bounds of multiplicative decrease parameter")]
-            public double blim { get; set; }
+            [Option("bmin", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the lower bound of the multiplicative decrease parameter, e.g. 0.125, N(0.125,0.025), U(.0, .25)")]
+            public string bmin { get; set; }
 
             [Option('o', "output-folder", Required = false, HelpText = "Folder to store the results")]
             public string OutputFolder { get; set; }
@@ -159,15 +154,15 @@ namespace TCPIllinoisTest
                 //double beta_max = new ContinuousUniform(0.0, 1.0).Sample();
                 //double beta_min = new ContinuousUniform(0.0, beta_max).Sample();
 
-                double alpha_max = new ContinuousUniform(o.amax - o.alim, o.amax + o.alim).Sample();
-                double alpha_min = new ContinuousUniform(o.amin - o.alim, o.amin + o.alim).Sample();
-                double beta_max = new ContinuousUniform(o.bmax - o.blim, o.bmax + o.blim).Sample();
-                double beta_min = new ContinuousUniform(o.bmin - o.blim, o.bmin + o.blim).Sample();
+                double alpha_max = new ScalarDistribution(o.amax).Sample();
+                double alpha_min = new ScalarDistribution(o.amin).Sample();
+                double beta_max = new ScalarDistribution(o.bmax).Sample();
+                double beta_min = new ScalarDistribution(o.bmin).Sample();
 
-                if (alpha_max < 0) alpha_max = o.amax;
-                if (alpha_min < 0) alpha_min = o.amin;
-                if (beta_max < 0) beta_max = o.bmax;
-                if (beta_min < 0) beta_min = o.bmin;
+                if ((alpha_max < 0) || (alpha_min < 0) || (beta_max < 0) || (beta_min < 0) || (alpha_max < alpha_min) || (beta_max < beta_min))
+                {
+                    throw new ArgumentException($"Bad STATEBASED parameters: alpha_max = {alpha_max}, alpha_max = {alpha_min}, beta_max = {beta_max}, beta_min = {beta_min}");
+                }
 
                 switch (o.Protocol)
                 {
@@ -204,20 +199,24 @@ namespace TCPIllinoisTest
                     }
                 }
 
-                string folderName = Path.Combine(Environment.CurrentDirectory, o.OutputFolder + "\\" + o.Protocol);
-                if (o.Protocol == "STATEBASED_RAND")
-                {
-                    folderName = folderName + $"_{alpha_min}_{alpha_max}_{beta_min}_{beta_max}";
-                }
-                folderName = folderName + $"_{Guid.NewGuid()}";
-                if (!Directory.Exists(folderName))
-                {
-                    Directory.CreateDirectory(folderName);
-                }
-                string controlpath = Path.Combine(Environment.CurrentDirectory, folderName + "\\control.txt");
+
 
                 if (string.IsNullOrEmpty(o.OutputFile))
                 {
+                    string folderName = Path.Combine(Environment.CurrentDirectory, o.OutputFolder + "\\" + o.Protocol);
+                    if (o.Protocol == "STATEBASED_RAND")
+                    {
+                        folderName = folderName + $"_{alpha_min}_{alpha_max}_{beta_min}_{beta_max}";
+                    }
+                    folderName = folderName + $"_{Guid.NewGuid()}";
+
+                    string controlpath = Path.Combine(Environment.CurrentDirectory, folderName + "\\control.txt");
+
+                    if (!Directory.Exists(folderName))
+                    {
+                        Directory.CreateDirectory(folderName);
+                    }
+
                     channel.SaveAll(folderName);
                     sender.SaveTrajectory(controlpath);
                 }
@@ -227,6 +226,58 @@ namespace TCPIllinoisTest
                 }
             }
 
+        }
+    }
+
+    public class ScalarDistribution
+    {
+        private string pattern = "[NU][(](([0-9]*[.])?[0-9]+[, ]*){2,2}[)]";
+        private string floatpattern = "([0-9]*[.])?[0-9]+";
+        private IContinuousDistribution distr;
+        private double value;
+        private string error = "Input string should match one of the patterns: float, N(float, float) or U(float, float)";
+        bool isStochastic = true;
+        public ScalarDistribution(string str)
+        {
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+
+            if (double.TryParse(str, NumberStyles.AllowDecimalPoint, provider, out value))
+            {
+                isStochastic = false;
+            }
+            else
+            {
+                Regex regexFull = new Regex(pattern);
+                if (regexFull.IsMatch(str))
+                {
+                    Regex regexFloat = new Regex(floatpattern);
+                    var floats = regexFloat.Matches(str);
+                    var a = double.Parse(floats[0].Value, NumberStyles.AllowDecimalPoint, provider);
+                    var b = double.Parse(floats[1].Value, NumberStyles.AllowDecimalPoint, provider);
+                    switch (str[0])                        
+                    {
+                        case 'N': distr = new Normal(a, b); break;
+                        case 'U': distr = new ContinuousUniform(a, b); break;
+                        default: throw new ArgumentException(error);
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException(error);
+                }
+            }
+        }
+        public double Sample()
+        {
+            if (isStochastic)
+            {
+                return distr.Sample();
+            }
+            else
+            {
+                return value;
+            }
         }
     }
 }
