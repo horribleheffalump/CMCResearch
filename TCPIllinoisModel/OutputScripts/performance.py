@@ -74,12 +74,18 @@ def get_df(folders):
             dfp = dfp.set_index('Crit')
             dataframes_protocols.append(dfp)
     df = pd.concat(dataframes_protocols, axis=1)
-    return df
+    return df.transpose()
 
-#folder1 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_uniform"
-#folder2 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_gaussian"
+folder1 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_uniform"
+folder2 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_gaussian"
 
-#df = get_df([folder1,folder2])
+df = get_df([folder1,folder2])
+
+ddd = df[df['Mean_Throughput'] > 70][['Mean_Throughput', 'Loss', 'alpha_min', 'alpha_max',  'beta_min', 'beta_max']]
+ddd['Loss'] = ddd['Loss'] / 100000
+ddd = ddd[ddd['Loss'] < 2.0]
+ddd = ddd.set_index('Mean_Throughput')
+ddd = ddd.sort_values('Mean_Throughput')
 
 #X = df.loc['Mean_Throughput']
 #Y = df.loc['Loss'] / df.loc['TotalTime']
@@ -95,8 +101,15 @@ def get_df(folders):
 #X2 = df.loc['Mean_Throughput']
 #Y2 = df.loc['Loss'] / df.loc['TotalTime']
 
-file = "D:/projects.git/CMCResearch/TCPIllinoisModel/results.txt"
-df = pd.read_csv(file, header=0, delimiter = " ", dtype=str, engine='python') ## TODO: problem with unicode strings
+folder = 'D:/projects.git/CMCResearch/TCPIllinoisModel/'
+
+files = ["results_my.txt", "results_b.txt", "results_ext_g5500-4.txt", "results_ext_g5500-8.txt", "results_ext_power2.txt"]
+dfs = []
+for f in files:
+    d = pd.read_csv(os.path.join(folder, f), header=0, delimiter = " ", dtype=str, engine='python') ## TODO: problem with unicode strings
+    dfs.append(d)
+
+df = pd.concat(dfs, axis=0)
 
 for c in df.columns:
     if c == 'protocol':

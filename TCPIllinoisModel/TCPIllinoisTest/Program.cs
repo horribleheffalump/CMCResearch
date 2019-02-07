@@ -147,14 +147,23 @@ namespace TCPIllinoisTest
                 //double beta_max = new ContinuousUniform(0.0, 1.0).Sample();
                 //double beta_min = new ContinuousUniform(0.0, beta_max).Sample();
 
-                double alpha_max = new ScalarDistribution(o.amax).Sample();
-                double alpha_min = new ScalarDistribution(o.amin).Sample();
-                double beta_max = new ScalarDistribution(o.bmax).Sample();
-                double beta_min = new ScalarDistribution(o.bmin).Sample();
+                double alpha_max = double.MinValue;
+                double alpha_min = double.MinValue;
+                double beta_max = double.MinValue;
+                double beta_min = double.MinValue;
+                int trycount = 100;
 
-                if ((alpha_max < 0) || (alpha_min < 0) || (beta_max < 0) || (beta_min < 0) || (alpha_max < alpha_min) || (beta_max < beta_min))
+                while (((alpha_max < 0) || (alpha_min < 0) || (beta_max < 0) || (beta_min < 0) || (alpha_max < alpha_min) || (beta_max < beta_min)) && trycount > 0)
                 {
-                    throw new ArgumentException($"Bad STATEBASED parameters: alpha_max = {alpha_max}, alpha_max = {alpha_min}, beta_max = {beta_max}, beta_min = {beta_min}");
+                    alpha_max = new ScalarDistribution(o.amax).Sample();
+                    alpha_min = new ScalarDistribution(o.amin).Sample();
+                    beta_max = new ScalarDistribution(o.bmax).Sample();
+                    beta_min = new ScalarDistribution(o.bmin).Sample();
+                    trycount--;
+                }
+                if (trycount == 0)
+                {
+                    throw new ArgumentException($"Could not generate appropriate STATEBASED parameters");
                 }
 
                 switch (o.Protocol)
