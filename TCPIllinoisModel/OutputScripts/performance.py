@@ -76,16 +76,16 @@ def get_df(folders):
     df = pd.concat(dataframes_protocols, axis=1)
     return df.transpose()
 
-folder1 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_uniform"
-folder2 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_gaussian"
+#folder1 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_uniform"
+#folder2 = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_gaussian"
 
-df = get_df([folder1,folder2])
+#df = get_df([folder1,folder2])
 
-ddd = df[df['Mean_Throughput'] > 70][['Mean_Throughput', 'Loss', 'alpha_min', 'alpha_max',  'beta_min', 'beta_max']]
-ddd['Loss'] = ddd['Loss'] / 100000
-ddd = ddd[ddd['Loss'] < 2.0]
-ddd = ddd.set_index('Mean_Throughput')
-ddd = ddd.sort_values('Mean_Throughput')
+#ddd = df[df['Mean_Throughput'] > 70][['Mean_Throughput', 'Loss', 'alpha_min', 'alpha_max',  'beta_min', 'beta_max']]
+#ddd['Loss'] = ddd['Loss'] / 1000000
+#ddd = ddd[ddd['Loss'] < 2.0]
+#ddd = ddd.set_index('Mean_Throughput')
+#ddd = ddd.sort_values('Mean_Throughput')
 
 #X = df.loc['Mean_Throughput']
 #Y = df.loc['Loss'] / df.loc['TotalTime']
@@ -101,9 +101,8 @@ ddd = ddd.sort_values('Mean_Throughput')
 #X2 = df.loc['Mean_Throughput']
 #Y2 = df.loc['Loss'] / df.loc['TotalTime']
 
-folder = 'D:/projects.git/CMCResearch/TCPIllinoisModel/'
-
-files = ["results_my.txt", "results_b.txt", "results_ext_g5500-4.txt", "results_ext_g5500-8.txt", "results_ext_power2.txt"]
+folder = 'D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/'
+files = glob.glob(os.path.join(folder, '*'))
 dfs = []
 for f in files:
     d = pd.read_csv(os.path.join(folder, f), header=0, delimiter = " ", dtype=str, engine='python') ## TODO: problem with unicode strings
@@ -123,8 +122,8 @@ Ynew = df['Loss'] / df['TotalTime']
 
 folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_mln"
 df = get_df([folder])
-Xsb = df.loc['Mean_Throughput']
-Ysb = df.loc['Loss'] / df.loc['TotalTime']
+Xsb = df['Mean_Throughput']
+Ysb = df['Loss'] / df['TotalTime']
 
 #folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_100000"
 #df = get_df([folder])
@@ -139,8 +138,8 @@ Ysb = df.loc['Loss'] / df.loc['TotalTime']
 
 folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_mln"
 df = get_df([folder])
-Xil = df.loc['Mean_Throughput']
-Yil = df.loc['Loss'] / df.loc['TotalTime']
+Xil = df['Mean_Throughput']
+Yil = df['Loss'] / df['TotalTime']
 
 #folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_100000"
 #df = get_df([folder])
@@ -178,7 +177,11 @@ plt.xlabel('Пропускная способность соединения')
 plt.ylabel('Потерь в секунду')
 #for i, txt in enumerate(note):
 #    ax.annotate(txt, (X[i], Y[i]))
+ax.set_ylim(0,2)
+#ax.set_xlim(65,75)
+
 plt.legend()
 plt.show()
 #print(df)
 #df.to_csv(os.path.join(folder, outfilename))
+

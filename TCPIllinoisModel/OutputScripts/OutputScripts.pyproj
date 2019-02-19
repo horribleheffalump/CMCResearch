@@ -28,6 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="alpha_beta.py" />
+    <Compile Include="CDCpics\control.py" />
+    <Compile Include="CDCpics\simple_control.py" />
     <Compile Include="contobs.py">
       <SubType>Code</SubType>
     </Compile>
@@ -106,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="JCSSIpics\" />
+    <Folder Include="CDCpics\" />
     <Folder Include="VSPU\" />
   </ItemGroup>
   <PropertyGroup>
