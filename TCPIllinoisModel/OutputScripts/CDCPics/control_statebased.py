@@ -13,7 +13,7 @@ rc('text.latex',preamble=r'\usepackage{amssymb}')
 import pylab
 import pandas as pd
 from Points import *
-from arrowed_spines import *
+#from arrowed_spines import *
 
 folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/STATEBASED_7506535c-a6b8-41db-9b8d-8b99a8e1aa43/"
 interval = [0,180]
@@ -67,7 +67,7 @@ dlpoints = Points(t_dl, dl)
 dlpoints.toones()
 
 
-ax1.plot(t, rtt, '-', color = 'black', linewidth=1.0)
+ax1.plot(t, rtt, '-', color = 'red', alpha = 0.6, linewidth=1.5)
 ax1.set_xticks([]);
 
 ax1p = ax1.twinx()
@@ -109,7 +109,7 @@ ax1.plot(dhpoints.x, dhpoints.y*levelevents, 'v', color = 'black', markersize=3,
 ax1.plot(dlpoints.x, dlpoints.y*levelevents, 'x', color = 'red', label = 'Time-outs')
 
 
-ax2.plot(t, u, '-', color = 'black', linewidth = 1.0)
+ax2.plot(t, u, '-', color = 'black', linewidth = 1.5)
 
 ax2p = ax2.twinx()
 ax2p.stackplot(t_dcg,  p_dcg[:,0],  p_dcg[:,1],  p_dcg[:,2],  p_dcg[:,3], colors=['white', 'green', 'red', 'black'], alpha=0.3)
@@ -134,9 +134,9 @@ xticks = [0, 60, 120, 180]
 xlabels = ['0', '1 min', '2 min', '3 min']
 
 ax2.set_xticks(xticks);
-#ax1.set_yticks([]);
+ax1.set_yticks([]);
 ax2.set_xticklabels(xlabels);
-#ax2.text(188, -20, '$t$')
+ax2.text(188, -20, '$t$')
 
 yticks2 = [0, 1250, 1350]
 ylabels2 = ['0','$B$', "$B+W''$"]

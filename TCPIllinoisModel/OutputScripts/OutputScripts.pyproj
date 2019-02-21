@@ -28,7 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="alpha_beta.py" />
-    <Compile Include="CDCpics\control.py" />
+    <Compile Include="CDCpics\control_illinois.py" />
+    <Compile Include="CDCpics\control_statebased.py" />
     <Compile Include="CDCpics\performance.py" />
     <Compile Include="CDCpics\simple_control.py" />
     <Compile Include="contobs.py">

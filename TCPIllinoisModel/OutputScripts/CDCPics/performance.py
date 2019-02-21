@@ -131,8 +131,8 @@ Xil = df['Mean_Throughput'].mean()
 Yil = (df['Loss'] / df['TotalTime']).mean()
 
 
-f = plt.figure(num=None, figsize=(5,3), dpi=200, facecolor='w', edgecolor='k')
-plt.subplots_adjust(left=0.10, bottom=0.15, right=0.98, top=0.97)
+f = plt.figure(num=None, figsize=(5,2.5), dpi=150, facecolor='w', edgecolor='k')
+plt.subplots_adjust(left=0.10, bottom=0.17, right=0.98, top=0.97)
 f.tight_layout()
 ax = f.add_subplot(111)
 #ax.scatter(X,Y, c='black', s=1, label='TCP NewReno модифицированный')
@@ -143,7 +143,7 @@ ax = f.add_subplot(111)
 
 ax.scatter(X,Y, c='black', s=1, label='Statebased')
 ax.scatter(Xil,Yil, c='red', s=40, marker= 'h', label='Illinois original')
-ax.scatter(Xbest,Ybest, c='blue', s=40, marker='.', label='Statebased Pareto front')
+ax.scatter(Xbest,Ybest, c='blue', s=40, marker='.', label='Statebased Pareto frontier')
 
 
 
