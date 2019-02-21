@@ -9,5 +9,7 @@ class Target():
         # the survaillance quality
         # X - UAV position
         d = np.linalg.norm(self.X0-X) # squared distance
-        return 1.0 / (1.0 + d / (self.d0)**2)
-
+        return 1.0 / (1.0 + np.power(d / self.d0, 2))
+    def dnu(self, X):
+        # the derivative
+        return 2 * (X - self.X0) * np.power(self.nu(X),3) / np.power(self.d0, 2)
