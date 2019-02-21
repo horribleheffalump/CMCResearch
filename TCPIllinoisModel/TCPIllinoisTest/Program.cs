@@ -15,7 +15,7 @@ namespace TCPIllinoisTest
     {
         public class Options
         {
-            [Option('p', "protocol", Required = true, HelpText = "Protocol name, one of ILLINOIS, NEWRENO, STATEBASED, STATEBASED_RAND, CUBIC")]
+            [Option('p', "protocol", Required = true, HelpText = "Protocol name, one of ILLINOIS_BASE, ILLINOIS, NEWRENO, STATEBASED, STATEBASED_RAND, CUBIC")]
             public string Protocol { get; set; }
 
             [Option('T', "upper-bound", Required = true, HelpText = "The upper bound of the observation interval")]
@@ -30,16 +30,16 @@ namespace TCPIllinoisTest
             [Option("save-every", Required = false, Default = 1000, HelpText = "How often the sample path should be saved")]
             public int saveEvery { get; set; }
 
-            [Option("amax", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the upper bound of the additive increase parameter, e.g. 10.0, N(10,1), U(9.0, 10.0)")]
+            [Option("amax", Required = false, HelpText = "For defines the value or the distribution of the upper bound of the additive increase parameter, e.g. 10.0, N(10,1), U(9.0, 10.0)")]
             public string amax { get; set; }
 
-            [Option("amin", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the lower bound of the additive increase parameter, e.g. 0.3, N(0.3,0.1), U(0, .5)")]
+            [Option("amin", Required = false, HelpText = "For defines the value or the distribution of the lower bound of the additive increase parameter, e.g. 0.3, N(0.3,0.1), U(0, .5)")]
             public string amin { get; set; }
 
-            [Option("bmax", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the upper bound of the multiplicative decrease parameter, e.g. 0.5, N(0.5,0.1), U(.4, .6)")]
+            [Option("bmax", Required = false, HelpText = "For defines the value or the distribution of the upper bound of the multiplicative decrease parameter, e.g. 0.5, N(0.5,0.1), U(.4, .6)")]
             public string bmax { get; set; }
 
-            [Option("bmin", Required = false, HelpText = "For STATEBASED protocol defines the value or the distribution of the lower bound of the multiplicative decrease parameter, e.g. 0.125, N(0.125,0.025), U(.0, .25)")]
+            [Option("bmin", Required = false, HelpText = "For defines the value or the distribution of the lower bound of the multiplicative decrease parameter, e.g. 0.125, N(0.125,0.025), U(.0, .25)")]
             public string bmin { get; set; }
 
             [Option('o', "output-folder", Required = false, HelpText = "Folder to store the results")]
@@ -163,12 +163,13 @@ namespace TCPIllinoisTest
                 }
                 if (trycount == 0)
                 {
-                    throw new ArgumentException($"Could not generate appropriate STATEBASED parameters");
+                    throw new ArgumentException($"Could not generate appropriate STATEBASED or ILLINOIS parameters");
                 }
 
                 switch (o.Protocol)
                 {
-                    case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
+                    case "ILLINOIS_BASE": sender = new IllinoisSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
+                    case "ILLINOIS": sender = new IllinoisSender(channel.RTT0, exponential_smooth, alpha_min, alpha_max, beta_min, beta_max, o.saveEvery); break;
                     case "NEWRENO": sender = new NewRenoSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
                     case "STATEBASED": sender = new StateBasedSender(channel.RTT0, exponential_smooth, o.saveEvery); break;
                     case "STATEBASED_RAND": sender = new StateBasedSender(channel.RTT0, exponential_smooth, alpha_min, alpha_max, beta_min, beta_max, o.saveEvery); break;
@@ -206,7 +207,7 @@ namespace TCPIllinoisTest
                 if (string.IsNullOrEmpty(o.OutputFile))
                 {
                     string folderName = Path.Combine(Environment.CurrentDirectory, o.OutputFolder + "\\" + o.Protocol);
-                    if (o.Protocol == "STATEBASED_RAND")
+                    if (o.Protocol == "STATEBASED_RAND" || o.Protocol == "ILLINOIS")
                     {
                         folderName = folderName + $"_{alpha_min}_{alpha_max}_{beta_min}_{beta_max}";
                     }

@@ -81,20 +81,12 @@ def get_df(folders):
 
 #df = get_df([folder1,folder2])
 
-#ddd = df[df['Mean_Throughput'] > 70][['Mean_Throughput', 'Loss', 'alpha_min', 'alpha_max',  'beta_min', 'beta_max']]
-#ddd['Loss'] = ddd['Loss'] / 1000000
-#ddd = ddd[ddd['Loss'] < 2.0]
-#ddd = ddd.set_index('Mean_Throughput')
-#ddd = ddd.sort_values('Mean_Throughput')
 
 #X = df.loc['Mean_Throughput']
 #Y = df.loc['Loss'] / df.loc['TotalTime']
 #note = df.loc['alpha_min'].map("{:.2f}".format) + ',' + df.loc['alpha_max'].map("{:.2f}".format) + ';' + df.loc['beta_min'].map("{:.2f}".format) + ',' + df.loc['beta_max'].map("{:.2f}".format)
 
-#XY = np.transpose(np.vstack([-X.values,Y.values]))
-#fr = is_pareto_efficient(XY)
-#m = X>60
-#fr = fr & m
+
 
 #folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out"
 #df = get_df(folder)
@@ -116,40 +108,27 @@ for c in df.columns:
     else:
         df[[c]] = df[[c]].astype(float)
 
-Xnew = df['Mean_Throughput']
-Ynew = df['Loss'] / df['TotalTime']
+X = df['Mean_Throughput']
+Y = df['Loss'] / df['TotalTime']
+
+XY = np.transpose(np.vstack([-X.values,Y.values]))
+fr = is_pareto_efficient(XY)
+
+Xbest = df[fr]['Mean_Throughput']
+Ybest = df[fr]['Loss'] / df[fr]['TotalTime']
+
+#best = df[df['Mean_Throughput'] > 66][['Mean_Throughput', 'Loss', 'alpha_min', 'alpha_max',  'beta_min', 'beta_max']]
+#best['Loss'] = best['Loss'] / best['TotalTime']
+#best = best[best['Loss'] < 2.0]
+#best = best.set_index('Mean_Throughput')
+#best = best.sort_values('Mean_Throughput')
 
 
-folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_mln"
+
+folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_10mln"
 df = get_df([folder])
-Xsb = df['Mean_Throughput']
-Ysb = df['Loss'] / df['TotalTime']
-
-#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_100000"
-#df = get_df([folder])
-#Xsb2 = df.loc['Mean_Throughput']
-#Ysb2 = df.loc['Loss'] / df.loc['TotalTime']
-
-#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\statebased_10mln"
-#df = get_df([folder])
-#Xsb3 = df.loc['Mean_Throughput']
-#Ysb3 = df.loc['Loss'] / df.loc['TotalTime']
-
-
-folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_mln"
-df = get_df([folder])
-Xil = df['Mean_Throughput']
-Yil = df['Loss'] / df['TotalTime']
-
-#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_100000"
-#df = get_df([folder])
-#Xil2 = df.loc['Mean_Throughput']
-#Yil2 = df.loc['Loss'] / df.loc['TotalTime']
-
-#folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_10mln"
-#df = get_df([folder])
-#Xil3 = df.loc['Mean_Throughput']
-#Yil3 = df.loc['Loss'] / df.loc['TotalTime']
+Xil = df['Mean_Throughput'].mean()
+Yil = (df['Loss'] / df['TotalTime']).mean()
 
 
 f = plt.figure(num=None, figsize=(5,3), dpi=200, facecolor='w', edgecolor='k')
@@ -162,23 +141,18 @@ ax = f.add_subplot(111)
 
 #ax.scatter(X[fr],Y[fr], c='orange', s=3, label='Pareto')
 
-#ax.scatter(Xsb2,Ysb2, c='green', s=1, label='Statebased 100000')
-ax.scatter(Xsb,Ysb,c='blue', s=1, label = 'Statebased mln')
-#ax.scatter(Xsb3,Ysb3, c='cyan', s=1, label='Statebased 10mln')
-
-#ax.scatter(Xil2,Yil2, c='orange', s=1, label='Illinois 100000')
-ax.scatter(Xil,Yil, c='red', s=1, label='Illinois mln')
-#ax.scatter(Xil3,Yil3, c='magenta', s=1, label='Illinois 10mln')
-
-ax.scatter(Xnew,Ynew, c='black', s=1, label='Statebased')
+ax.scatter(X,Y, c='black', s=1, label='Statebased')
+ax.scatter(Xil,Yil, c='red', s=40, marker= 'h', label='Illinois original')
+ax.scatter(Xbest,Ybest, c='blue', s=40, marker='.', label='Statebased Pareto front')
 
 
-plt.xlabel('Пропускная способность соединения')
-plt.ylabel('Потерь в секунду')
+
+plt.xlabel('Average throughput')
+plt.ylabel('Loss per second')
 #for i, txt in enumerate(note):
 #    ax.annotate(txt, (X[i], Y[i]))
 ax.set_ylim(0,2)
-#ax.set_xlim(65,75)
+ax.set_xlim(66,74)
 
 plt.legend()
 plt.show()

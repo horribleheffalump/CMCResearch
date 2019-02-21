@@ -13,6 +13,13 @@ namespace TCPAgent
         double beta_ss = 0.5;           // denominator in slow start
 
 
+        // coefficients for alpha(d), beta(d)
+        double alpha_max = 10;
+        double alpha_min = 0.3; // 0.1 according to Basar original paper, 0.3 - Linux kernel implementation
+        double beta_max = 0.5;
+        double beta_min = 0.125;
+
+
         public double T_min { get; set; } // min RTT in session 
         public double T_max { get; set; } // max RTT in session 
 
@@ -26,6 +33,16 @@ namespace TCPAgent
             T_max = double.NaN;
         }
 
+        public IllinoisSender(double _rawrtt, double _gamma, double alpha_min, double alpha_max, double beta_min, double beta_max, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
+        {
+            this.alpha_max = alpha_max;
+            this.alpha_min = alpha_min;
+            this.beta_max = beta_max;
+            this.beta_min = beta_min;
+
+            T_min = double.NaN;
+            T_max = double.NaN;
+        }
 
         public override double Step(double h, int dh, int dl, double rawrtt) //parameters: time increment,loss increment, timeout increment, RTT; returns: current control (window size)
         {
@@ -77,12 +94,6 @@ namespace TCPAgent
             }
         }
 
-
-        // coefficients for alpha(d), beta(d)
-        double alpha_max = 10;
-        double alpha_min = 0.3; // 0.1 according to Basar original paper, 0.3 - Linux kernel implementation
-        double beta_max = 0.5;
-        double beta_min = 0.125;
         double eta_1 = 0.01; // 0.01 according to Basar original paper
         double eta_2 = 0.1;
         double eta_3 = 0.8;
