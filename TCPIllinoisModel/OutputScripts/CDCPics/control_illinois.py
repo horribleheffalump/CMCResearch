@@ -126,7 +126,7 @@ ax2p.set_yticks([]);
 ax1.set_ylim(0.0995, 0.1105)
 yticks1 = [0.1, 0.109]
 ax1.set_yticks(yticks1);
-ax1.text(-10.0, 0.105, r'Smoothed RTT $r_t$', rotation=90)
+ax1.text(2030-10.0, 0.107, r'Smoothed RTT $r_t$', rotation=90)
 #ax1.legend()
 ax1.legend(bbox_to_anchor=(0.22,1.01,0.5,0.2), loc="lower left", borderaxespad=0, ncol=2, frameon=False)
 

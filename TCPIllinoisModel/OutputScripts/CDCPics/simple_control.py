@@ -16,14 +16,14 @@ import pandas as pd
 
 
 
-filename = u"../out_for_JCSS/simple_illinois_control.txt"
+filename = u"../out_for_CDC/simple_illinois_control.txt"
 data_i = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "u_i"], engine='python')
 
-filename = u"../out_for_JCSS/simple_newreno_control.txt"
+filename = u"../out_for_CDC/simple_newreno_control.txt"
 data_nr = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "u_nr"], engine='python')
 
 #filename = u"D:/Наука/projects.git.vs2017/CMCResearch/TCPIllinoisModel/out/simple_statebased_control.txt"
-filename = u"../out_for_JCSS/simple_statebased_control.txt"
+filename = u"../out_for_CDC/simple_statebased_control.txt"
 data_sb = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "u_sb"], engine='python')
 
 data = pd.merge(data_i, data_nr, left_on = 't', right_on = 't')
@@ -56,8 +56,8 @@ ax1p.set_xlim([0,180])
 ax1p.set_ylim([0,1])
 
 ax1p.fill_between(data.t, levelzero, levelone, where=data.u_i<1250, color='white', alpha = 0.3, linewidth=0.0);
-ax1p.fill_between(data.t, levelzero, levelone, where=(data.u_i>=1250)*(data.u_i<1330), color='green', alpha = 0.3, linewidth=0.0);
-ax1p.fill_between(data.t, levelzero, levelone, where=(data.u_i>1330), color='red', alpha = 0.3, linewidth=0.0);
+ax1p.fill_between(data.t, levelzero, levelone, where=(data.u_i>=1250)*(data.u_i<1350), color='green', alpha = 0.3, linewidth=0.0);
+ax1p.fill_between(data.t, levelzero, levelone, where=(data.u_i>=1350), color='red', alpha = 0.3, linewidth=0.0);
 
 ax1.plot(data.t, data.u_i, '-', color = 'black') #, label = 'illinois')
 
