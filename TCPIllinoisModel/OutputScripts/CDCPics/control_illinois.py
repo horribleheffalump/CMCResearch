@@ -15,8 +15,13 @@ import pandas as pd
 from Points import *
 #from arrowed_spines import *
 
-folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/ILLINOIS_0,3_10_0,125_0,5_ff0c3fc1-b378-4449-8c02-983a531a88bb/"
-interval = [2030,2210]
+#folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/ILLINOIS_0,3_10_0,125_0,5_ff0c3fc1-b378-4449-8c02-983a531a88bb/"
+#folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/ILLINOIS_0,3_10_0,125_0,5_72938458-b6c2-4674-9c24-76f17e527979/"
+folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/ILLINOIS_STANDARD_SAMPLE/"
+start = 1000 #2030
+end = 1180 # 2210
+
+interval = [start,end]
 bounds = [0,1450]
 
 
@@ -123,14 +128,14 @@ ax2p.set_xlim(interval)
 ax1p.set_yticks([]);
 ax2p.set_yticks([]);
 
-ax1.set_ylim(0.0995, 0.1105)
+#ax1.set_ylim(0.0995, 0.1105)
 yticks1 = [0.1, 0.109]
 ax1.set_yticks(yticks1);
-ax1.text(2030-10.0, 0.107, r'Smoothed RTT $r_t$', rotation=90)
+ax1.text(start-10.0, 0.107, r'Smoothed RTT $r_t$', rotation=90)
 #ax1.legend()
 ax1.legend(bbox_to_anchor=(0.22,1.01,0.5,0.2), loc="lower left", borderaxespad=0, ncol=2, frameon=False)
 
-xticks = [2030+0, 2030+60, 2030+120, 2030+180]
+xticks = [start+0, start+60, start+120, start+180]
 xlabels = ['0', '1 min', '2 min', '3 min']
 
 ax2.set_xticks(xticks);
@@ -144,7 +149,7 @@ ylabels2 = ['0','$B$', "$B+W''$"]
 ax2.set_yticks(yticks2);
 ax2.set_yticklabels(ylabels2);
 ax2.yaxis.set_label_coords(-0.02, 0.45)
-ax2.text(2030-10.0, 1000.0, 'Illinoise control $U_t$', rotation=90)
+ax2.text(start-10.0, 1000.0, 'Illinoise control $U_t$', rotation=90)
 plt.show()
 
 

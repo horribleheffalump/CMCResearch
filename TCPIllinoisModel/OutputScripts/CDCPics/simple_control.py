@@ -16,14 +16,14 @@ import pandas as pd
 
 
 
-filename = u"../out_for_CDC/simple_illinois_control.txt"
+filename = u"../out_for_CDC/simple controls/simple_illinois_control.txt"
 data_i = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "u_i"], engine='python')
 
-filename = u"../out_for_CDC/simple_newreno_control.txt"
+filename = u"../out_for_CDC/simple controls/simple_newreno_control.txt"
 data_nr = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "u_nr"], engine='python')
 
 #filename = u"D:/Наука/projects.git.vs2017/CMCResearch/TCPIllinoisModel/out/simple_statebased_control.txt"
-filename = u"../out_for_CDC/simple_statebased_control.txt"
+filename = u"../out_for_CDC/simple controls/simple_statebased_control.txt"
 data_sb = pd.read_csv(filename, delimiter = " ", header=None, usecols=(0,1), dtype=float, names = ["t", "u_sb"], engine='python')
 
 data = pd.merge(data_i, data_nr, left_on = 't', right_on = 't')

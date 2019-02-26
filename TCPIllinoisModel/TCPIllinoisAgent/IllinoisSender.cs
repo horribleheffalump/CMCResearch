@@ -23,7 +23,11 @@ namespace TCPAgent
         public double T_min { get; set; } // min RTT in session 
         public double T_max { get; set; } // max RTT in session 
 
+        public double[] RTTs;
         //double h; //discretization step
+
+        private int c = 0;
+        private bool full = false;
 
         public IllinoisSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         {
@@ -31,6 +35,8 @@ namespace TCPAgent
             //gamma = 0.99999;
             T_min = double.NaN;
             T_max = double.NaN;
+
+            RTTs = new double[100]; // TODO: calculate for different discretization steps and RTTs
         }
 
         public IllinoisSender(double _rawrtt, double _gamma, double alpha_min, double alpha_max, double beta_min, double beta_max, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
@@ -42,14 +48,45 @@ namespace TCPAgent
 
             T_min = double.NaN;
             T_max = double.NaN;
+
+            RTTs = new double[100]; // TODO: calculate for different discretization steps and RTTs
+
         }
 
         public override double Step(double h, int dh, int dl, double rawrtt) //parameters: time increment,loss increment, timeout increment, RTT; returns: current control (window size)
         {
             t += h;
+
+            RTTs[c] = rawrtt;
+            double sumRTT = 0;
+            if (full)
+            {
+                for (int i = 0; i < RTTs.Length; i++)
+                {
+                    sumRTT += RTTs[i];
+                }
+                rtt = sumRTT / RTTs.Length;
+            }
+            else
+            {
+                for (int i = 0; i <= c; i++)
+                {
+                    sumRTT += RTTs[i];
+                }
+                rtt = sumRTT / (c+1);
+            }
+            // moving average with window equal to RTT
+            c++;
+            if (c == RTTs.Length)
+            {
+                full = true;
+                c = 0;
+            }
             //this.rawrtt = rawrtt;
-            this.rawrtt = estimateRTT(rawrtt);
-            this.rtt = estimateRTT(rawrtt);
+            //this.rawrtt = estimateRTT(rawrtt);
+            //this.rtt = estimateRTT(rawrtt);
+            this.rawrtt = rtt;
+
 
             if (double.IsNaN(T_min) || double.IsNaN(T_max))
             {

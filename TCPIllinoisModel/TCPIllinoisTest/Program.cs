@@ -64,6 +64,7 @@ namespace TCPIllinoisTest
             double h_write = o.h_write;
             double t0 = 0.0;
 
+            //double exponential_smooth = 0.0; // no smooth
             double exponential_smooth = 0.9999;
             //double exponential_smooth = 0.99;
 
@@ -151,21 +152,24 @@ namespace TCPIllinoisTest
                 double alpha_min = double.MinValue;
                 double beta_max = double.MinValue;
                 double beta_min = double.MinValue;
-                int trycount = 100;
 
-                while (((alpha_max < 0) || (alpha_min < 0) || (beta_max < 0) || (beta_min < 0) || (alpha_max < alpha_min) || (beta_max < beta_min)) && trycount > 0)
+                if (o.Protocol == "STATEBASED_RAND" || o.Protocol == "ILLINOIS")
                 {
-                    alpha_max = new ScalarDistribution(o.amax).Sample();
-                    alpha_min = new ScalarDistribution(o.amin).Sample();
-                    beta_max = new ScalarDistribution(o.bmax).Sample();
-                    beta_min = new ScalarDistribution(o.bmin).Sample();
-                    trycount--;
-                }
-                if (trycount == 0)
-                {
-                    throw new ArgumentException($"Could not generate appropriate STATEBASED or ILLINOIS parameters");
-                }
+                    int trycount = 100;
 
+                    while (((alpha_max < 0) || (alpha_min < 0) || (beta_max < 0) || (beta_min < 0) || (alpha_max < alpha_min) || (beta_max < beta_min)) && trycount > 0)
+                    {
+                        alpha_max = new ScalarDistribution(o.amax).Sample();
+                        alpha_min = new ScalarDistribution(o.amin).Sample();
+                        beta_max = new ScalarDistribution(o.bmax).Sample();
+                        beta_min = new ScalarDistribution(o.bmin).Sample();
+                        trycount--;
+                    }
+                    if (trycount == 0)
+                    {
+                        throw new ArgumentException($"Could not generate appropriate STATEBASED or ILLINOIS parameters");
+                    }
+                }
                 switch (o.Protocol)
                 {
                     case "ILLINOIS_BASE": sender = new IllinoisSender(channel.RTT0, exponential_smooth, o.saveEvery); break;

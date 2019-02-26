@@ -16,7 +16,11 @@ from Points import *
 #from arrowed_spines import *
 
 folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/STATEBASED_7506535c-a6b8-41db-9b8d-8b99a8e1aa43/"
-interval = [0,180]
+folder = "D:/projects.git/CMCResearch/TCPIllinoisModel/out_for_CDC/STATEBASED_STANDARD_SAMPLE/"
+
+start = 1500
+end = 1680
+interval = [start,end]
 bounds = [0,1450]
 
 
@@ -124,19 +128,19 @@ ax1p.set_yticks([]);
 ax2p.set_yticks([]);
 
 #ax1.set_ylim(bounds)
-yticks1 = [0.1, 0.107]
+yticks1 = [0.1, 0.109]
 ax1.set_yticks(yticks1);
-ax1.text(-10.0, 0.105, r'Smoothed RTT $r_t$', rotation=90)
+ax1.text(start-10.0, 0.107, r'Smoothed RTT $r_t$', rotation=90)
 #ax1.legend()
 ax1.legend(bbox_to_anchor=(0.22,1.01,0.5,0.2), loc="lower left", borderaxespad=0, ncol=2, frameon=False)
 
-xticks = [0, 60, 120, 180]
+xticks = [start+0, start+60, start+120, start+180]
 xlabels = ['0', '1 min', '2 min', '3 min']
 
 ax2.set_xticks(xticks);
-ax1.set_yticks([]);
+#ax1.set_yticks([]);
 ax2.set_xticklabels(xlabels);
-ax2.text(188, -20, '$t$')
+ax2.text(start+188, -20, '$t$')
 
 yticks2 = [0, 1250, 1350]
 ylabels2 = ['0','$B$', "$B+W''$"]
@@ -144,7 +148,7 @@ ylabels2 = ['0','$B$', "$B+W''$"]
 ax2.set_yticks(yticks2);
 ax2.set_yticklabels(ylabels2);
 ax2.yaxis.set_label_coords(-0.02, 0.45)
-ax2.text(-10.0, 1000.0, 'State-based control $U_t$', rotation=90)
+ax2.text(start-10.0, 1000.0, 'State-based control $U_t$', rotation=90)
 plt.show()
 
 

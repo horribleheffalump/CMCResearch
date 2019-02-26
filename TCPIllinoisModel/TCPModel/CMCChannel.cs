@@ -74,8 +74,10 @@ namespace Channel
             rttSimulationMode = _RTTSimulationMode;
 
             delta_p = 0.1;
-            mV0 = delta_p * Extensions.Vector(0.0, 0.0, 0.0, 0.03);
+            mV0 = delta_p * Extensions.Vector(0.0, 0.0, 0.0, 0.09);
             stdV0 = delta_p * Extensions.Vector(0.003, 0.01, 0.02, 0.02);
+            //stdV0 = delta_p * Extensions.Vector(0.001, 0.001, 0.002, 0.003);
+            //stdV0 = delta_p * Extensions.Vector(0.0, 0.0, 0.0, 0.0);
 
             noise = new Normal(0.0, 1.0);
 
@@ -198,7 +200,7 @@ namespace Channel
             switch (rttSimulationMode)
             {
                 case RTTSimulationMode.Explicit: currentRTT = PossibleRTT(JOS.State.t, u)[JOS.State.X]; break;
-                case RTTSimulationMode.AsRenewal: if (JOS.ContObservations.dx > 0) currentRTT = h / JOS.ContObservations.dx * u; break;
+                case RTTSimulationMode.AsRenewal: if (JOS.ContObservations.dx > 0) currentRTT = Math.Min(Math.Max(delta_p, h / JOS.ContObservations.dx * u), 1.5*delta_p); break;
             }
 
 

@@ -114,8 +114,13 @@ Y = df['Loss'] / df['TotalTime']
 XY = np.transpose(np.vstack([-X.values,Y.values]))
 fr = is_pareto_efficient(XY)
 
+#g = Y<0.7
+#fr = fr & g
+
 Xbest = df[fr]['Mean_Throughput']
 Ybest = df[fr]['Loss'] / df[fr]['TotalTime']
+
+
 
 #best = df[df['Mean_Throughput'] > 66][['Mean_Throughput', 'Loss', 'alpha_min', 'alpha_max',  'beta_min', 'beta_max']]
 #best['Loss'] = best['Loss'] / best['TotalTime']
@@ -123,12 +128,15 @@ Ybest = df[fr]['Loss'] / df[fr]['TotalTime']
 #best = best.set_index('Mean_Throughput')
 #best = best.sort_values('Mean_Throughput')
 
-
-
-folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_test\illinois_10mln"
+folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_for_CDC\ILLINOIS_STANDARD_STATS"
 df = get_df([folder])
 Xil = df['Mean_Throughput'].mean()
 Yil = (df['Loss'] / df['TotalTime']).mean()
+
+folder = "D:\projects.git\CMCResearch\TCPIllinoisModel\out_for_CDC\STATEBASED_STANDARD_STATS"
+df = get_df([folder])
+Xsb = df['Mean_Throughput'].mean()
+Ysb = (df['Loss'] / df['TotalTime']).mean()
 
 
 f = plt.figure(num=None, figsize=(5,2.5), dpi=150, facecolor='w', edgecolor='k')
@@ -141,18 +149,20 @@ ax = f.add_subplot(111)
 
 #ax.scatter(X[fr],Y[fr], c='orange', s=3, label='Pareto')
 
-ax.scatter(X,Y, c='black', s=1, label='Statebased')
-ax.scatter(Xil,Yil, c='red', s=40, marker= 'h', label='Illinois original')
-ax.scatter(Xbest,Ybest, c='blue', s=40, marker='.', label='Statebased Pareto frontier')
+ax.scatter(X,Y, c='black', s=1, label='Statebased - random params')
+ax.scatter(Xbest,Ybest, c='blue', s=40, marker='.', label='Statebased - Pareto frontier')
+ax.scatter(Xil,Yil, c='red', s=40, marker= 'h', label='Illinois - original params')
+#ax.scatter(Xsb,Ysb, c='green', s=40, marker= 'h', label='Statebased original params')
+
 
 
 
 plt.xlabel('Average throughput')
-plt.ylabel('Loss per second')
+plt.ylabel('Average loss intensity')
 #for i, txt in enumerate(note):
 #    ax.annotate(txt, (X[i], Y[i]))
-ax.set_ylim(0,2)
-ax.set_xlim(66,74)
+ax.set_ylim(0.3,1)
+ax.set_xlim(60,76)
 
 plt.legend()
 plt.show()

@@ -30,16 +30,21 @@ namespace TCPAgent
         public double T_min { get; set; } // min RTT in session 
         public double T_max { get; set; } // max RTT in session 
 
+        public double[] RTTs;
+        private int c = 0;
+        private bool full = false;
         //double h; //discretization step
 
         public StateBasedSender(double _rawrtt, double _gamma, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         {
             //h = _h;
             alphas = Extensions.Vector(alpha_max, alpha_min, alpha_min, alpha_min);
-            betas = Extensions.Vector(beta_min, beta_min, beta_min, beta_max);
+            betas = Extensions.Vector(beta_min, beta_min, beta_max, beta_max);
 
             T_min = double.NaN;
             T_max = double.NaN;
+
+            RTTs = new double[100]; // TODO: calculate for different discretization steps and RTTs
         }
         public StateBasedSender(double _rawrtt, double _gamma, double alpha_min, double alpha_max, double beta_min, double beta_max, int _saveEvery = 0) : base(_rawrtt, _gamma, _saveEvery) // parameters: start point for RTT estimation
         {
@@ -50,12 +55,14 @@ namespace TCPAgent
             this.beta_min = beta_min;
 
             alphas = Extensions.Vector(alpha_max, alpha_min, alpha_min, alpha_min);
-            betas = Extensions.Vector(beta_min, beta_min, beta_min, beta_max);
+            betas = Extensions.Vector(beta_min, beta_min, beta_max, beta_max);
 
             T_min = double.NaN;
             T_max = double.NaN;
+
+            RTTs = new double[100]; // TODO: calculate for different discretization steps and RTTs
         }
-        
+
 
         public double Step(double h, int dh, int dl, double rawrtt, Vector<double> p)
         {
@@ -68,19 +75,48 @@ namespace TCPAgent
         {
             t += h;
 
-            this.rawrtt = estimateRTT(rawrtt);
-            this.rtt = estimateRTT(rawrtt);
-
-            if (double.IsNaN(T_min) || double.IsNaN(T_max))
+            //this.rawrtt = estimateRTT(rawrtt);
+            //this.rtt = estimateRTT(rawrtt);
+            RTTs[c] = rawrtt;
+            double sumRTT = 0;
+            if (full)
             {
-                T_min = this.rawrtt;
-                T_max = this.rawrtt;
+                for (int i = 0; i < RTTs.Length; i++)
+                {
+                    sumRTT += RTTs[i];
+                }
+                rtt = sumRTT / RTTs.Length;
             }
-            T_min = Math.Min(T_min, this.rawrtt);
-            T_max = Math.Max(T_max, this.rawrtt);
+            else
+            {
+                for (int i = 0; i <= c; i++)
+                {
+                    sumRTT += RTTs[i];
+                }
+                rtt = sumRTT / (c + 1);
+            }
+            // moving average with window equal to RTT
+            c++;
+            if (c == RTTs.Length)
+            {
+                full = true;
+                c = 0;
+            }
+            //this.rawrtt = rawrtt;
+            //this.rawrtt = estimateRTT(rawrtt);
+            //this.rtt = estimateRTT(rawrtt);
+            this.rawrtt = rtt;
+
+            //if (double.IsNaN(T_min) || double.IsNaN(T_max))
+            //{
+            //    T_min = this.rawrtt;
+            //    T_max = this.rawrtt;
+            //}
+            //T_min = Math.Min(T_min, this.rawrtt);
+            //T_max = Math.Max(T_max, this.rawrtt);
 
 
-            double d = rtt - T_min;
+            //double d = rtt - T_min;
 
 
 
