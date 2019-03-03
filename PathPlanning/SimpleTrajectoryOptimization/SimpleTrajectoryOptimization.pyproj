@@ -24,7 +24,10 @@
     <Compile Include="Channel.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SimpleTrajectoryOptimization.py" />
+    <Compile Include="SimpleTrajectoryOptimization.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SimpleTrajectoryPlot.py" />
     <Compile Include="SurveillanceTarget.py">
       <SubType>Code</SubType>
     </Compile>
