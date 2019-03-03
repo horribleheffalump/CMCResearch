@@ -38,7 +38,8 @@ dh_sb = [0.5]
 print(data.head())
 
 #f = plt.figure(num=None, figsize=(7, 3.5), dpi=150, facecolor='w', edgecolor='k')
-f = plt.figure(num=None, figsize=(5,2.5), dpi=150, facecolor='w', edgecolor='k')
+f = plt.figure(num=None, figsize=(5,2.0), dpi=150, facecolor='w', edgecolor='k')
+plt.subplots_adjust(left=0.13, bottom=0.11, right=0.96, top=0.97)
 #plt.subplots_adjust(left=0.1, bottom=0.12, right=0.96, top=0.95, wspace=0.1)
 
 ax1 = plt.gca()
