@@ -10,19 +10,27 @@ class UAV():
         self.h = h                  # discritization step
         self.t = 0.0                # current time
         self.X = X0                 # current position
-    def setmission(self, target, channel, kappa):
+    def setmission(self, target, channel, kappa, epsilon):
         self.target = target        # survaillance target
         self.channel = channel      # data transfer channel to the base station
         self.kappa = kappa          # data transfer cost
+        self.epsilon = epsilon      # minimum control
     def step(self, gamma):
         # UAV dynamics
         # gamma - current yaw angle
         self.t = self.t + self.h
         self.X = self.X + self.h * self.V * np.array([np.cos(gamma), np.sin(gamma)])
         return self.X
-    def u(self, X):
+    def u(self, t, X):
         # optimal control, depends on the state
-        return self.target.nu(X) / self.kappa - 1.0 / self.channel.l(X) 
-    def du(self, X):
+        uu = self.target.nu(t,X) / self.kappa - 1.0 / self.channel.l(X)
+        if uu > self.epsilon:
+            return uu
+        else:
+            return self.epsilon
+    def du(self, t, X):
         # optimal control derivative
-        return self.target.dnu(X) / self.kappa + self.channel.dl(X) / np.power(self.channel.l(X), 2) 
+        if self.u(t,X) > self.epsilon:
+            return self.target.dnu(t,X) / self.kappa + self.channel.dl(X) / np.power(self.channel.l(X), 2) 
+        else:
+            return 0
