@@ -28,8 +28,8 @@ kT = 0.1
 
 
 
-for j in range(0,10):
-    V0 = 0.1 + 0.05 * j
+for j in range(0,1):
+    V0 = 0.5 + 0.05 * j
 
 
     target = Target(Xtg0, XtgT, d0)
@@ -81,6 +81,8 @@ for j in range(0,10):
 
     def bc(ya, yb):
         return np.array([ya[0] - X0[0], ya[1] - X0[1], yb[2] + kT * (yb[0] - XT[0]), yb[3] + kT * (yb[1] - XT[1])])
+
+
 
     y = np.vstack((np.transpose(X), np.transpose(Psi))) #np.zeros((2, t.size)))) #np.ones((4, t.size))
 
