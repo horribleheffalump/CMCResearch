@@ -5,18 +5,18 @@ using BoundaryValueDiffEq
 #using Plots; gr()
 using PyPlot
 
-#Xth1_0 = [5.0,0.0]
-#Xth1_T = [3.0,6.0]
-Xth1_0 = [5.0,5.0]
-Xth1_T = [5.0,5.0]
+Xth1_0 = [5.0,0.0]
+Xth1_T = [3.0,6.0]
+#Xth1_0 = [5.0,5.0]
+#Xth1_T = [5.0,5.0]
 d1₀ = 2.5
 threat1 = Threat(Xth1_0, Xth1_T, d1₀)
 
-#Xth2_0 = [0.0,1.0]
-#Xth2_T = [4.0,5.0]
-Xth2_0 = [1.0,4.0]
-Xth2_T = [1.0,4.0]
-d2₀ = 15.5
+Xth2_0 = [0.0,1.0]
+Xth2_T = [4.0,5.0]
+#Xth2_0 = [1.0,4.0]
+#Xth2_T = [1.0,4.0]
+d2₀ = 7.5
 threat2 = Threat(Xth2_0, Xth2_T, d2₀)
 
 threats = [threat1, threat2]
@@ -30,11 +30,11 @@ T = 60.0
 kT = 10
 
 function F(t::Float64, X::Array{Float64})
-    return -sum(map(a -> th(a, t, X), threats))
+    return sum(map(a -> th(a, t, X), threats))
 end
 
 function dFdX(t::Float64, X::Array{Float64})
-    return -sum(map(a -> dth(a, t, X), threats))
+    return sum(map(a -> dth(a, t, X), threats))
 end
 
 function dXdPsi(Psi::Array{Float64}, V::Float64)
@@ -104,14 +104,14 @@ tspan = (0.0,1.0)
 #bvp2 = TwoPointBVProblem(RHS!, bc2!, [X0[1],X0[2], 1.0, 1.0], tspan)
 sol2 = []
 res = [0.0,0.0,0.0,0.0]
-maxcrit = 0.0
+mincrit = 1e10
 bestV0 = 0.0
 h = 0.01
 
 Vinterval = [0.1, 0.2]
 Vstep = 0.002
 for j = 0:(Vinterval[2] - Vinterval[1])/Vstep
-    global maxcrit, maxintcontrol, bestV0
+    global mincrit, maxintcontrol, bestV0
     V0 = Vinterval[1] + j * Vstep
     #println(V0)
     bvp2 = BVProblem(RHS!, bc2!, [X0[1],X0[2], 1.0, 1.0], tspan, V0)
@@ -122,12 +122,12 @@ for j = 0:(Vinterval[2] - Vinterval[1])/Vstep
         for i = 1:size(sol2.t)[1]
             crit = crit + F(sol2.t[i], [sol2.u[i][1], sol2.u[i][2]]) * h * T
         end
-        #println(crit, maxcrit)
-        if crit > maxcrit
-            maxcrit = crit
+        #println(crit, mincrit)
+        if crit < mincrit
+            mincrit = crit
             bestV0 = V0
         end
-        println("V: ", V0, " crit: ", crit, " maxcrit: ", maxcrit, " bestV: ", bestV0, " residuals ", norm(res))
+        println("V: ", V0, " crit: ", crit, " mincrit: ", mincrit, " bestV: ", bestV0, " residuals ", norm(res))
         plotall(V0)
     else
         #println("residual norm:", norm(res))
@@ -139,4 +139,4 @@ V0 = bestV0
 
 
 plotall(bestV0)
-println("best V: ", V0, "best crit: ", maxcrit)
+println("best V: ", V0, "best crit: ", mincrit)
