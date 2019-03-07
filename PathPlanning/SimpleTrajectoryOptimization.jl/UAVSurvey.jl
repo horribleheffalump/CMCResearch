@@ -1,6 +1,6 @@
 include("target.jl")
 include("basestation.jl")
-struct UAV
+struct UAVSurvey
            target::Target          # survaillance target
            bs::BaseStation         # data transfer channel to the base station
            X₀::Array{Float64}      # UAV position at start
@@ -12,13 +12,13 @@ struct UAV
            epsilon::Float64        # minimum control
        end
 
-function step!(uav::UAV, gamma::Float64)
+function step!(uav::UAVSurvey, gamma::Float64)
     uav.t = uav.t + uav.h
     uav.X = uav.X + uav.h * uav.V * [cos(gamma), sin(gamma)]
     return uav.X
 end
 
-function u(uav::UAV, t::Float64, X::Array{Float64})
+function u(uav::UAVSurvey, t::Float64, X::Array{Float64})
     # optimal control, depends on the state
     uu = nu(uav.target, t, X) / uav.kappa - 1.0 / l(bs, X)
     if uu > uav.epsilon
@@ -28,7 +28,7 @@ function u(uav::UAV, t::Float64, X::Array{Float64})
     end
 end
 
-function du(uav::UAV, t::Float64, X::Array{Float64})
+function du(uav::UAVSurvey, t::Float64, X::Array{Float64})
     # optimal control derivative
     if u(uav,t,X) > uav.epsilon
         return dnu(uav.target,t,X) / uav.kappa + dl(bs, X) / (l(bs,X))^2
