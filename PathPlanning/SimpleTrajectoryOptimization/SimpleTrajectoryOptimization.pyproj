@@ -21,6 +21,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CDC - opt.py" />
+    <Compile Include="CDC - level curves.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Channel.py">
       <SubType>Code</SubType>
     </Compile>

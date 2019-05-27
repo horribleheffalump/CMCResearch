@@ -63,6 +63,8 @@ for j in range(0,1):
 #    XT = X[-1]
   
     
+    def F(t, X):
+        return target.nu(t,X) * np.log(1 + channel.l(X) * uav.u(t,X)) - kappa * uav.u(t,X)
 
     def dFdX(t, X,kappa):
         return target.dnu(t,X) * np.log(1 + channel.l(X) * uav.u(t,X)) + target.nu(t,X) * (channel.dl(X) * uav.u(t,X) + channel.l(X) * target.dnu(t,X)) / (1 + channel.l(X) * uav.u(t,X)) - kappa * uav.du(t,X)
