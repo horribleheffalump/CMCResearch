@@ -17,5 +17,6 @@ end
 
 function dl(bs::BaseStation, X::Array{Float64})
    # the derivative
-   return -2.0 * (X-bs.X₀)/r(bs, X) * (l(bs, X) / bs.r₀)^2
+   # return -2.0 * (X-bs.X₀)/r(bs, X) * (l(bs, X) / bs.r₀)^2 ####!!! do we need /r(bs,X) here?
+   return -2.0 * (X-bs.X₀) * (l(bs, X) / bs.r₀)^2
 end

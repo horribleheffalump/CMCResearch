@@ -34,5 +34,5 @@ end
 
 function dnu(target::Target, t::Float64, X::Array{Float64})
    # the derivative
-   return -2.0 * (X - pos(target, t)) / d(target, t, X) * (nu(target, t, X) / target.d₀)^2
+   return -2.0 * (X - pos(target, t)) * (nu(target, t, X) / target.d₀)^2
 end

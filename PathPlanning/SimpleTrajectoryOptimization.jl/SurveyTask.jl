@@ -10,8 +10,8 @@ using PyPlot
 #Xtg0 = [5.0,0.0]
 #XtgT = [3.0,6.0]
 trajectory = [
-[0.0,  5.0,  0.0],
-[0.0,  3.0,  6.0]
+[0.0,  3.0,  6.0],
+[0.0,  5.0,  0.0]
 ]
 totaldist = 0.0
 for i = 2:size(trajectory)[1]
@@ -37,7 +37,7 @@ target = Target(trajectory, d₀)
 
 Xbs = [1.0, 5.0]
 #Xbs = [6.04, 1.86]
-r₀ = 5.0
+r₀ = 3.0
 bs = BaseStation(Xbs, r₀)
 
 X0 = [0,0]
@@ -57,7 +57,7 @@ function F(t::Float64, X::Array{Float64})
 end
 
 function dFdX(t::Float64, X::Array{Float64}, kappa::Float64)
-    return dnu(target, t, X) * log(1.0 + l(bs, X) * u(uav, t, X)) + nu(target, t, X) * (dl(bs, X) * u(uav, t, X) + l(bs, X) * dnu(target, t, X)) / (1.0 + l(bs, X) * u(uav, t, X)) - kappa * du(uav, t, X)
+    return dnu(target, t, X) * log(1.0 + l(bs, X) * u(uav, t, X)) + nu(target, t, X) * (dl(bs, X) * u(uav, t, X) + l(bs, X) * du(uav, t, X)) / (1.0 + l(bs, X) * u(uav, t, X)) - kappa * du(uav, t, X)
 end
 
 
@@ -78,8 +78,8 @@ function RHS!(du,u,p,t::Float64)
 
     du[1] = dxdpsi[1]
     du[2] = dxdpsi[2]
-    du[3] = dfdx[1]
-    du[4] = dfdx[2]
+    du[3] = -dfdx[1]
+    du[4] = -dfdx[2]
     #println(du[:])
 end
 
@@ -212,7 +212,7 @@ h = 0.01
 
 #Vinterval = [0.1, 1.0]
 Vstep = 0.001
-Vinterval = [0.5, 1.0]
+Vinterval = [0.1, 0.55]
 for j = 0:(Vinterval[2] - Vinterval[1])/Vstep
     global maxcrit, maxintcontrol, bestV0
     V0 = Vinterval[1] + j * Vstep
