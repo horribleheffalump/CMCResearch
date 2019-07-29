@@ -165,7 +165,7 @@ function plotpath(V0::Float64)
     end
     #ax2.plot(sol2.t * T, control, color ="red")
 
-    savefig(string("D:\\pic_V_", V0 , ".pdf"))
+    savefig(string("D:\\Наука\\_Статьи\\__в работе\\path planning\\pic_V_", V0 , ".pdf"))
     #savefig(string("D:\\Наука\\_Статьи\\__в работе\\path planning\\pic_V_", V0 , ".eps"))
 end
 
@@ -196,7 +196,7 @@ function plotcontrol(V0::Float64)
     plt.xticks([0,30,60], ("\$0\\,min\$", "\$30\\,min\$", "\$60\\,min\$"))
     plt.yticks([0,10,20], ("\$0\$","\$10\$","\$u^*(t)\$"))
     #savefig(string("D:\\Наука\\_Статьи\\__в работе\\path planning\\pic_control_V_", V0 , ".pdf"))
-    savefig(string("D:\\pic_control_V_", V0 , ".pdf"))
+    savefig(string("D:\\Наука\\_Статьи\\__в работе\\path planning\\pic_control_V_", V0 , ".pdf"))
 end
 
 

@@ -273,7 +273,7 @@ function plotpathandcontrol(V0::Float64)
         crit = crit + F(sol2.t[i], [sol2.u[i][1], sol2.u[i][2]]) * h * T
     end
 
-    ax2.plot(sol2.t * T, control, color ="blue")
+    ax2.plot(sol2.t * T, control, color ="green")
     ax2.set_xticks([0,30,60])
     ax2.set_xticklabels(["\$0\\,min\$", "\$30\\,min\$", "\$60\\,min\$"])
     ax2.set_yticks([0,5,10])
