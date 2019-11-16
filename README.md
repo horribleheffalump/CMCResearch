@@ -42,4 +42,7 @@ Miller B., Miller G., Siemenikhin K. Optimal control problem regularization for 
 Miller B., Miller G., Siemenikhin K. Optimization of the Data Transmission Flow from Moving Object to Nonhomogeneous Network of Base Stations // In Preprints of the 20th World Congress The International Federation of Automatic Control, July 2017, Toulouse, France, IFAC-PapersOnLine, vol 50(1), pp. 6160-6165. 
 DOI: 10.1016/j.ifacol.2017.08.981. [Researchgate](https://www.researchgate.net/publication/320465943_Optimization_of_the_Data_Transmission_Flow_from_Moving_Object_to_Nonhomogeneous_Network_of_Base_Stations)
 
-[3] yet unpublished
+[[3]](https://link.springer.com/article/10.1134/S1064230719010040)
+A. Borisov, G. Miller, A. Stefanovich, Controllable Markov Jump Processes. II. Monitoring and Optimization of TCP Connections // Journal of Computer and Systems Sciences International. January 2019. 58(1):12-28
+DOI: 10.1134/S1064230719010040. [Researchgate](https://www.researchgate.net/publication/332468208_Controllable_Markov_Jump_Processes_II_Monitoring_and_Optimization_of_TCP_Connections)
+
