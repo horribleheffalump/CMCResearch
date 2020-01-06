@@ -28,9 +28,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="alpha_beta.py" />
+    <Compile Include="CDCpics\arrowed_spines.py" />
+    <Compile Include="CDCpics\control_illinois - Copy.py" />
     <Compile Include="CDCpics\control_illinois.py" />
     <Compile Include="CDCpics\control_statebased.py" />
     <Compile Include="CDCpics\performance.py" />
+    <Compile Include="CDCpics\RED no RTT - Copy.py" />
+    <Compile Include="CDCpics\RED no RTT.py" />
     <Compile Include="CDCpics\simple_control.py" />
     <Compile Include="contobs.py">
       <SubType>Code</SubType>

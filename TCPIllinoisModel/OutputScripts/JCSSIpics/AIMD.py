@@ -100,7 +100,8 @@ levelone = np.ones(n) * 1450.0
 ax3.set_xticks([]);
 ax3.set_yticks([]);
 ax3.set_xticklabels(xlabels);
-ax3.set_xlabel('Время, с')
+#ax3.set_xlabel('Время, с')
+ax3.set_xlabel('Time')
 ax3.xaxis.set_label_coords(0.5,-0.4)
 ax3.text(208, -2.4, '$t$')
 
@@ -110,14 +111,15 @@ ylabels = ['$\\underline{W}$', '$W^{th}$', '$B$', "$B+Q$"]
 ax1.set_xticks(xticks);
 ax1.set_yticks(yticks);
 ax1.set_yticklabels(ylabels);
-ax1.set_ylabel('Окно перегрузки, число пакетов')
+#ax1.set_ylabel('Окно перегрузки, число пакетов')
+ax1.set_ylabel('CWND')
 ax1.yaxis.set_label_coords(-0.02, 0.50)
 ax1.text(-9.0, 1450.0, '$U_t$')
 
-ax1.fill_between(x, levelzero, levelone, where=vals==o, color='black', alpha = 0.1, linewidth=0.0);
-ax1.fill_between(x, levelzero, levelone, where=vals==ones, color='black', alpha = 0.2, linewidth=0.0);
-ax1.fill_between(x, levelzero, levelone, where=vals==ones*2, color='black', alpha = 0.4, linewidth=0.0);
-ax1.fill_between(x, levelzero, levelone, where=vals==ones*3, color='black', alpha = 0.6, linewidth=0.0);
+#ax1.fill_between(x, levelzero, levelone, where=vals==o, color='black', alpha = 0.1, linewidth=0.0);
+#ax1.fill_between(x, levelzero, levelone, where=vals==ones, color='black', alpha = 0.2, linewidth=0.0);
+#ax1.fill_between(x, levelzero, levelone, where=vals==ones*2, color='black', alpha = 0.4, linewidth=0.0);
+#ax1.fill_between(x, levelzero, levelone, where=vals==ones*3, color='black', alpha = 0.6, linewidth=0.0);
 
 ax1.text(25, 80, '$U_t = \\underline{W} 2^t$')
 ax1.text(30, 250, '$\\mathrm{tg}(\\alpha) = \\overline{\\mathrm{RTT}}^{-1}$')
